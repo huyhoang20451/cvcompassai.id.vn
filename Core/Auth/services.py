@@ -52,7 +52,7 @@ def login_for_access_token(login_form = Login_form, session = Session) -> Token:
     if not user:
         return False
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(data={"sub" : user.username, "role": user.role, "company_name": user.company_name, "id": user.id},
+    access_token = create_access_token(data={"sub" : user.username},
                                        expires_delta=access_token_expires)
     return Token(access_token=access_token, 
                  Token_type="bearer")

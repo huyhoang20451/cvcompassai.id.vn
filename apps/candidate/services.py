@@ -46,7 +46,7 @@ def add_cv_into_candidate(session: Session, URL: str, user_id: int) -> candidate
 
 async def upload_cv(file: UploadFile, user_id: int, session: Session) -> str:
 
-    UPLOAD_DIR = "uploads"
+    UPLOAD_DIR = os.path.join("static", "cv")
     os.makedirs(UPLOAD_DIR, exist_ok=True)
 
     try:

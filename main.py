@@ -4,6 +4,7 @@ from fastapi.security import OAuth2PasswordBearer
 from fastapi.staticfiles import StaticFiles
 from apps.candidate.routes import router as candidate_router
 from apps.business.routes import router as business_router
+from apps.setting.routes import router as setting_router
 from Core.Auth.routes import router as auth_router
 from Core.Auth.dependencies import authorize_role, templates
 from Core.Auth.schemas import user
@@ -17,6 +18,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 app.include_router(auth_router)
 app.include_router(candidate_router)
 app.include_router(business_router)
+app.include_router(setting_router)
 
 @app.on_event("startup")
 def on_startup():

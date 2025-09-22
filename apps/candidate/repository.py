@@ -8,16 +8,33 @@ from typing import List, Optional
 # Lấy tất cả JD theo keyword và location trong database
 def search_jobs(session: Session, 
                 keyword: str = None, 
-                location: str = None):
-    statement = select(jd_db)
+                location: str = None) -> List[jd]:
+    statement = (
+        select(jd_db, User_db.avatar_path)
+        .join(User_db, jd_db.business_id == User_db.id)
+    )
+
     if keyword:
-        keyword_pattern = f"%{keyword}"
-        statement = statement.where(or_(jd_db.title.ilike(keyword_pattern), jd_db.description.ilike(keyword_pattern)))
+        keyword_pattern = f"%{keyword}%"
+        statement = statement.where(
+            or_(
+                jd_db.title.ilike(keyword_pattern),
+                jd_db.job_description.ilike(keyword_pattern)  # dùng đúng tên cột
+            )
+        )
     if location:
-        location_pattern = f"%{location}"
+        location_pattern = f"%{location}%"
         statement = statement.where(jd_db.location.ilike(location_pattern))
-    result = session.exec(statement).all()
-    return result
+
+    results = session.exec(statement).all()
+
+    jobs = []
+    for jd_in_db, avatar_path in results:
+        job = jd.model_validate(jd_in_db, from_attributes=True)
+        job.avatar_path = avatar_path
+        jobs.append(job)
+
+    return jobs
 
 # Lấy tất cả CV theo username trong database
 def get_cvs(session: Session, 
@@ -33,16 +50,33 @@ def get_cvs(session: Session,
 
 # Lấy tất cả JD trong database
 def get_jds(session: Session) -> List[jd]:
-    statement = select(jd_db)
-    results = session.exec(statement)
-    jds = [jd.model_validate(jd_in_db) for jd_in_db in results]
+    statement = (
+        select(jd_db, User_db.avatar_path)
+        .join(User_db, jd_db.business_id == User_db.id)
+    )
+    results = session.exec(statement).all()
+
+    jds = []
+    for jd_in_db, avatar_path in results:
+        jd_obj = jd.model_validate(jd_in_db, from_attributes=True)
+        jd_obj.avatar_path = avatar_path
+        jds.append(jd_obj)
+
     return jds
 
 def get_jd_by_id(session: Session, id: int) -> jd:
-    statement = select(jd_db).where(jd_db.id == id)
+    statement = (
+        select(jd_db, User_db.avatar_path)
+        .join(User_db, jd_db.business_id == User_db.id)
+        .where(jd_db.id == id)
+    )
     result = session.exec(statement).first()
-    result_jd = jd.model_validate(result)
-    return result_jd
+    if result:
+        jd_in_db, avatar_path = result
+        jd_obj = jd.model_validate(jd_in_db, from_attributes=True)
+        jd_obj.avatar_path = avatar_path
+        return jd_obj
+    return None
 
 # Cập nhật coin mới vào database
 def update_coin(session: Session, 

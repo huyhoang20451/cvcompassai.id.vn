@@ -7,6 +7,7 @@ class user(BaseModel):
     company_name: str | None = None
     coin: int | None = None
     model_config = ConfigDict(from_attributes=True)
+    avatar_path: str | None = None
 
 class userinDB(user):
     hashed_password: str

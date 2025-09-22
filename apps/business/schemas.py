@@ -17,6 +17,7 @@ class JD_form(BaseModel):
     working_time: Optional[str] = None
     application_method: Optional[str] = None
     deadline: Optional[str] = None
+    avatar_path: Optional[str] = None
 
     business_id: Optional[int] = None
     created_at: datetime

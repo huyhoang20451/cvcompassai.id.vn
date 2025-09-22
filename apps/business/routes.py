@@ -93,4 +93,3 @@ def compare_cv_vs_jd(request: Request,
                                                                   "username": user_info.username,
                                                                   "company": user_info.company_name,
                                                                   "results": results})
-

@@ -13,6 +13,15 @@ def get_jds_by_user_name(session: Session, username: str) -> List[JD_form]:
     jds = [JD_form.model_validate(jd_in_db) for jd_in_db in results]
     return jds
 
+def get_user_by_jd_id(session: Session, jd_id: int) -> User_db:
+    statement = (
+        select(User_db)
+        .join(jd_db, jd_db.business_id == User_db.id)
+        .where(jd_db.id == jd_id)
+    )
+    result = session.exec(statement).first()
+    return result
+
 def add_jd(session: Session, jd: JD_form) -> JD_form:
     db_obj  = jd_db(**jd.model_dump())  # Pydantic v2 -> dùng model_dump()
     

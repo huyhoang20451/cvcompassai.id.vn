@@ -12,12 +12,12 @@ class User_db(SQLModel, table=True):
     username: str = Field(nullable=False, max_length=100, unique=True)
     hashed_password: str = Field(nullable=False, max_length=255)
     role: str = Field(nullable=False, max_length=50)  # "candidate" hoặc "business"
+    avatar_path: Optional[str] = Field(default=None, max_length=255)
+    coin: Optional[int] = Field(default=0)
 
     # Các trường chỉ dành cho business
     company_name: Optional[str] = Field(default=None, max_length=100)
-    company_logo: Optional[str] = Field(default=None, max_length=255)
     location: Optional[str] = Field(default=None, max_length=100)
-    coin: Optional[int] = Field(default=0)
 
 class jd_db(SQLModel, table=True):
     __tablename__ = "jd"
