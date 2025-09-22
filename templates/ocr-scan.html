@@ -103,6 +103,34 @@
             <div>Kết quả quét được:</div>
             <div id="ocr-result" style="margin-top:18px; background:#EAF4FF; border-radius:8px; padding:16px;"></div>
         </div>
+        <script>
+            // Lay ket qua tu trong apps/candidate/routes.py
+            const form = document.getElementById('uploadForm');
+            form.addEventListener('submit', async function(event)) {
+                event.preventDefault();
+                const fileInput = document.getElementById('myFile');
+                if (fileInput.files.length === 0) {
+                    alert('Vui lòng chọn file để tải lên.');
+                    return;
+                }
+                const formData = new FormData();
+                formData.append('filename', fileInput.files[0]);
+                try {
+                    const response = await fetch('/upload-cv-ocr?username={{username}}', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        document.getElementById('ocr-result').innerText = data.extracted_text;
+                    } else {
+                        document.getElementById('ocr-result').innerText = 'Lỗi khi quét CV: ' + data.msg;
+                    }
+                } catch (error) {
+                    document.getElementById('ocr-result').innerText = 'Lỗi mạng khi quét CV.';
+                }
+            }
+        </script>
         <div class="ocr-right">
             <div class="cv-preview">
                 <img src="/static/images/cv_sample.png" alt="CV Preview" class="cv-img">

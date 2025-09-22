@@ -12,7 +12,8 @@ def search_jobs(session: Session,
     statement = select(jd_db)
     if keyword:
         keyword_pattern = f"%{keyword}"
-        statement = statement.where(or_(jd_db.title.ilike(keyword_pattern), jd_db.description.ilike(keyword_pattern)))
+        # models.jd_db uses `job_description` for the JD body (not `description`)
+        statement = statement.where(or_(jd_db.title.ilike(keyword_pattern), jd_db.job_description.ilike(keyword_pattern)))
     if location:
         location_pattern = f"%{location}"
         statement = statement.where(jd_db.location.ilike(location_pattern))

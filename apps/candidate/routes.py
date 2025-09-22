@@ -25,7 +25,14 @@ router = APIRouter(tags=["candidate"])
 async def home(request: Request, 
                user_info: user = Depends(authorize_role(["candidate"])), 
                session: Session = Depends(get_session)):
-    job_descriptions = get_jds(session)
+    # Tìm kiếm job theo từ khóa và vị trí
+    keyword = request.query_params.get("keyword", "")
+    location = request.query_params.get("location", "")
+    if keyword or location:
+        search_params = JobSearchRequest(keyword=keyword if keyword else None, location=location if location else None)
+        job_descriptions = search_jobs(session, search_params)
+    else:
+        job_descriptions = get_jds(session)
     return templates.TemplateResponse("home_logged_in.html", {"request": request, "job_descriptions": job_descriptions, "username": user_info.username})
 
 @router.get("/aboutus-logged-in", response_class=HTMLResponse)
@@ -50,8 +57,12 @@ async def finding_jobs(request: Request,
 
 # Thanh tìm kiếm job
 @router.post("/jobs_search", response_model=list[JobResponse])
-async def search_jobs(search_params: JobSearchRequest, 
+async def jobs_search_endpoint(search_params: JobSearchRequest, 
                       session: Session = Depends(get_session)):
+    """Endpoint wrapper that calls the candidate.services.search_jobs function.
+
+    Renamed to avoid shadowing the imported `search_jobs` service.
+    """
     try:
         jobs = search_jobs(session, search_params)
         return jobs
@@ -150,3 +161,4 @@ async def submit_cv(request: Request,
 
     return templates.TemplateResponse("finding-jobs.html",{"request": request, 
                                                            "username": user_info.username})
+

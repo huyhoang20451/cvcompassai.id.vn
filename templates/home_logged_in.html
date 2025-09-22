@@ -124,9 +124,13 @@
         </div>
     </div> <!-- kết thúc phần giới thiệu cách hoạt động-->
     <div class="thanh-timkiemvavitri"> <!--thanh tìm kiếm vị trí-->
-        <input type="text" placeholder="🔍Tìm kiếm công việc">
-        <input type="text" placeholder="⛳Vị trí">
-        <button>Tìm kiếm</button>
+        <form method="GET" action="/home-logged-in" style="display: flex; gap: 10px; align-items: center;">
+            <!-- Keyword -->
+            <input type="text" name="keyword" placeholder="🔍Tìm kiếm công việc (từ khóa, công ty, vị trí...)" value="{{ request.query_params.get('keyword','') }}" style="flex: 1;">
+            <!-- Location -->
+            <input type="text" name="location" placeholder="Địa điểm (ví dụ: Hà Nội, Hồ Chí Minh)" value="{{ request.query_params.get('location','') }}" style="width: 240px;">
+            <button type="submit">Tìm kiếm</button>
+        </form>
     </div> <!-- kết thúc thanh tìm kiếm vị trí -->
     <div class="phan_congvieclienquan"> <!--Bắt đầu phần công việc liên quan-->
         <div class="filter-selection" style="display: flex; align-items: center; gap: 24px; justify-content: space-between;">
@@ -143,7 +147,7 @@
         </div>
         <section class="job-listing-grid">
                 {%for jd in job_descriptions%}
-                <a style="text-decoration: none;" href="/job-detail/{{ jd.id }}?username={{ username }}">
+                <a style="text-decoration: none;" method="GET" href="/job-detail/{{ jd.id }}?username={{ username }}">
                     <div class="job-card">
                         <div class="job-card-logo">
                             <img src="{{jd.company_logo}}" alt="{{jd.company_name}}">

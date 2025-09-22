@@ -1,12 +1,13 @@
 import json
 import os
+import math
 from fastapi import FastAPI, HTTPException, Form, Request, requests
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from passlib.context import CryptContext
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 # File is not defined
 
 
@@ -53,7 +54,27 @@ def get_job_detail_by_id(job_id: int) -> job_description | None:
 def load_jd_by_company(company: str) -> List[job_description]:
     all_jobs = load_jd()
     company_jobs = [job for job in all_jobs if job["company"] == company]
-    return company_jobs 
+    return company_jobs
+
+# Hàm tìm kiếm job theo từ khóa
+def search_jobs_by_keyword(keyword: str) -> List[job_description]:
+    all_jobs = load_jd()
+    if not keyword:
+        return all_jobs
+    
+    keyword_lower = keyword.lower()
+    filtered_jobs = []
+    
+    for job in all_jobs:
+        # Tìm kiếm trong job_title, company_name, industry, location
+        if (keyword_lower in job.get("job_title", "").lower() or
+            keyword_lower in job.get("company_name", "").lower() or
+            keyword_lower in job.get("industry", "").lower() or
+            keyword_lower in job.get("location", "").lower() or
+            keyword_lower in job.get("position", "").lower()):
+            filtered_jobs.append(job)
+    
+    return filtered_jobs 
 
 # Băm mật khẩu
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -161,10 +182,14 @@ def login(request: Request, username: str = Form(...), password: str = Form(...)
 #-------------------------chuyen trang khi da dang nhap---------------------------------------------
 # Trang home (sau khi login)
 @app.get("/home-logged-in", response_class=HTMLResponse)
-def home_logged_in(request: Request, username: str):
-    job_descriptions = load_jd()
+def home_logged_in(request: Request, username: str, keyword: str = ""):
+    # Nếu có keyword thì lọc kết quả, ngược lại show tất cả
+    if keyword:
+        job_descriptions = search_jobs_by_keyword(keyword)
+    else:
+        job_descriptions = load_jd()
     templates = Jinja2Templates(directory="templates")
-    return templates.TemplateResponse("home_logged_in.html", {"request": request, "job_descriptions": job_descriptions, "username": username})
+    return templates.TemplateResponse("home_logged_in.html", {"request": request, "job_descriptions": job_descriptions, "username": username, "keyword": keyword})
 
 @app.get("/", response_class=HTMLResponse)
 def root(request: Request):
@@ -221,6 +246,26 @@ def home(request: Request):
 @app.get("/pricing", response_class=HTMLResponse)
 def pricing(request: Request):
     return templates.TemplateResponse("pricing.html", {"request": request})
+
+# Route tìm kiếm job theo từ khóa
+@app.get("/search-jobs", response_class=HTMLResponse)
+def search_jobs(request: Request, keyword: str = "", username: str = ""):
+    if keyword:
+        job_descriptions = search_jobs_by_keyword(keyword)
+    else:
+        job_descriptions = load_jd()
+    
+    return templates.TemplateResponse("search-results.html", {
+        "request": request, 
+        "job_descriptions": job_descriptions, 
+        "keyword": keyword,
+        "username": username
+    })
+
+# Route xử lý form tìm kiếm (POST)
+@app.post("/search-jobs", response_class=HTMLResponse)
+def search_jobs_post(request: Request, keyword: str = Form(""), username: str = Form("")):
+    return RedirectResponse(url=f"/search-jobs?keyword={keyword}&username={username}", status_code=303)
 
 # Viết trang khi click vào 1 job cần quan tâm, chuyển sang trang chi tiết
 @app.get("/job-detail/{job_id}", response_class=HTMLResponse)
@@ -321,23 +366,7 @@ def job_storage_detail(request: Request, company: str, username: str, job_id: in
     return templates.TemplateResponse("job-storage.html", {"request": request, "company": company, "username": username, "job_position": job_position, "job_descriptions": job_descriptions, "job": job})
 
 @app.post("/submit-job", response_class=HTMLResponse)
-def submit_job(request: Request, 
-               company_logo: str = Form(...), 
-               job_title: str = Form(...), 
-               company_name: str = Form(...), 
-               salary: str = Form(...), 
-               location: str = Form(...), 
-               industry: str = Form(...), 
-               position: str = Form(...), 
-               company: str = Form(...), 
-               workplace: str = Form(...), 
-               job_description: str = Form(...), 
-               requirements: str = Form(...), 
-               benefits: str = Form(...), 
-               working_time: str = Form(...), 
-               application_method: str = Form(...), 
-               deadline: str = Form(...), 
-               username: str = Form(...)):
+def submit_job(request: Request, company_logo: str = Form(...), job_title: str = Form(...), company_name: str = Form(...), salary: str = Form(...), location: str = Form(...), industry: str = Form(...), position: str = Form(...), company: str = Form(...), workplace: str = Form(...), job_description: str = Form(...), requirements: str = Form(...), benefits: str = Form(...), working_time: str = Form(...), application_method: str = Form(...), deadline: str = Form(...), username: str = Form(...)):
     job_descriptions = load_jd()
     new_id = max([job["id"] for job in job_descriptions], default=0) + 1
     # Tìm company_id cho công ty này, nếu chưa có thì gán mới
@@ -414,3 +443,165 @@ def finding_jobs(request: Request, username: str):
     users = load_users()
     user = users.get(username)
     return templates.TemplateResponse("finding-jobs.html", {"request": request, "username": username, "user": user})
+
+@app.api_route("/payment", methods=["GET", "POST"], response_class=HTMLResponse)
+async def payment(request: Request, username: str = None):
+    """Handle payment page for GET and POST.
+    Accepts query params or form data. For the 'xu' package we parse
+    `price` and `quantity` safely (empty strings fallback to defaults)
+    and compute total values to pass to the template.
+    """
+    package = None
+
+    # Extract package and username from form (POST) or query params (GET)
+    if request.method == "POST":
+        form = await request.form()
+        package = form.get("package") or None
+        if not username:
+            username = form.get("username") or None
+    else:
+        qp = request.query_params
+        package = qp.get("package") or None
+        if not username:
+            username = qp.get("username") or None
+
+    users = load_users()
+    user = users.get(username) if username else None
+
+    if package == 'premium':
+        return templates.TemplateResponse(
+            "payment-premium.html",
+            {"request": request, "username": username, "user": user, "package": package},
+        )
+
+    if package == 'xu':
+        # Defaults
+        default_price = 10000
+        default_quantity = 1
+        xu_per_pack = 2
+
+        # Read raw inputs
+        if request.method == 'POST':
+            form = await request.form()
+            raw_price = form.get('price')
+            raw_quantity = form.get('quantity')
+            # support client sending requested xu amount
+            raw_xu_requested = form.get('xu') or form.get('xu_requested')
+        else:
+            qp = request.query_params
+            raw_price = qp.get('price')
+            raw_quantity = qp.get('quantity')
+            raw_xu_requested = qp.get('xu') or qp.get('xu_requested')
+
+        # Safe parsing helper: treat None or empty string as fallback
+        def safe_int(val, fallback):
+            if val is None:
+                return fallback
+            if isinstance(val, int):
+                return val
+            s = str(val).strip()
+            if s == "":
+                return fallback
+            try:
+                return int(s)
+            except (ValueError, TypeError):
+                return fallback
+
+        price_val = safe_int(raw_price, default_price)
+        quantity_val = safe_int(raw_quantity, default_quantity)
+
+        # If client provided desired xu count, compute required packs (ceil)
+        xu_requested = safe_int(raw_xu_requested, None) if 'raw_xu_requested' in locals() else None
+        if xu_requested is not None:
+            # compute number of packs needed to reach at least xu_requested
+            packs_needed = math.ceil(xu_requested / xu_per_pack) if xu_per_pack > 0 else quantity_val
+            quantity_val = max(quantity_val, packs_needed)
+
+        if quantity_val < 1:
+            quantity_val = 1
+
+        total_price = price_val * quantity_val
+        total_xu = xu_per_pack * quantity_val
+
+        return templates.TemplateResponse(
+            "payment-coin.html",
+            {
+                "request": request,
+                "username": username,
+                "user": user,
+                "package": package,
+                "price": price_val,
+                "quantity": quantity_val,
+                "total": total_price,
+                "xu_per_pack": xu_per_pack,
+                "total_xu": total_xu,
+            },
+        )
+
+    # If package not recognized, show a generic page or 400
+    raise HTTPException(status_code=400, detail="Missing or invalid package")
+
+@app.get("/premium-checkout", response_class=HTMLResponse)
+def premium_checkout(request: Request, username: Optional[str] = None, package: Optional[str] = None, price: Optional[int] = 0, quantity: Optional[int] = 1):
+    """Render the premium checkout page. All query parameters are optional so
+    the route won't 422 when called without some values. Provide sensible
+    defaults to the template and only look up the user when a username is
+    supplied.
+    """
+    users = load_users()
+    user = users.get(username) if username else None
+
+    # Ensure context has safe defaults
+    ctx_package = package or "premium"
+    ctx_price = price or 0
+    ctx_quantity = quantity or 1
+    total_price = ctx_price * ctx_quantity
+
+    return templates.TemplateResponse(
+        "premium-checkout.html",
+        {
+            "request": request,
+            "username": username,
+            "user": user,
+            "package": ctx_package,
+            "price": ctx_price,
+            "quantity": ctx_quantity,
+            "total": total_price,
+        },
+    )
+
+@app.get("/coin-checkout", response_class=HTMLResponse)
+def coin_checkout(request: Request, username: Optional[str] = None, package: Optional[str] = None, price: Optional[int] = 10000, quantity: Optional[int] = 1):
+    """Render the xu checkout page. All query parameters are optional so
+    the route won't 422 when called without some values. Provide sensible
+    defaults to the template and only look up the user when a username is
+    supplied.
+    """
+    users = load_users()
+    user = users.get(username) if username else None
+
+    # Ensure context has safe defaults
+    ctx_package = package or "xu"
+    ctx_price = price or 10000
+    ctx_quantity = quantity or 1
+    xu_per_pack = 2
+    total_price = ctx_price * ctx_quantity
+    total_xu = xu_per_pack * ctx_quantity
+    # Provide a display name: prefer explicit username, else fall back to user record
+    display_name = username or (user.get("username") if user and isinstance(user, dict) else None)
+
+    return templates.TemplateResponse(
+        "coin-checkout.html",
+        {
+            "request": request,
+            "username": username,
+            "display_name": display_name,
+            "user": user,
+            "package": ctx_package,
+            "price": ctx_price,
+            "quantity": ctx_quantity,
+            "total": total_price,
+            "xu_per_pack": xu_per_pack,
+            "total_xu": total_xu,
+        },
+    )
