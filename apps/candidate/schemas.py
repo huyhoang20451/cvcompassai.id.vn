@@ -8,10 +8,10 @@ class JobSearchRequest(BaseModel):
 
 class JobResponse(BaseModel):
     title: str
-    description: str
+    job_description: Optional[str] = None
     location: str
-    salary: float
-    image: HttpUrl
+    salary: Optional[str] = None
+    company_logo: Optional[HttpUrl] = None
 
     model_config = ConfigDict(from_attributes=True)
 

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Thanh toán</title>
+</head>
+<style>
+    .container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      max-width: 400px;
+      margin: 40px auto;
+      font-size: 20px;
+    }
+    body { font-family: Arial, sans-serif; background-color: #F6FCFF; text-align: center; padding: 20px; }
+    h2 { color: #3674B5; }
+    h3 { color: #EEC759; }
+    button {
+      width: 200px;
+      padding: 10px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    button:hover { background: #218838; }
+</style>
+<body>
+  <div class="container">
+    <h2>Thanh toán gói: {{ package }}</h2>
+    <p>Người dùng: {{ username }}</p>
+    <p>Đơn giá: {{ price }} VND</p>
+    <p>Số lượng: {{ quantity }}</p>
+    <h3>Tổng cộng: {{ total }} VND</h3>
+    <button>Thanh toán ngay</button>
+  </div>
+</body>
+</html>
