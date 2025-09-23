@@ -10,7 +10,7 @@ import os
 
 async def upload_avatar(file: UploadFile, user_id: int, session: Session) -> str:
 
-    AVATAR_DIR = os.path.join("static", "avatars")
+    AVATAR_DIR = "avatars"
     os.makedirs(AVATAR_DIR, exist_ok=True)
 
     try:
