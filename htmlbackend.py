@@ -8,9 +8,17 @@ from fastapi.templating import Jinja2Templates
 from passlib.context import CryptContext
 from pydantic import BaseModel
 from typing import List, Optional
+from datetime import datetime, timedelta
+import urllib.parse
+import hmac
+import hashlib
+from vnpay import vnpay as VnPayHelper
 # File is not defined
 
-
+vnp_TmnCode = "FEJUIRPO"
+vnp_HashSecret = "OQS4K5WVO7RJ67NK4SCVTFB2BI59Z9EX"
+vnp_ReturnUrl = "http://localhost:8000/payment-return"
+VNP_URL = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -20,6 +28,7 @@ templates = Jinja2Templates(directory="templates")
 # File JSON lưu user
 USER_FILE = "database/users.json"
 JD_FILE = "database/job-description.json"
+ORDERS_FILE = "database/orders.json"
 
 # Load the model
 class job_description(BaseModel):
@@ -92,6 +101,20 @@ def load_users():
 def save_users(users):
     with open(USER_FILE, "w", encoding="utf-8") as f:
         json.dump(users, f, ensure_ascii=False, indent=4)
+
+def load_orders():
+    if not os.path.exists(ORDERS_FILE):
+        return {}
+    with open(ORDERS_FILE, "r", encoding="utf-8") as f:
+        try:
+            return json.load(f)
+        except json.JSONDecodeError:
+            return {}
+
+def save_orders(orders):
+    os.makedirs(os.path.dirname(ORDERS_FILE), exist_ok=True)
+    with open(ORDERS_FILE, "w", encoding="utf-8") as f:
+        json.dump(orders, f, ensure_ascii=False, indent=4)
 
 # ==== ROUTES ====
 
@@ -605,3 +628,200 @@ def coin_checkout(request: Request, username: Optional[str] = None, package: Opt
             "total_xu": total_xu,
         },
     )
+
+VNPAY_TMN_CODE = "FEJUIRPO"
+VNPAY_HASH_SECRET_KEY = "OQS4K5WVO7RJ67NK4SCVTFB2BI59Z9EX"
+VNPAY_PAYMENT_URL = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+VNPAY_RETURN_URL = "http://localhost:8000/payment_return"
+
+@app.post("/payment")
+async def create_payment(request: Request):
+    body = await request.json()
+    order_type = body.get("order_type", "other")
+    order_id = body.get("order_id")
+    amount = int(body.get("amount", 0))
+    order_desc = body.get("order_desc", "Thanh toan don hang")
+    bank_code = body.get("bank_code", "")
+    language = body.get("language", "vn")
+    ipaddr = request.client.host
+
+    vnp_Params = {
+        "vnp_Version": "2.1.0",
+        "vnp_Command": "pay",
+        "vnp_TmnCode": VNPAY_TMN_CODE,
+        "vnp_Amount": str(amount * 100),  # đơn vị VNPay yêu cầu = VND*100
+        "vnp_CurrCode": "VND",
+        "vnp_TxnRef": order_id,
+        "vnp_OrderInfo": order_desc,
+        "vnp_OrderType": order_type,
+        "vnp_Locale": language,
+        "vnp_CreateDate": datetime.now().strftime("%Y%m%d%H%M%S"),
+        "vnp_IpAddr": ipaddr,
+        "vnp_ReturnUrl": VNPAY_RETURN_URL
+    }
+    if bank_code:
+        vnp_Params["vnp_BankCode"] = bank_code
+
+    # Use the project's vnpay helper to build the payment URL (includes secure hash)
+    helper = VnPayHelper()
+    # copy params into helper.requestData (string values)
+    helper.requestData = {k: str(v) for k, v in vnp_Params.items()}
+    vnpay_payment_url = helper.get_payment_url(VNPAY_PAYMENT_URL, VNPAY_HASH_SECRET_KEY)
+
+    # Bạn có thể redirect thẳng:
+    # return RedirectResponse(vnpay_payment_url)
+
+    # Hoặc trả JSON cho FE tự redirect:
+    return JSONResponse({
+        "payment_url": vnpay_payment_url,
+        "order_id": order_id,
+        "amount": amount,
+        "desc": order_desc
+    })
+
+
+@app.post("/create_payment")
+async def create_payment_vnp(request: Request):
+    """Accept JSON or form-encoded POSTs from the frontend, parse `amount` (VND),
+    build VNPay payment URL using VnPayHelper and return it as JSON.
+    """
+    # read body as JSON or form
+    content_type = request.headers.get('content-type', '')
+    if 'application/json' in content_type:
+        try:
+            body = await request.json()
+        except Exception:
+            return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
+    else:
+        form = await request.form()
+        body = dict(form)
+
+    order_id = body.get('order_id')
+    amount_raw = body.get('amount')
+    username = body.get('username')
+    order_desc = body.get('order_desc', 'Thanh toan don hang')
+    order_type = body.get('order_type', 'other')
+    bank_code = body.get('bank_code', '')
+    language = body.get('language', 'vn')
+
+    # parse amount: accept numeric strings like '10000', '10.000', '10000 đ'
+    def parse_amount(a):
+        if a is None:
+            return None
+        if isinstance(a, int):
+            return a
+        s = str(a)
+        # keep digits only
+        digits = ''.join(ch for ch in s if ch.isdigit())
+        if digits == '':
+            return None
+        return int(digits)
+
+    amount_val = parse_amount(amount_raw)
+    if amount_val is None:
+        return JSONResponse({"error": "Invalid amount. Send numeric 'amount' in VND."}, status_code=400)
+
+    # VNPay expects amount in smallest unit (VND * 100)
+    vnp_amount = amount_val * 100
+
+    if not order_id:
+        order_id = datetime.now().strftime("%Y%m%d%H%M%S")
+
+    ipaddr = request.client.host if request.client else '127.0.0.1'
+
+    vnp_Params = {
+        "vnp_Version": "2.1.0",
+        "vnp_Command": "pay",
+        "vnp_TmnCode": VNPAY_TMN_CODE,
+        "vnp_Amount": str(vnp_amount),
+        "vnp_CurrCode": "VND",
+        "vnp_TxnRef": order_id,
+        "vnp_OrderInfo": order_desc,
+        "vnp_OrderType": order_type,
+        "vnp_Locale": language,
+        "vnp_CreateDate": datetime.now().strftime("%Y%m%d%H%M%S"),
+        "vnp_IpAddr": ipaddr,
+        "vnp_ReturnUrl": VNPAY_RETURN_URL,
+    }
+    if bank_code:
+        vnp_Params["vnp_BankCode"] = bank_code
+
+    helper = VnPayHelper()
+    helper.requestData = {k: str(v) for k, v in vnp_Params.items()}
+    payment_url = helper.get_payment_url(VNPAY_PAYMENT_URL, VNPAY_HASH_SECRET_KEY)
+
+    # persist order as pending so we can match on return
+    orders = load_orders()
+    orders[order_id] = {
+        "order_id": order_id,
+        "username": username,
+        "amount": amount_val,
+        "package": body.get('package'),
+        "status": "pending",
+        "created_at": datetime.now().isoformat(),
+    }
+    save_orders(orders)
+
+    return JSONResponse({"payment_url": payment_url, "order_id": order_id, "amount": amount_val})
+
+@app.get("/payment_return", response_class=HTMLResponse)
+def payment_return(request: Request):
+    vnp_Params = {}
+    for key, value in request.query_params.items():
+        if key.startswith("vnp_"):
+            vnp_Params[key] = value
+
+    # Retrieve the secure hash from the original query (do not discard it yet)
+    vnp_SecureHash = request.query_params.get("vnp_SecureHash")
+
+    helper = VnPayHelper()
+    # The helper expects responseData to contain the full set of vnp_ params including vnp_SecureHash
+    helper.responseData = dict(request.query_params)
+    check_hash = helper.validate_response(VNPAY_HASH_SECRET_KEY)
+
+    if not check_hash:
+        return templates.TemplateResponse("payment-fail.html", {"request": request, "message": "Chữ ký không hợp lệ"})
+
+    rsp_code = vnp_Params.get("vnp_ResponseCode")
+    if rsp_code == "00":
+        amount = int(vnp_Params.get("vnp_Amount", 0)) // 100  # convert back to VND
+        order_id = vnp_Params.get("vnp_TxnRef")
+
+        # mark order as paid
+        orders = load_orders()
+        order = orders.get(order_id, {})
+        order_username = order.get('username') if order else None
+        orders[order_id] = {**order, "status": "paid", "paid_at": datetime.now().isoformat(), "paid_amount": amount}
+        save_orders(orders)
+
+        # handle package-specific post-payment actions
+        package = order.get('package')
+        coins_received = 0
+        new_balance = None
+
+        users = load_users()
+        if order_username:
+            user = users.get(order_username)
+            if user is None:
+                users[order_username] = {"username": order_username, "coin": 0, "role": "user"}
+                user = users[order_username]
+
+            # Premium package: grant premium role and initial 5 xu credit
+            if package and package.lower() == 'premium':
+                user['role'] = 'premium'
+                # set expiry 30 days from now
+                user['premium_expires'] = (datetime.now() + timedelta(days=30)).isoformat()
+                coins_received = 5  # initial credit (one-day grant)
+            else:
+                # xu package: compute coins as 10000 VND = 2 xu
+                coins_received = (amount // 10000) * 2
+
+            old_coin = user.get('coin', 0)
+            user['coin'] = old_coin + coins_received
+            save_users(users)
+            new_balance = user['coin']
+
+        return templates.TemplateResponse("success-transaction.html", {"request": request, "amount": amount, "order_id": order_id, "message": "Giao dịch thành công", "coins_received": coins_received, "new_balance": new_balance, "username": order_username})
+    else:
+        message = f"Giao dịch không thành công. Mã lỗi: {rsp_code}"
+        return templates.TemplateResponse("fail-transaction.html", {"request": request, "message": message})

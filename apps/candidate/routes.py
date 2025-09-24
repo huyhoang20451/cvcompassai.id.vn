@@ -33,7 +33,8 @@ async def home(request: Request,
         job_descriptions = search_jobs(session, search_params)
     else:
         job_descriptions = get_jds(session)
-    return templates.TemplateResponse("home_logged_in.html", {"request": request, "job_descriptions": job_descriptions, "username": user_info.username})
+    user_avatar = getattr(user_info, "avatar_path", None)
+    return templates.TemplateResponse("home_logged_in.html", {"request": request, "job_descriptions": job_descriptions, "username": user_info.username, "user_avatar": user_avatar})
 
 @router.get("/aboutus-logged-in", response_class=HTMLResponse)
 async def about_us(request: Request,
