@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Cookie, File, Up
 from fastapi.responses import HTMLResponse, JSONResponse
 from sqlmodel import Session
 from .services import (search_jobs, 
-                       get_cvs, 
+                       get_cvs_by_username as service_get_cvs_by_username, 
                        get_jds, 
                        update_coin,
                        get_jd_by_id,
@@ -82,8 +82,9 @@ def job_detail(request: Request,
 
 # Lấy tất cả CVs theo username lấy từ token
 @router.get("/get_cvs", response_model= List[candidate_CV])
-async def get_cvs(session: Session = Depends(get_session)):
-    return get_cvs(session)
+async def get_cvs_by_username(user_info: user = Depends(authorize_role(["candidate"])),
+                              session: Session = Depends(get_session)):
+    return service_get_cvs_by_username(user_info.username, session)
 
 # Trừ coin vào database
 @router.get("/deduct-coin")

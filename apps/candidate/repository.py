@@ -37,7 +37,7 @@ def search_jobs(session: Session,
     return jobs
 
 # Lấy tất cả CV theo username trong database
-def get_cvs(session: Session, 
+def get_cvs_by_username(session: Session, 
             username: str) -> List[candidate_CV]:
     statement = (   
         select(candidate_CV_db)

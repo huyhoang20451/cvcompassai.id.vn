@@ -6,8 +6,7 @@ from sqlmodel import Session
 from .services import upload_avatar
 from db import get_session
 from Core.Auth.schemas import user
-from Core.Auth.dependencies import templates, get_current_user, decode_token, authorize_role
-from Core.OCR import run_vintern
+from Core.Auth.dependencies import templates, authorize_role
 
 router = APIRouter(tags=["setting"])
 
