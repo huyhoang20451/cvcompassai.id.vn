@@ -1,10 +1,12 @@
 # Chứa các models của database
+import uuid
+from sqlalchemy import Column, DateTime, func
 from sqlmodel import SQLModel, Field
 from typing import Optional
 from datetime import datetime, timezone, date
 from apps.business.schemas import JD_form
 import json
-
+from apps.payment.schemas import OrderStatus
 class User_db(SQLModel, table=True):
     __tablename__ = "user"
 
@@ -52,3 +54,21 @@ class jd_CV_db(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     jd_id: int = Field(foreign_key="jd.id")   # liên kết với bảng job
     URL: str = Field(max_length=255)
+
+class Order(SQLModel, table=True):
+    __tablename__ = "orders"
+
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, index=True)
+    user_id: int = Field(foreign_key="user.id")
+    package: str
+    amount: int
+    total_money: int
+    description: Optional[str] = None
+    status: OrderStatus = Field(default=OrderStatus.pending)
+    created_at: datetime = Field(
+        sa_column=Column(
+            DateTime(timezone=True),
+            server_default=func.now(),   # chỉ set khi insert
+            nullable=False
+        )
+    )

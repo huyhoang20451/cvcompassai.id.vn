@@ -33,6 +33,7 @@ async def register_page(request: Request, session: Session = Depends(get_session
     if not token:
         raise HTTPException(status_code=400, detail="Sai username hoặc password")
     username, role, company_name = decode_token(token.access_token)
+    print(username, role, company_name)
     if role == "business":
         url = f"/business-dashboard"
     else:

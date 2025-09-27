@@ -17,6 +17,7 @@ from Core.Auth.schemas import user
 from .schemas import JobResponse, JobSearchRequest, candidate_CV
 from Core.Auth.dependencies import templates, get_current_user, decode_token, authorize_role
 from Core.OCR import run_vintern
+
 router = APIRouter(tags=["candidate"])
 
 

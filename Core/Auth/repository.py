@@ -5,6 +5,10 @@ def get_user_by_username(session: Session, username: str) -> User_db:
     statement = select(User_db).where(User_db.username == username)
     return session.exec(statement).first()
 
+def get_user_by_id(session: Session, user_id: int) -> User_db:
+    statement = select(User_db).where(User_db.id == user_id)
+    return session.exec(statement).first()
+
 def save_user_to_db(session: Session, user: User_db) -> User_db:
     session.add(user)
     session.commit()
