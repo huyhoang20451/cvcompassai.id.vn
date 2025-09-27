@@ -47,7 +47,8 @@
             </script>
         </div>
         <div class="user-avatar">
-            <img onclick="boxAppear()" style="width: 40px; height: 40px; border-radius: 50%;" src="/static/images/user_avatar.png" alt="User Avatar">
+            <!-- Load avatar từ db -->
+            <img onclick="boxAppear()" style="width: 40px; height: 40px; border-radius: 50%;" src="{{ user_avatar if user_avatar else '/static/avatars/user_avatar.png' }}" alt="User Avatar">
         </div>
         <script>
             function boxAppear() {

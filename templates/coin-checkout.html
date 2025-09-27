@@ -52,13 +52,47 @@
       <p>Số xu cộng thêm: <strong>{{ total_xu }} xu</strong></p>
     </div>
 
-    <!-- Gửi yêu cầu thanh toán thật sự -->
-    <form method="post" action="/coin-payment">
-      <input type="hidden" name="username" value="{{ username }}">
-      <input type="hidden" name="quantity" value="{{ quantity }}">
-      <input type="hidden" name="price" value="{{ price }}">
-      <button type="submit">Thanh toán ngay</button>
-    </form>
+    <!-- VNPay quick checkout button for xu -->
+        <div style="max-width:400px;margin:8px auto;text-align:center;">
+            <button id="vnpay-btn-xu" type="button" class="btn" style="background:#0066cc">Thanh toán VNPay</button>
+        </div>
+
+        <script>
+      document.getElementById('vnpay-btn-xu').addEventListener('click', async function () {
+        try {
+              // compute total amount = price * quantity from hidden form inputs
+              const form = document.getElementById('coin-pay-form');
+              const price = Number(form.querySelector('input[name="price"]').value || 10000);
+              const quantity = Number(form.querySelector('input[name="quantity"]').value || 1);
+              const amount = price * quantity;
+
+              const payload = new URLSearchParams();
+              // send only the total amount (thành tiền)
+              payload.append('amount', String(amount));
+              // include username so server can map the order to a user
+              const username = form.querySelector('input[name="username"]').value || '';
+              if (username) payload.append('username', username);
+              const packageVal = form.querySelector('input[name="package"]').value || 'xu';
+              if (packageVal) payload.append('package', packageVal);
+
+          const resp = await fetch('/create_payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: payload.toString(),
+          });
+          const data = await resp.json();
+          if (data && data.payment_url) {
+            window.location.href = data.payment_url;
+          } else {
+            alert('Không tạo được link thanh toán. Vui lòng thử lại.');
+            console.error('create_payment response', data);
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Lỗi khi tạo thanh toán VNPay');
+        }
+      });
+        </script>
   </div>
 </body>
 </html>

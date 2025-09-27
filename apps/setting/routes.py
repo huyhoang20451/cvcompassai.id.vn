@@ -10,6 +10,11 @@ from Core.Auth.dependencies import templates, authorize_role
 
 router = APIRouter(tags=["setting"])
 
+@router.get("/load-avatar")
+async def load_avatar(user_info: user = Depends(authorize_role(["candidate"]))):
+    # Trả về đường dẫn ảnh avatar dạng JSON
+    return {"avatar_path": user_info.avatar_path}
+
 @router.post("/update_avatar")
 async def update_avatar(request: Request,
                         file: UploadFile = File(...),
@@ -19,5 +24,7 @@ async def update_avatar(request: Request,
     if not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="Chỉ được upload file ảnh")
     avatar_path = await upload_avatar(file, user_info.id, session)
-    return templates.TemplateResponse("home_logged_in.html", {"request": request,  # Frontend tự chỉnh return cho hợp lý
-                                                              "username": user_info.username}) 
+    return templates.TemplateResponse("home_logged_in.html", {"request": request, # Frontend tự chỉnh return cho hợp lý
+                                                              "user_avatar": avatar_path,
+                                                              "username": user_info.username})
+    # return JSONResponse(content={"avatar_path": avatar_path})
