@@ -1,0 +1,13 @@
+<!-- Component thanh tìm kiếm - có thể include vào các trang khác -->
+<div class="search-bar" style="margin: 20px 0; text-align: center;">
+    <form method="POST" action="/search-jobs" style="display: inline-block;">
+        <input type="text" name="keyword" 
+               placeholder="Tìm kiếm việc làm..." 
+               style="padding: 10px; width: 300px; border: 2px solid #ddd; border-radius: 4px;">
+        <input type="hidden" name="username" value="{{ username if username else '' }}">
+        <button type="submit" 
+                style="padding: 10px 20px; background-color: #003366; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 5px;">
+            Tìm kiếm
+        </button>
+    </form>
+</div>

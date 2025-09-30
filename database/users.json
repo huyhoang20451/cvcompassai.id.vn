@@ -1,0 +1,53 @@
+[
+    {
+        "username": "Hoang123",
+        "password": "$2b$12$b5dVo0QN4GuXviaQxn6piepNBMfFMhUOzHWecr1dOVtKm6mb/j..G",
+        "role": "premium",
+        "coin": 3,
+        "premium_expires": "2025-10-24T20:13:43.100743"
+    },
+    {
+        "username": "phong01",
+        "password": "$2b$12$ChYhaGwS0KDiUurXFcKFyOlv5LqqWU.y74iXY1knI/GrkJ.KSgVgm",
+        "role": "user",
+        "coin": 10
+    },
+    {
+        "username": "cocacola_company",
+        "password": "$2b$12$6TSyNWKCFCXeHaTcd5YpL.bZ0DeCtZFr/l8R848sIfxBakFSybt8.",
+        "role": "business",
+        "company": "Coca Cola Company",
+        "company_id": 2
+    },
+    {
+        "username": "deercoffee",
+        "password": "$2a$12$35FSQUQvuiHICOlfLZcnm.7GatLiyRSUutlXSSljZ.p5p3JHLwdXK",
+        "role": "business",
+        "company": "Deer Coffee",
+        "company_id": 1
+    },
+    {
+        "username": "hoang234",
+        "password": "$2b$12$C1LweF169SwEi.VGQkxdXuimvbXkTKFbbBau/AMXKv5ZjEjVwQlPO",
+        "role": "user",
+        "coin": 10
+    },
+    {
+        "username": "hoang2305",
+        "password": "$2b$12$X6PYlzaHBb99d4ALDaucJuA1tjcePQXQkhf5mJZxln.GapiLH1cfa",
+        "role": "user",
+        "coin": 10
+    },
+    {
+        "username": "hoang090",
+        "password": "$2b$12$nvdbdmoOmu.OOjs2HaChOuQwKOjLlxBpWF969.t9YVACUKPpAF5G6",
+        "role": "user",
+        "coin": 10
+    },
+    {
+        "username": "hoang0120",
+        "password": "$2b$12$8Mg1RF8J5SK.HaKeCqIuzOAfW4VcIcyrxd.fTrhyjss5NXn0C.CWC",
+        "role": "user",
+        "coin": 10
+    }
+]

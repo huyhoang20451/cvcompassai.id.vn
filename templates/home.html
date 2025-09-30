@@ -17,8 +17,8 @@
         </div>
         <div class="header-menu"> <!-- Menu lựa chọn -->
             <ul>
-                <li><a href="/">Trang chủ</a></li>
-                <li><a href="/about-us">Về chúng tôi</a></li>
+                <li><a href="/home">Trang chủ</a></li>
+                <li><a href="/aboutus">Về chúng tôi</a></li>
                 <li><a href="/">Tìm việc làm</a></li>
                 <li><a href="/login">Quét CV bằng OCR</a></li>
                 <li><a href="/pricing">Gói dịch vụ</a></li>
@@ -77,9 +77,11 @@
         </div>
     </div> <!-- kết thúc phần giới thiệu cách hoạt động-->
     <div class="thanh-timkiemvavitri"> <!--thanh tìm kiếm vị trí-->
-        <input type="text" placeholder="🔍Tìm kiếm công việc">
-        <input type="text" placeholder="⛳Vị trí">
-        <button>Tìm kiếm</button>
+        <form method="POST" action="/search-jobs" style="display: flex; gap: 10px; align-items: center;">
+            <input type="text" name="keyword" placeholder="🔍Tìm kiếm công việc (từ khóa, công ty, địa điểm...)" style="flex: 1;">
+            <input type="hidden" name="username" value="">
+            <button type="submit">Tìm kiếm</button>
+        </form>
     </div> <!-- kết thúc thanh tìm kiếm vị trí -->
     <div class="phan_congvieclienquan"> <!--Bắt đầu phần công việc liên quan-->
         <div class="filter-selection" style="display: flex; align-items: center; gap: 24px; justify-content: space-between;">

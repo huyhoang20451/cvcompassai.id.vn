@@ -52,6 +52,13 @@
       <p>Số xu cộng thêm: <strong>{{ total_xu }} xu</strong></p>
     </div>
 
+    <!-- Gửi yêu cầu thanh toán thật sự -->
+    <form id="coin-pay-form" method="post" action="/coin-payment">
+      <input type="hidden" name="username" value="{{ username }}">
+      <input type="hidden" name="quantity" value="{{ quantity }}">
+      <input type="hidden" name="price" value="{{ price }}">
+      <button type="submit">Thanh toán ngay</button>
+    </form>
     <!-- VNPay quick checkout button for xu -->
         <div style="max-width:400px;margin:8px auto;text-align:center;">
             <button id="vnpay-btn-xu" type="button" class="btn" style="background:#0066cc">Thanh toán VNPay</button>

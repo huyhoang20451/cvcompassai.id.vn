@@ -65,7 +65,7 @@
                     <p><a href="/edit-profile?username={{username}}" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
                     <p><a href="/mycv-settings?username={{username}}" style="text-decoration:none;color:#222;">CV của tôi</a></p>
                     <p><a href="/system-settings?username={{username}}" style="text-decoration:none;color:#222;">Cài đặt tài khoản</a></p>
-                    <p><a href="/logout" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
+                    <p><a href="/home" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
                 `;
                 document.body.appendChild(box);
                 document.addEventListener('click', function handleClickOutside(event) {
@@ -94,7 +94,7 @@
         <script>
             function unlockTop5JD() {
                 // Lay tong so xu o trang top-10-best-jd-unblur
-                fetch(`/deduct-coin?username={{username}}&amount=5`)
+                fetch(`/api/deduct-coin?username={{username}}&amount=5`)
                   .then(res => res.json())
                   .then(data => {
                     if (data.success) {

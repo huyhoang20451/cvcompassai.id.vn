@@ -65,7 +65,7 @@
                     <p><a href="/edit-profile?username={{username}}" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
                     <p><a href="/mycv-settings?username={{username}}" style="text-decoration:none;color:#222;">CV của tôi</a></p>
                     <p><a href="/system-settings?username={{username}}" style="text-decoration:none;color:#222;">Cài đặt tài khoản</a></p>
-                    <p><a href="/logout" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
+                    <p><a href="/home" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
                 `;
                 document.body.appendChild(box);
                 document.addEventListener('click', function handleClickOutside(event) {
@@ -104,7 +104,7 @@
                     <li>Tự động cập nhật thông tin doanh nghiệp mỗi 2 ngày</li>
                     <li>Giới hạn bài đăng</li>
                 </ul>
-                <button class="buy-btn">Mua ngay</button>
+                <button onclick="location.href='/payment?username={{username}}&package=premium'" class="buy-btn">Mua ngay</button>
             </div>
         </div>
 
@@ -117,7 +117,7 @@
                     <li>Dùng xu để mở khóa top 5 doanh nghiệp</li>
                     <li>Không tự động cập nhật thông tin doanh nghiệp</li>
                 </ul>
-                <button class="buy-btn">Mua ngay</button>
+                <button onclick="location.href='/payment?username={{username}}&package=xu'" class="buy-btn">Mua ngay</button>
             </div>
         </div>
     </div> <!--Kết thúc các gói dịch vụ-->

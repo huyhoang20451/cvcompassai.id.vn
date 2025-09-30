@@ -9,9 +9,6 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime, timedelta
-import urllib.parse
-import hmac
-import hashlib
 from vnpay import vnpay as VnPayHelper
 # File is not defined
 
@@ -142,7 +139,10 @@ def signup(request: Request, username: str = Form(...), password: str = Form(...
 @app.post("/login", response_class=HTMLResponse)
 def login(username: str = Form(...), password: str = Form(...)):
     users = load_users()
-    user = users.get(username)
+    if isinstance(users, dict):
+        user = users.get(username)
+    else:
+        user = next((u for u in users if u.get("username") == username), None)
 
     if not user or not pwd_context.verify(password, user["password"]):
         raise HTTPException(status_code=400, detail="Sai tên đăng nhập hoặc mật khẩu")
@@ -187,7 +187,10 @@ def login_form(request: Request):
 @app.post("/login", response_class=HTMLResponse)
 def login(request: Request, username: str = Form(...), password: str = Form(...)):
     users = load_users()
-    user = users.get(username)
+    if isinstance(users, dict):
+        user = users.get(username)
+    else:
+        user = next((u for u in users if u.get("username") == username), None)
 
     if not user or not pwd_context.verify(password, user["password"]):
         raise HTTPException(status_code=400, detail="Sai tên đăng nhập hoặc mật khẩu")
@@ -248,7 +251,10 @@ def top10_best_jd(request: Request, username: str):
 def top10_best_jd_detail(request: Request, username: str):
     job_description = load_jd()
     users = load_users()
-    user = users.get(username)
+    if isinstance(users, dict):
+        user = users.get(username)
+    else:
+        user = next((u for u in users if u.get("username") == username), None)
     coin = user.get("coin", 0) if user else 0
     if not job_description:
         raise HTTPException(status_code=404, detail="Job not found")
@@ -332,7 +338,10 @@ def top10_best_jd_unblur(request: Request, username: str):
 @app.get("/api/deduct-coin")
 def deduct_coin(username: str, amount: int):
     users = load_users()
-    user = users.get(username)
+    if isinstance(users, dict):
+        user = users.get(username)
+    else:
+        user = next((u for u in users if u.get("username") == username), None)
     if not user:
         return JSONResponse(content={"success": False, "msg": "Không tìm thấy người dùng."})
     coin = user.get("coin", 0)
@@ -345,7 +354,10 @@ def deduct_coin(username: str, amount: int):
 @app.get("/api/get-coin")
 def get_coin(username: str):
     users = load_users()
-    user = users.get(username)
+    if isinstance(users, dict):
+        user = users.get(username)
+    else:
+        user = next((u for u in users if u.get("username") == username), None)
     if not user:
         return {"success": False, "msg": "Không tìm thấy người dùng.", "coin": 0}
     coin = user.get("coin", 0)
@@ -357,7 +369,10 @@ def top10_best_jd_detail_unblur(request: Request, username: str, job_id: int):
     job_descriptions = load_jd()
     job = next((item for item in job_descriptions if item["id"] == job_id), None)
     users = load_users()
-    user = users.get(username)
+    if isinstance(users, dict):
+        user = users.get(username)
+    else:
+        user = next((u for u in users if u.get("username") == username), None)
     coin = user.get("coin", 0) if user else 0
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
@@ -433,7 +448,10 @@ def dang_tuyen_ngay(request: Request, username: str):
 @app.get("/cv-detail-business", response_class=HTMLResponse)
 def cv_detail_business(request: Request, username: str):
     users = load_users()
-    user = users.get(username)
+    if isinstance(users, dict):
+        user = users.get(username)
+    else:
+        user = next((u for u in users if u.get("username") == username), None)
     company = user.get("company", "") if user else ""
     return templates.TemplateResponse("cv-detail-business.html", {"request": request, "username": username, "company": company})
 
@@ -464,7 +482,10 @@ def system_settings(request: Request, username: str):
 @app.get("/finding-jobs", response_class=HTMLResponse)
 def finding_jobs(request: Request, username: str):
     users = load_users()
-    user = users.get(username)
+    if isinstance(users, dict):
+        user = users.get(username)
+    else:
+        user = next((u for u in users if u.get("username") == username), None)
     return templates.TemplateResponse("finding-jobs.html", {"request": request, "username": username, "user": user})
 
 @app.api_route("/payment", methods=["GET", "POST"], response_class=HTMLResponse)
@@ -489,8 +510,17 @@ async def payment(request: Request, username: str = None):
             username = qp.get("username") or None
 
     users = load_users()
-    user = users.get(username) if username else None
+    if isinstance(users, dict):
+        user = users.get(username) if username else None
+    else:
+        user = next((u for u in users if u.get("username") == username), None) if username else None
 
+    if package == 'business-premium':
+        return templates.TemplateResponse(
+            "payment-premium.html",
+            {"request": request, "username": username, "user": user, "package": package, "price": 500000, "title": "Gói Premium Doanh nghiệp"},
+        )
+    
     if package == 'premium':
         return templates.TemplateResponse(
             "payment-premium.html",
@@ -564,6 +594,43 @@ async def payment(request: Request, username: str = None):
     # If package not recognized, show a generic page or 400
     raise HTTPException(status_code=400, detail="Missing or invalid package")
 
+@app.get("/business-premium-checkout", response_class=HTMLResponse)
+def business_premium_checkout(request: Request, username: Optional[str] = None, company: Optional[str] = None, package: Optional[str] = None, price: Optional[int] = 0, quantity: Optional[int] = 1):
+    """Render the premium checkout page for business users. All query parameters are optional so
+    the route won't 422 when called without some values. Provide sensible
+    defaults to the template and only look up the user when a username is
+    supplied.
+    """
+    users = load_users()
+    if isinstance(users, dict):
+        user = users.get(username) if username else None
+    else:
+        user = next((u for u in users if u.get("username") == username), None) if username else None
+
+    # If company not provided, try to get from user record
+    if not company and user:
+        company = user.get("company", "")
+
+    # Ensure context has safe defaults
+    ctx_package = package or "premium"
+    ctx_price = price or 0
+    ctx_quantity = quantity or 1
+    total_price = ctx_price * ctx_quantity
+
+    return templates.TemplateResponse(
+        "business-premium-checkout.html",
+        {
+            "request": request,
+            "username": username,
+            "company": company,
+            "user": user,
+            "package": ctx_package,
+            "price": ctx_price,
+            "quantity": ctx_quantity,
+            "total": total_price,
+        },
+    )
+
 @app.get("/premium-checkout", response_class=HTMLResponse)
 def premium_checkout(request: Request, username: Optional[str] = None, package: Optional[str] = None, price: Optional[int] = 0, quantity: Optional[int] = 1):
     """Render the premium checkout page. All query parameters are optional so
@@ -572,7 +639,10 @@ def premium_checkout(request: Request, username: Optional[str] = None, package: 
     supplied.
     """
     users = load_users()
-    user = users.get(username) if username else None
+    if isinstance(users, dict):
+        user = users.get(username) if username else None
+    else:
+        user = next((u for u in users if u.get("username") == username), None) if username else None
 
     # Ensure context has safe defaults
     ctx_package = package or "premium"
@@ -601,7 +671,10 @@ def coin_checkout(request: Request, username: Optional[str] = None, package: Opt
     supplied.
     """
     users = load_users()
-    user = users.get(username) if username else None
+    if isinstance(users, dict):
+        user = users.get(username) if username else None
+    else:
+        user = next((u for u in users if u.get("username") == username), None) if username else None
 
     # Ensure context has safe defaults
     ctx_package = package or "xu"
@@ -812,6 +885,11 @@ def payment_return(request: Request):
                 # set expiry 30 days from now
                 user['premium_expires'] = (datetime.now() + timedelta(days=30)).isoformat()
                 coins_received = 5  # initial credit (one-day grant)
+            elif package and package.lower() == 'business-premium':
+                user['role'] = 'business-premium'
+                # set expiry 30 days from now for business
+                user['premium_expires'] = (datetime.now() + timedelta(days=30)).isoformat()
+                coins_received = 10  # business gets more initial credit
             else:
                 # xu package: compute coins as 10000 VND = 2 xu
                 coins_received = (amount // 10000) * 2
@@ -825,3 +903,30 @@ def payment_return(request: Request):
     else:
         message = f"Giao dịch không thành công. Mã lỗi: {rsp_code}"
         return templates.TemplateResponse("fail-transaction.html", {"request": request, "message": message})
+    
+@app.get("/business-payment-checkout", response_class=HTMLResponse)
+def business_payment_checkout(request: Request, username: str, company: str = None, package: str = "business-premium", price: int = 500000, quantity: int = 1):
+    users = load_users()
+    if isinstance(users, dict):
+        user = users.get(username)
+    else:
+        user = next((u for u in users if u.get("username") == username), None)
+    
+    # Lấy company từ user nếu không được truyền vào
+    if not company and user:
+        company = user.get("company", "")
+    
+    # Tính tổng tiền
+    total_price = price * quantity
+
+    return templates.TemplateResponse("payment-business-premium.html", {
+        "request": request, 
+        "username": username, 
+        "company": company,
+        "user": user,
+        "package": package,
+        "price": price,
+        "quantity": quantity,
+        "total": total_price,
+        "title": "Gói Premium Doanh nghiệp"
+    })

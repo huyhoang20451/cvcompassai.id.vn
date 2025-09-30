@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Service Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: linear-gradient(135deg, var(--page-grad-start) 0%, var(--page-grad-end) 100%);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: var(--max-width);
+            margin: 24px auto;
+            padding: 0 16px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            box-shadow: var(--shadow);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        thead {
+            background: linear-gradient(90deg, rgba(37,99,235,0.1), rgba(245,158,11,0.1));
+        }
+        thead th {
+            color: var(--muted);
+            text-align: left;
+            padding: 12px;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tbody tr:hover {
+            background-color: var(--glass);
+        }
+        td {
+            padding: 12px;
+            border-top: 1px solid rgba(15,23,36,0.03);
+        }
+        .badge {
+            display: inline-block;
+            padding: 6px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge.green {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .badge.red {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+        .badge.blue {
+            background: #065f46;
+            color: #d1fae5;
+            cursor: pointer;
+        }
+        .badge.blue:hover {
+            background: #047857;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Service Management</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Service Name</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for service in services %}
+                <tr>
+                    <td>{{ service.name_service }}</td>
+                    <td><span class="badge {{ 'green' if service.status == 'active' else 'red' }}">{{ service.status.capitalize() }}</span></td>
+                    <td><span class="badge blue"><i class="fas fa-edit"></i> Edit</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="/"><-- Quay lại trang admin</a>
+    </div>
+</html>
