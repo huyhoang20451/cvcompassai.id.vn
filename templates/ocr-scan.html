@@ -19,9 +19,9 @@
             <ul>
                 <li><a href="/home-logged-in?username={{username}}">Trang chủ</a></li>
                 <li><a href="/aboutus-logged-in?username={{username}}">Về chúng tôi</a></li>
-                <li><a href="/home-logged-in?username={{username}}">Tìm việc làm</a></li>
+                <li><a href="/finding-jobs?username={{username}}">Tìm việc làm</a></li>
                 <li><a href="/ocr-scan-logged-in?username={{username}}">Quét CV bằng OCR</a></li>
-                <li><a href="/pricing-user-logged-in?username={{username}}">Gói dịch vụ</a></li>
+                <li><a href="/pricing-user-loggedin?username={{username}}">Gói dịch vụ</a></li>
             </ul>
         </div>
         <div class="header-actions">
@@ -31,7 +31,7 @@
             <script>
                 async function fetchCoin() {
                     try {
-                    const response = await fetch(`/get-coin?username={{username}}`);
+                    const response = await fetch(`/api/get-coin?username={{username}}`);
                     const data = await response.json();
                     if (data.success) {
                         document.querySelector('.header-actions strong').textContent = data.coin;
@@ -65,7 +65,7 @@
                     <p><a href="/edit-profile?username={{username}}" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
                     <p><a href="/mycv-settings?username={{username}}" style="text-decoration:none;color:#222;">CV của tôi</a></p>
                     <p><a href="/system-settings?username={{username}}" style="text-decoration:none;color:#222;">Cài đặt tài khoản</a></p>
-                    <p><a href="/" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
+                    <p><a href="/home" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
                 `;
                 document.body.appendChild(box);
                 document.addEventListener('click', function handleClickOutside(event) {
@@ -95,42 +95,20 @@
             <div class="ocr-btn-group">
                 <form style="display: inline-block;" id="uploadForm">
                     <input type="file" id="myFile" name="filename" accept="image/*,.pdf,.doc,.docx">
-                    <input type="submit">
+                    <input type="submit" value="Quét CV">
                 </form>
                 <button onclick="location.href='/create-free-cv'" class="ocr-btn create">Tạo CV miễn phí</button>
             </div>
             <div class="ocr-support">Hỗ trợ các file định dạng JPG, PNG, PDF, .DOC, .DOCX</div>
             <div>Kết quả quét được:</div>
-            <div id="ocr-result" style="margin-top:18px; background:#EAF4FF; border-radius:8px; padding:16px;"></div>
+            <div id="ocr-result" style="margin-top:18px; background:#EAF4FF; border-radius:8px; padding:16px; display: none;">
+                <h3>Kết quả OCR</h3>
+                <div class="field"><span class="label">Họ và tên:</span> <span id="ho_ten"></span></div>
+                <div class="field"><span class="label">Email:</span> <span id="email"></span></div>
+                <div class="field"><span class="label">Vị trí tuyển dụng:</span> <span id="vi_tri"></span></div>
+                <div class="field"><span class="label">Kinh nghiệm:</span> <span id="kinh_nghiem"></span></div>
+            </div>
         </div>
-        <script>
-            // Lay ket qua tu trong apps/candidate/routes.py
-            const form = document.getElementById('uploadForm');
-            form.addEventListener('submit', async function(event)) {
-                event.preventDefault();
-                const fileInput = document.getElementById('myFile');
-                if (fileInput.files.length === 0) {
-                    alert('Vui lòng chọn file để tải lên.');
-                    return;
-                }
-                const formData = new FormData();
-                formData.append('filename', fileInput.files[0]);
-                try {
-                    const response = await fetch('/upload-cv-ocr?username={{username}}', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    const data = await response.json();
-                    if (data.success) {
-                        document.getElementById('ocr-result').innerText = data.extracted_text;
-                    } else {
-                        document.getElementById('ocr-result').innerText = 'Lỗi khi quét CV: ' + data.msg;
-                    }
-                } catch (error) {
-                    document.getElementById('ocr-result').innerText = 'Lỗi mạng khi quét CV.';
-                }
-            }
-        </script>
         <div class="ocr-right">
             <div class="cv-preview">
                 <img src="/static/images/cv_sample.png" alt="CV Preview" class="cv-img">
@@ -164,7 +142,7 @@
       <div class="footer-links-title">Company</div>
       <a href="/home-logged-in?username={{username}}">Home</a>
       <a href="/aboutus-logged-in?username={{username}}">About us</a>
-      <a href="/pricing-user-logged-in?username={{username}}">Pricing</a>
+      <a href="/pricing-user-loggedin?username={{username}}">Pricing</a>
     </div>
     <div class="footer-links-group">
       <div class="footer-links-title">Follow us</div>
@@ -191,6 +169,97 @@ document.getElementById('myFile').addEventListener('change', function(e) {
     }
     previewName.textContent = file.name;
 });
+
+// Xử lý submit form
+document.getElementById('uploadForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Ngăn form submit mặc định
+    sendRequest(); // Gọi hàm OCR
+});
+
+async function sendRequest() {
+    const fileInput = document.getElementById("myFile");
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        alert("Vui lòng chọn file để upload!");
+        return;
+    }
+    
+    let formData = new FormData();
+    formData.append("file", file);
+
+    try {
+        let response = await fetch("https://fe704ae8a5ba.ngrok-free.app/ocr", {
+            method: "POST",
+            body: formData,
+            headers: {
+                'ngrok-skip-browser-warning': 'true'
+            }
+        });
+        
+        let data = await response.json();
+        console.log('API Response:', data); // Debug
+
+        if (data.success) {
+            document.getElementById("ocr-result").style.display = "block";
+            document.getElementById("ho_ten").textContent = data.data.ho_ten || "Không tìm thấy";
+            document.getElementById("email").textContent = data.data.email || "Không tìm thấy";
+            document.getElementById("vi_tri").textContent = data.data.vi_tri_tuyen_dung || "Không tìm thấy";
+            document.getElementById("kinh_nghiem").textContent = data.data.kinh_nghiem || "Không tìm thấy";
+        } else {
+            alert("OCR lỗi: " + (data.error || "Lỗi không xác định"));
+            console.error('OCR Error:', data);
+        }
+    } catch (error) {
+        console.error('Network Error:', error);
+        alert("Lỗi mạng: " + error.message);
+    }
+}
+
+function processOCR(file) {
+    const resultDiv = document.getElementById('ocr-result');
+    resultDiv.innerHTML = 'Đang xử lý CV...';
+    resultDiv.style.whiteSpace = 'pre-line'; // giữ định dạng xuống dòng
+    // Tạo FormData để upload file
+    const formData = new FormData();
+    formData.append('file', file);
+    // Nếu API cần prompt, có thể thêm dòng này:
+    // formData.append('prompt', 'extract full text');
+    const url_model_load = "https://bc7da55f4a9f.ngrok-free.app/ocr";
+    fetch(url_model_load, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'ngrok-skip-browser-warning': 'true'
+        }
+    })
+    .then(response => response.json())
+    .then(result => {
+        // Nếu API trả về result.data là text đã format sẵn:
+        if (result.success && result.data) {
+            resultDiv.textContent = result.data;
+        } else if (result.success) {
+            // Nếu API trả về từng trường, ghép lại thành text lớn
+            let text = '';
+            if (result.name) text += `Assistant: Họ và tên: ${result.name}\n`;
+            if (result.email) text += `Địa chỉ email: ${result.email}\n`;
+            if (result.position) text += `Vị trí tuyển dụng: ${result.position}\n`;
+            if (result.kinh_nghiem) text += `Kinh nghiệm:\n${result.kinh_nghiem}\n`;
+            if (result.muc_tieu) text += `- Mục tiêu nghề nghiệp:\n${result.muc_tieu}\n`;
+            if (result.hoc_van) text += `- Học vấn:\n${result.hoc_van}\n`;
+            if (result.tin_hoc) text += `- Tin học:\n${result.tin_hoc}\n`;
+            if (result.ngoai_ngu) text += `- Ngoại ngữ:\n${result.ngoai_ngu}\n`;
+            if (result.lien_he) text += `- Người liên hệ: ${result.lien_he}\n`;
+            resultDiv.textContent = text || 'Không tìm thấy';
+        } else {
+            resultDiv.textContent = 'Quét thất bại. Vui lòng thử lại.';
+        }
+    })
+    .catch(error => {
+        console.error('Lỗi khi gọi API OCR:', error);
+        resultDiv.textContent = 'Đã xảy ra lỗi. Vui lòng thử lại.';
+    });
+}
 </script>
 </body>
 </html>

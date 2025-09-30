@@ -1,0 +1,14 @@
+[
+    {
+        "name_service": "Gói Premium User",
+        "price_service": 50000,
+        "description_service": "Dịch vụ hỗ trợ người dùng cao cấp với nhiều tính năng ưu việt.",
+        "status": "active"
+    },
+    {
+        "name_service": "Gói Basic User 10K/2 Xu",
+        "price_service": 10000,
+        "description_service": "Dịch vụ hỗ trợ người dùng cơ bản với các tính năng thiết yếu.",
+        "status": "active"
+    }
+]

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - User Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: linear-gradient(135deg, var(--page-grad-start) 0%, var(--page-grad-end) 100%);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: var(--max-width);
+            margin: 24px auto;
+            padding: 0 16px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            box-shadow: var(--shadow);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        thead {
+            background: linear-gradient(90deg, rgba(37,99,235,0.1), rgba(245,158,11,0.1));
+        }
+        thead th {
+            color: var(--muted);
+            text-align: left;
+            padding: 12px;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tbody tr:hover {
+            background-color: var(--glass);
+        }
+        td {
+            padding: 12px;
+            border-top: 1px solid rgba(15,23,36,0.03);
+        }
+        .badge {
+            display: inline-block;
+            padding: 6px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge.green {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .badge.yellow {
+            background: #fff7cd;
+            color: #92400e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>User Management</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Role</th>
+                    <th>Coin</th>
+                    <th>Premium Expire Date</th>
+                    <th>Actions (Update/Delete)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.password }}</td>
+                    <td>{{ user.role }}</td>
+                    <td>{{ user.coin }}</td>
+                    <td>{{ user.premium_expires }}</td>
+                    <td>
+                        <!--Tạo form để update thông tin-->
+                        <form style="display:inline;">
+                            <input type="hidden" name="id" value="{{ user.id }}">
+                            <input type="hidden" name="username" value="{{ user.username }}">
+                            <input type="hidden" name="password" value="{{ user.password }}">
+                            <input type="hidden" name="role" value="{{ user.role }}">
+                            {% if user.role == 'business' %}
+                            <input type="hidden" name="business_name" value="{{ user.business_name }}">
+                            {% endif %}
+                            <button onclick="appear_form()" type="button" class="btn" style="background:green">Update</button>
+                        </form>
+                        <form action="/delete_user/{{ user.username }}" method="POST" style="display:inline;">
+                            <input type="hidden" name="id" value="{{ user.id }}">
+                            <button type="submit" class="btn" style="background:red">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Modal overlay và form cập nhật user -->
+        <div id="update-modal-overlay" style="display:none; position:fixed; z-index:1000; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5);"></div>
+        <div id="update-form-modal" style="display:none; position:fixed; z-index:1001; left:50%; top:50%; transform:translate(-50%,-50%); min-width:340px; background:#fff; border-radius:10px; box-shadow:0 4px 24px #0005; padding:28px 24px;">
+            <form id="real-update-form" action="/update_user/{{ users.username }}" method="POST" autocomplete="off">
+                <div style="font-weight:bold; margin-bottom:14px; font-size:18px; text-align:center;">Cập nhật người dùng</div>
+                <input type="hidden" name="id" id="update-id">
+                <div style="margin-bottom:14px;">
+                    <label>Username:</label>
+                    <input type="text" name="username" id="update-username" required style="width:100%">
+                </div>
+                <div style="margin-bottom:14px;">
+                    <label>Password:</label>
+                    <input type="text" name="password" id="update-password" required style="width:100%">
+                </div>
+                <div style="margin-bottom:14px;">
+                    <label>Role:</label>
+                    <input type="text" name="role" id="update-role" required style="width:100%">
+                </div>
+                <div style="margin-bottom:14px;">
+                    <label>Coin:</label>
+                    <input type="number" name="coin" id="update-coin" style="width:100%">
+                </div>
+                <div style="margin-bottom:18px;">
+                    <label>Premium Expire Date:</label>
+                    <input type="text" name="premium_expires" id="update-premium-expires" style="width:100%">
+                </div>
+                <div style="text-align:center;">
+                    <button type="submit" style="background:green;color:#fff;padding:8px 24px;border:none;border-radius:4px;">Cập nhật</button>
+                    <button type="button" onclick="closeUpdateFormModal()" style="margin-left:12px; padding:8px 24px;">Hủy</button>
+                </div>
+            </form>
+        </div>
+        <a href="/"><-- Quay lại trang admin</a>
+    </div>
+    <script>
+        // Modal update form
+        function showUpdateFormModal(id, username, password, role, coin, premium_expires) {
+            document.getElementById('update-id').value = id;
+            document.getElementById('update-username').value = username;
+            document.getElementById('update-password').value = password;
+            document.getElementById('update-role').value = role;
+            document.getElementById('update-coin').value = coin;
+            document.getElementById('update-premium-expires').value = premium_expires;
+            document.getElementById('update-modal-overlay').style.display = 'block';
+            document.getElementById('update-form-modal').style.display = 'block';
+        }
+        function closeUpdateFormModal() {
+            document.getElementById('update-modal-overlay').style.display = 'none';
+            document.getElementById('update-form-modal').style.display = 'none';
+        }
+        document.getElementById('update-modal-overlay').onclick = closeUpdateFormModal;
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('form[style*="display:inline;"] .btn[style*="background:green"]')
+                .forEach(function(btn) {
+                    btn.onclick = function(e) {
+                        var tr = btn.closest('tr');
+                        var tds = tr.querySelectorAll('td');
+                        showUpdateFormModal(
+                            tr.querySelector('input[name="id"]').value,
+                            tds[0].textContent.trim(),
+                            tds[1].textContent.trim(),
+                            tds[2].textContent.trim(),
+                            tds[3].textContent.trim(),
+                            tds[4].textContent.trim()
+                        );
+                        e.stopPropagation();
+                    };
+                });
+        });
+    </script>
+</body>
+</html>

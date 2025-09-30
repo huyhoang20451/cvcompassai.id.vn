@@ -47,7 +47,7 @@
                     <p><a href="#" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
                     <p><a href="#" style="text-decoration:none;color:#222;">Lưu trữ JD</a></p>
                     <p><a href="#" style="text-decoration:none;color:#222;">Cài đặt</a></p>
-                    <p><a href="/logout" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
+                    <p><a href="/business-home" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
                 `;
                 document.body.appendChild(box);
                 document.addEventListener('click', function handleClickOutside(event) {
@@ -81,7 +81,7 @@
                     <li>Tải lên thư mục CV thủ công (tính năng sắp ra mắt)</li>
                     <li>Phân tích CV</li>
                 </ul>
-                <button class="buy-btn">Mua ngay</button>
+                <button onclick="location.href='/business-payment-checkout?username={{ username }}&company={{ company }}&package=business-premium&price=500000&quantity=1'" class="buy-btn">Mua ngay</button>
             </div>
         </div>
 
@@ -92,7 +92,7 @@
                 <ul>
                     <li>Tìm kiếm ứng viên theo từ khóa</li>
                 </ul>
-                <button class="buy-btn">Mua ngay</button>
+                <button onclick="location.href='/business-dashboard?username={{ username }}&role={{ role }}&company={{ company }}'" class="buy-btn">Sử dụng ngay</button>
             </div>
         </div>
     </div> <!--Kết thúc các gói dịch vụ-->

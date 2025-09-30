@@ -19,9 +19,9 @@
             <ul>
                 <li><a method="get" href="/home-logged-in?username={{username}}">Trang chủ</a></li>
                 <li><a method="get" href="/aboutus-logged-in?username={{username}}">Về chúng tôi</a></li>
-                <li><a method="get" href="/home-logged-in?username={{username}}">Tìm việc làm</a></li>
+                <li><a method="get" href="/finding-jobs?username={{username}}">Tìm việc làm</a></li>
                 <li><a method="get" href="/ocr-scan-logged-in?username={{username}}">Quét CV bằng OCR</a></li>
-                <li><a method="get" href="/pricing-user-logged-in?username={{username}}">Gói dịch vụ</a></li>
+                <li><a method="get" href="/pricing-user-loggedin?username={{username}}">Gói dịch vụ</a></li>
             </ul>
         </div>
         <div class="header-actions">
@@ -31,7 +31,7 @@
             <script>
                 async function fetchCoin() {
                     try {
-                    const response = await fetch(`/get-coin?username={{username}}`);
+                    const response = await fetch(`/api/get-coin?username={{username}}`);
                     const data = await response.json();
                     if (data.success) {
                         document.querySelector('.header-actions strong').textContent = data.coin;
@@ -66,7 +66,7 @@
                     <p><a href="/edit-profile?username={{username}}" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
                     <p><a href="/mycv-settings?username={{username}}" style="text-decoration:none;color:#222;">CV của tôi</a></p>
                     <p><a href="/system-settings?username={{username}}" style="text-decoration:none;color:#222;">Cài đặt tài khoản</a></p>
-                    <p><a href="/logout" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
+                    <p><a href="/home" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
                 `;
                 document.body.appendChild(box);
                 document.addEventListener('click', function handleClickOutside(event) {
@@ -98,7 +98,7 @@
         <div class="content-intro-aboutus">
             <p><span class="intro-title">CV Compass</span> là dự án khởi nghiệp phát triển bởi nhóm sinh viên yêu thích công nghệ và nhân sự, với mong muốn giúp người tìm việc - đặc biệt là <i>sinh viên</i> và <i>người mới ra trường</i> - hiểu rõ và cải thiện CV của mình một cách dễ dàng, chính xác và nhanh chóng.</p>
             <p>Chúng tôi ứng dụng công nghệ <i><strong>OCR (Nhận diện ký tự quang học) kết hợp với Mô hình ngôn ngữ lớn (LLM)</strong></i> để quét, trích xuất và phân tích nội dung CV, đồng thời so sánh trực tiếp với Mô tả công việc (JD) từ nhà tuyển dụng.</p>
-            <button class="btn btn-upload-cv">Bắt đầu ngay →</button>
+            <button onclick="location.href='/ocr-scan-logged-in?username={{username}}'" class="btn btn-upload-cv">Bắt đầu ngay →</button>
         </div>
         <img style="max-width: 50%; height: auto;" src="/static/images/illustrate-image-aboutus.png" alt="Illustration image">
     </div> <!--Kết thúc phần giới thiệu về chúng tôi-->

@@ -231,7 +231,7 @@ body {
                     <p><a href="#" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
                     <p><a href="#" style="text-decoration:none;color:#222;">Lưu trữ JD</a></p>
                     <p><a href="#" style="text-decoration:none;color:#222;">Cài đặt</a></p>
-                    <p><a href="/logout" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
+                    <p><a href="/business-home" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
                 `;
                 document.body.appendChild(box);
                 document.addEventListener('click', function handleClickOutside(event) {
@@ -252,8 +252,8 @@ body {
         <ul>
             {% for jd in job_position %}
             <li class={%if job and jd.id == job.id%} "active"{% endif %}>
-                <a href="/job-storage?jd_id={{ jd.id }}&username={{username}}&role={{role}}&company={{company}}">
-                    {{ jd.title }}
+                <a href="/job-storage/{{ jd.id }}?username={{username}}&role={{role}}&company={{company}}">
+                    {{ jd.job_title }}
                 </a>
             </li>
             {% endfor %}
@@ -273,7 +273,7 @@ body {
       <section class="job-card">
   {% if job %}
     <!-- Job Summary -->
-    <h3>{{ job.title }}</h3>
+    <h3>{{ job.job_title }}</h3>
     <div class="job-meta">
       <span>Lương thỏa thuận - {{ job.salary }}</span>
       <span>Địa điểm: {{ job.location }}</span>
@@ -299,7 +299,7 @@ body {
         <button class="edit">Chỉnh sửa</button>
         <button class="delete">Xóa</button>
       </div>
-      <p>{{ job.job_description }}</p>
+      <p>{{ job.description }}</p>
 
       <h4>Yêu cầu công việc</h4>
       <p>{{ job.requirements }}</p>

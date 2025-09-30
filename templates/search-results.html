@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết quả tìm kiếm - CV Compass</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            background-color: #003366;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .search-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .search-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .search-input {
+            width: 70%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .search-btn {
+            width: 25%;
+            padding: 12px;
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-left: 2%;
+        }
+        
+        .search-btn:hover {
+            background-color: #004080;
+        }
+        
+        .results-header {
+            background: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .job-card {
+            background: white;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-left: 4px solid #003366;
+        }
+        
+        .job-title {
+            color: #003366;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .job-company {
+            color: #666;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .job-details {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .job-actions {
+            text-align: right;
+        }
+        
+        .view-btn {
+            background-color: #003366;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .view-btn:hover {
+            background-color: #004080;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            color: #003366;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>CV Compass - Tìm kiếm việc làm</h1>
+    </div>
+    
+    <div class="search-container">
+        <!-- Form tìm kiếm -->
+        <div class="search-form">
+            <h2>Tìm kiếm việc làm</h2>
+            <form method="POST" action="/search-jobs">
+                <input type="text" name="keyword" class="search-input" 
+                       placeholder="Nhập từ khóa (tên công việc, công ty, địa điểm...)" 
+                       value="{{ keyword }}">
+                <input type="hidden" name="username" value="{{ username }}">
+                <button type="submit" class="search-btn">Tìm kiếm</button>
+            </form>
+        </div>
+        
+        <!-- Kết quả tìm kiếm -->
+        {% if keyword %}
+        <div class="results-header">
+            <h3>Kết quả tìm kiếm cho: "{{ keyword }}"</h3>
+            <p>Tìm thấy {{ job_descriptions|length }} công việc</p>
+        </div>
+        {% endif %}
+        
+        {% if job_descriptions %}
+            {% for job in job_descriptions %}
+            <div class="job-card">
+                <div class="job-title">{{ job.job_title }}</div>
+                <div class="job-company">{{ job.company_name }}</div>
+                <div class="job-details">
+                    <span>📍 {{ job.location }}</span> | 
+                    <span>🏢 {{ job.industry }}</span> | 
+                    <span>💰 {{ job.salary }}</span>
+                </div>
+                <div class="job-actions">
+                    {% if username %}
+                        <a href="/job-detail/{{ job.id }}?username={{ username }}" class="view-btn">Xem chi tiết</a>
+                    {% else %}
+                        <a href="/job-detail/{{ job.id }}" class="view-btn">Xem chi tiết</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-results">
+                <h3>Không tìm thấy kết quả</h3>
+                <p>Thử tìm kiếm với từ khóa khác hoặc kiểm tra lại chính tả.</p>
+            </div>
+        {% endif %}
+        
+        <!-- Link quay lại -->
+        {% if username %}
+            <a href="/home-logged-in?username={{ username }}" class="back-link">← Quay lại trang chủ</a>
+        {% else %}
+            <a href="/" class="back-link">← Quay lại trang chủ</a>
+        {% endif %}
+    </div>
+</body>
+</html>

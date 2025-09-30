@@ -19,9 +19,9 @@
             <ul>
                 <li><a method='get' href="/home-logged-in?username={{username}}">Trang chủ</a></li>
                 <li><a method="get" href="/aboutus-logged-in?username={{username}}">Về chúng tôi</a></li>
-                <li><a method="get" href="/home-logged-in?username={{username}}">Tìm việc làm</a></li>
+                <li><a method="get" href="/finding-jobs?username={{username}}">Tìm việc làm</a></li>
                 <li><a method="get" href="/ocr-scan-logged-in?username={{username}}">Quét CV bằng OCR</a></li>
-                <li><a method="get" href="/pricing-user-logged-in?username={{username}}">Gói dịch vụ</a></li>
+                <li><a method="get" href="/pricing-user-loggedin?username={{username}}">Gói dịch vụ</a></li>
             </ul>
         </div>
         <div class="header-actions">
@@ -31,7 +31,7 @@
             <script>
                 async function fetchCoin() {
                     try {
-                    const response = await fetch(`/get-coin?username={{username}}`);
+                    const response = await fetch(`/api/get-coin?username={{username}}`);
                     const data = await response.json();
                     if (data.success) {
                         document.querySelector('.header-actions strong').textContent = data.coin;
@@ -47,8 +47,7 @@
             </script>
         </div>
         <div class="user-avatar">
-            <!-- Load avatar từ db -->
-            <img onclick="boxAppear()" style="width: 40px; height: 40px; border-radius: 50%;" src="{{ user_avatar if user_avatar else '/static/avatars/user_avatar.png' }}" alt="User Avatar">
+            <img onclick="boxAppear()" style="width: 40px; height: 40px; border-radius: 50%;" src="/static/images/user_avatar.png" alt="User Avatar">
         </div>
         <script>
             function boxAppear() {
@@ -65,7 +64,7 @@
                     <p><a href="/edit-profile?username={{username}}" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
                     <p><a href="/mycv-settings?username={{username}}" style="text-decoration:none;color:#222;">CV của tôi</a></p>
                     <p><a href="/system-settings?username={{username}}" style="text-decoration:none;color:#222;">Cài đặt tài khoản</a></p>
-                    <p><a href="/logout" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
+                    <p><a href="/home" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
                 `;
                 document.body.appendChild(box);
                 document.addEventListener('click', function handleClickOutside(event) {
@@ -126,10 +125,8 @@
     </div> <!-- kết thúc phần giới thiệu cách hoạt động-->
     <div class="thanh-timkiemvavitri"> <!--thanh tìm kiếm vị trí-->
         <form method="GET" action="/home-logged-in" style="display: flex; gap: 10px; align-items: center;">
-            <!-- Keyword -->
-            <input type="text" name="keyword" placeholder="🔍Tìm kiếm công việc (từ khóa, công ty, vị trí...)" value="{{ request.query_params.get('keyword','') }}" style="flex: 1;">
-            <!-- Location -->
-            <input type="text" name="location" placeholder="Địa điểm (ví dụ: Hà Nội, Hồ Chí Minh)" value="{{ request.query_params.get('location','') }}" style="width: 240px;">
+            <input type="text" name="keyword" placeholder="🔍Tìm kiếm công việc (từ khóa, công ty, địa điểm...)" value="{{ keyword if keyword else '' }}" style="flex: 1;">
+            <input type="hidden" name="username" value="{{ username }}">
             <button type="submit">Tìm kiếm</button>
         </form>
     </div> <!-- kết thúc thanh tìm kiếm vị trí -->
@@ -148,7 +145,7 @@
         </div>
         <section class="job-listing-grid">
                 {%for jd in job_descriptions%}
-                <a style="text-decoration: none;" method="GET" href="/job-detail/{{ jd.id }}?username={{ username }}">
+                <a style="text-decoration: none;" href="/job-detail/{{ jd.id }}?username={{ username }}">
                     <div class="job-card">
                         <div class="job-card-logo">
                             <img src="{{jd.company_logo}}" alt="{{jd.company_name}}">

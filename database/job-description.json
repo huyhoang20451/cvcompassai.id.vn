@@ -1,0 +1,465 @@
+[
+    {
+        "id": 1,
+        "company_id": 1,
+        "company_logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVZEZ6fa7bPwCI4HE5583rhd3qiFNmf6kiPg&s",
+        "job_title": "Frontend Developer",
+        "company_name": "Google Việt Nam",
+        "salary": "25,000,000 - 35,000,000 VND",
+        "location": "Quận 1, TP. Hồ Chí Minh",
+        "industry": "Công nghệ thông tin",
+        "position": "Frontend Developer",
+        "company": "Google Việt Nam",
+        "workplace": "Quận 1, TP. Hồ Chí Minh",
+        "job_description": [
+            "Phát triển giao diện người dùng cho các ứng dụng web, tối ưu trải nghiệm người dùng, phối hợp cùng backend team để tích hợp API."
+        ],
+        "requirements": [
+            "Tốt nghiệp chuyên ngành CNTT hoặc liên quan",
+            "Kinh nghiệm tối thiểu 2 năm với ReactJS/Angular",
+            "Hiểu biết về HTML5, CSS3, JavaScript ES6+",
+            "Có khả năng làm việc nhóm và tư duy giải quyết vấn đề"
+        ],
+        "benefits": [
+            "Lương thưởng cạnh tranh, review 2 lần/năm",
+            "Bảo hiểm full lương, gói chăm sóc sức khỏe",
+            "Teambuilding, du lịch hàng năm"
+        ],
+        "working_time": "Thứ 2 - Thứ 6, 9:00 - 18:00",
+        "application_method": "Ứng tuyển trực tiếp qua website công ty hoặc gửi CV đến hr@google.com",
+        "deadline": "30/09/2025"
+    },
+    {
+        "id": 2,
+        "company_id": 1,
+        "company_logo": "https://inkythuatso.com/uploads/thumbnails/800/2021/10/logo-vinfast-inkythuatso-21-11-22-46.jpg",
+        "job_title": "Kỹ sư Cơ khí Ô tô",
+        "company_name": "VinFast",
+        "salary": "18,000,000 - 28,000,000 VND",
+        "location": "Hải Phòng",
+        "industry": "Công nghiệp ô tô",
+        "position": "Kỹ sư Cơ khí Ô tô",
+        "company": "VinFast",
+        "workplace": "KCN Đình Vũ, Hải Phòng",
+        "job_description": [
+            "Tham gia thiết kế, cải tiến và kiểm định các bộ phận cơ khí trong sản xuất ô tô. Hỗ trợ vận hành dây chuyền và xử lý sự cố kỹ thuật."
+        ],
+        "requirements": [
+            "Tốt nghiệp đại học chuyên ngành Cơ khí, Ô tô",
+            "Có ít nhất 1 năm kinh nghiệm",
+            "Khả năng đọc hiểu bản vẽ kỹ thuật",
+            "Tiếng Anh giao tiếp cơ bản"
+        ],
+        "benefits": [
+            "Lương thưởng hấp dẫn, chế độ đãi ngộ tốt",
+            "Xe đưa đón nhân viên Hà Nội – Hải Phòng",
+            "Được đào tạo chuyên môn nâng cao"
+        ],
+        "working_time": "Thứ 2 - Thứ 7, 8:00 - 17:00",
+        "application_method": "Ứng tuyển qua website VinFast hoặc gửi CV về careers@vinfast.vn",
+        "deadline": "15/10/2025"
+    },
+    {
+        "id": 3,
+        "company_id": 1,
+        "company_logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDDlOahXX8ADANkCQuNoKVlMH_tOygy8zpMw&s",
+        "job_title": "Chuyên viên Tín dụng Doanh nghiệp",
+        "company_name": "Vietcombank",
+        "salary": "Thỏa thuận",
+        "location": "Hà Nội",
+        "industry": "Ngân hàng - Tài chính",
+        "position": "Chuyên viên Tín dụng Doanh nghiệp",
+        "company": "Ngân hàng TMCP Ngoại thương Việt Nam (Vietcombank)",
+        "workplace": "Trụ sở chính, Hà Nội",
+        "job_description": [
+            "Tìm kiếm, tư vấn và chăm sóc khách hàng doanh nghiệp. Phân tích tài chính, đề xuất giải pháp tín dụng phù hợp, quản lý rủi ro tín dụng."
+        ],
+        "requirements": [
+            "Tốt nghiệp Đại học chuyên ngành Tài chính, Ngân hàng",
+            "Ưu tiên ứng viên có kinh nghiệm tín dụng 1-2 năm",
+            "Kỹ năng phân tích tài chính tốt",
+            "Giao tiếp tốt, có tinh thần cầu tiến"
+        ],
+        "benefits": [
+            "Mức lương cạnh tranh, thưởng theo hiệu quả công việc",
+            "Chế độ đãi ngộ theo quy định của Vietcombank",
+            "Cơ hội thăng tiến rõ ràng"
+        ],
+        "working_time": "Thứ 2 - Thứ 6, 8:30 - 17:30",
+        "application_method": "Ứng tuyển qua cổng tuyển dụng chính thức của Vietcombank",
+        "deadline": "05/10/2025"
+    },
+    {
+        "id": 4,
+        "company_id": 4,
+        "company_logo": "https://career.fpt-software.com/wp-content/themes/jobcareer/fpt_landing_page/taste-vietnam/images/user/11125/Logo_fpt_software.png",
+        "job_title": "Chuyên viên Phân tích Kinh doanh",
+        "company_name": "FPT Software",
+        "salary": "20,000,000 - 30,000,000 VND",
+        "location": "Hà Nội",
+        "industry": "Công nghệ thông tin",
+        "position": "Chuyên viên Phân tích Kinh doanh",
+        "company": "FPT Software",
+        "workplace": "Tòa nhà FPT, Cầu Giấy, Hà Nội",
+        "job_description": [
+            "Phân tích yêu cầu kinh doanh của khách hàng, chuyển đổi yêu cầu thành tài liệu kỹ thuật cho đội phát triển. Hỗ trợ quản lý dự án và đảm bảo chất lượng sản phẩm."
+        ],
+        "requirements": [
+            "Tốt nghiệp Đại học chuyên ngành CNTT, Quản trị Kinh doanh hoặc liên quan",
+            "Kinh nghiệm 2-3 năm trong vai trò tương đương",
+            "Kỹ năng giao tiếp và thuyết trình tốt",
+            "Hiểu biết về quy trình phát triển phần mềm"
+        ],
+        "benefits": [
+            "Lương thưởng hấp dẫn, review 2 lần/năm",
+            "Chế độ bảo hiểm đầy đủ theo quy định",
+            "Cơ hội tham gia các dự án quốc tế"
+        ],
+        "working_time": "Thứ 2 - Thứ 6, 9:00 - 18:00",
+        "application_method": "Ứng tuyển qua website FPT Software hoặc gửi CV đến email: recruitment@fpt.com.vn",
+        "deadline": "30/09/2025"
+    },
+    {
+        "id": 5,
+        "company_id": 5,
+        "company_logo": "https://vietnamstaytravel.com/wp-content/uploads/202106192318-iconlogovns-0x0.png",
+        "job_title": "Nhân Viên Kinh Doanh - Nghỉ Dưỡng Cao Cấp (Hồ Chí Minh)",
+        "company_name": "Công ty TNHH VNS",
+        "salary": "Thoả thuận",
+        "location": "Hồ Chí Minh",
+        "industry": "Bán hàng",
+        "position": "Nhân Viên Kinh Doanh",
+        "company": "Công ty TNHH VNS",
+        "workplace": "Hồ Chí Minh",
+        "job_description": [
+            "Tìm kiếm và phát triển khách hàng mới. Chăm sóc khách hàng hiện tại, duy trì mối quan hệ tốt với khách hàng."
+        ],
+        "requirements": [
+            "Tốt nghiệp Đại học chuyên ngành Kinh tế, Quản trị Kinh doanh",
+            "Có kinh nghiệm ít nhất 1 năm trong lĩnh vực bán hàng",
+            "Kỹ năng giao tiếp và thuyết phục tốt",
+            "Chịu được áp lực công việc"
+        ],
+        "benefits": [
+            "Lương cơ bản + hoa hồng hấp dẫn",
+            "Chế độ đãi ngộ tốt, môi trường làm việc chuyên nghiệp",
+            "Cơ hội thăng tiến cao"
+        ],
+        "working_time": "Thứ 2 - Thứ 6, 8:30 - 17:30",
+        "application_method": "Ứng tuyển qua email: hr@vns.com.vn",
+        "deadline": "30/09/2025"
+    },
+    {
+        "id": 6,
+        "company_id": 6,
+        "company_logo": "https://cdn-new.topcv.vn/unsafe/140x/https://static.topcv.vn/company_logos/cong-ty-co-phan-ky-thuat-viet-son-60a341add0a68.jpg",
+        "job_title": "Nhân Viên Kỹ Thuật Máy Nén Khí (Không Yêu Cầu Kinh Nghiệm)",
+        "company_name": "CÔNG TY CỔ PHẦN KỸ THUẬT VIỆT SƠN",
+        "salary": "9-11 triệu",
+        "location": "Hà Nội, Hồ Chí Minh",
+        "industry": "Bán hàng",
+        "position": "Nhân Viên Kinh Doanh",
+        "company": "Công ty TNHH VNS",
+        "workplace": "Hồ Chí Minh",
+        "job_description": [
+            "Tìm kiếm và phát triển khách hàng mới. Chăm sóc khách hàng hiện tại, duy trì mối quan hệ tốt với khách hàng.",
+            "Vận hành chạy thử hệ thống khí nén sau khi lắp đặt.",
+            "Kiểm tra, tìm hiểu nguyên nhân và đưa ra biện pháp khắc phục sự cố máy",
+            "Thực hiện công việc bảo trì, bảo dưỡng những thiết bị đã cung cấp",
+            "Ghi nhận ý kiến, phản hồi của khách hàng và lập báo cáo",
+            "Có hiểu biết về lắp điện, nếu chưa có kinh nghiệm lắp đặt hệ thống sẽ được đào tạo"
+        ],
+        "requirements": [
+            "Tốt nghiệp Đại học chuyên ngành Kinh tế, Quản trị Kinh doanh",
+            "Có kinh nghiệm ít nhất 1 năm trong lĩnh vực bán hàng",
+            "Kỹ năng giao tiếp và thuyết phục tốt",
+            "Chịu được áp lực công việc"
+        ],
+        "benefits": [
+            "Lương cơ bản + hoa hồng hấp dẫn",
+            "Chế độ đãi ngộ tốt, môi trường làm việc chuyên nghiệp",
+            "Cơ hội thăng tiến cao"
+        ],
+        "working_time": "Thứ 2 - Thứ 6, 8:30 - 17:30",
+        "application_method": "Ứng tuyển qua email: hr@vns.com.vn",
+        "deadline": "30/09/2025"
+    },
+    {
+        "id": 7,
+        "company_id": 7,
+        "company_logo": "https://congthuongabc.com.vn/wp-content/uploads/Logo-ABC-Cong-Thuong-Viet-Nam.png",
+        "job_title": "Nhân Viên Hỗ Trợ Khách Hàng",
+        "company_name": "Công ty TNHH ABC",
+        "salary": "8-10 triệu",
+        "location": "Hà Nội",
+        "industry": "Dịch vụ",
+        "position": "Nhân Viên Hỗ Trợ Khách Hàng",
+        "company": "Công ty TNHH ABC",
+        "workplace": "Hà Nội",
+        "job_description": [
+            "Tiếp nhận và xử lý yêu cầu của khách hàng qua điện thoại, email.",
+            "Hỗ trợ khách hàng trong việc sử dụng sản phẩm, dịch vụ của công ty."
+        ],
+        "requirements": [
+            "Tốt nghiệp Cao đẳng trở lên",
+            "Kỹ năng giao tiếp tốt, nhạy bén trong xử lý tình huống",
+            "Có kinh nghiệm trong lĩnh vực chăm sóc khách hàng là một lợi thế"
+        ],
+        "benefits": [
+            "Mức lương cạnh tranh, thưởng theo hiệu quả công việc",
+            "Được đào tạo và phát triển nghề nghiệp",
+            "Môi trường làm việc thân thiện, chuyên nghiệp"
+        ],
+        "working_time": "Thứ 2 - Thứ 6, 8:30 - 17:30",
+        "application_method": "Ứng tuyển qua email: hr@abc.com.vn",
+        "deadline": "30/09/2025"
+    },
+    {
+        "id": 8,
+        "company_id": 8,
+        "company_logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmU98Acot1Lz9zz6zNzSbZzeLP4m0KHMwFvQ&s",
+        "job_title": "Nhân Viên Kinh Doanh",
+        "company_name": "Công ty TNHH XYZ",
+        "salary": "10-12 triệu",
+        "location": "Đà Nẵng",
+        "industry": "Bán hàng",
+        "position": "Nhân Viên Kinh Doanh",
+        "company": "Công ty TNHH XYZ",
+        "workplace": "Đà Nẵng",
+        "job_description": [
+            "Tìm kiếm và phát triển khách hàng mới.",
+            "Chăm sóc khách hàng hiện tại."
+        ],
+        "requirements": [
+            "Tốt nghiệp Đại học chuyên ngành Kinh tế, Quản trị Kinh doanh",
+            "Có kinh nghiệm ít nhất 1 năm trong lĩnh vực bán hàng",
+            "Kỹ năng giao tiếp và thuyết phục tốt"
+        ],
+        "benefits": [
+            "Lương cơ bản + hoa hồng hấp dẫn",
+            "Chế độ đãi ngộ tốt, môi trường làm việc chuyên nghiệp"
+        ],
+        "working_time": "Thứ 2 - Thứ 6, 8:30 - 17:30",
+        "application_method": "Ứng tuyển qua email: hr@xyz.com.vn",
+        "deadline": "30/09/2025"
+    },
+    {
+        "id": 9,
+        "company_id": 9,
+        "company_logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Def_Jam_Recordings.svg/250px-Def_Jam_Recordings.svg.png",
+        "job_title": "Nhân Viên Marketing",
+        "company_name": "Công ty TNHH DEF",
+        "salary": "12-15 triệu",
+        "location": "Hà Nội",
+        "industry": "Marketing",
+        "position": "Nhân Viên Marketing",
+        "company": "Công ty TNHH DEF",
+        "workplace": "Hà Nội",
+        "job_description": [
+            "Lên kế hoạch và triển khai các chiến dịch marketing.",
+            "Phân tích thị trường và đối thủ cạnh tranh."
+        ],
+        "requirements": [
+            "Tốt nghiệp Đại học chuyên ngành Marketing, Quản trị Kinh doanh",
+            "Có kinh nghiệm ít nhất 2 năm trong lĩnh vực marketing",
+            "Kỹ năng giao tiếp và làm việc nhóm tốt"
+        ],
+        "benefits": [
+            "Lương hấp dẫn, thưởng theo hiệu quả công việc",
+            "Được đào tạo và phát triển nghề nghiệp",
+            "Môi trường làm việc năng động, sáng tạo"
+        ],
+        "working_time": "Thứ 2 - Thứ 6, 8:30 - 17:30",
+        "application_method": "Ứng tuyển qua email: hr@def.com.vn",
+        "deadline": "30/09/2025"
+    },
+    {
+        "id": 10,
+        "company_id": 10,
+        "company_logo": "https://blob-careerlinkvn.careerlink.vn/company_logos/9af9aa21884b7191f49c40faf29071c7.png",
+        "job_title": "Nhân Viên Kỹ Thuật",
+        "company_name": "Công ty TNHH GHI",
+        "salary": "12-15 triệu",
+        "location": "Hà Nội",
+        "industry": "Công nghệ",
+        "position": "Nhân Viên Kỹ Thuật",
+        "company": "Công ty TNHH GHI",
+        "workplace": "Hà Nội",
+        "job_description": [
+            "Triển khai và bảo trì hệ thống công nghệ thông tin.",
+            "Hỗ trợ người dùng trong việc sử dụng hệ thống."
+        ],
+        "requirements": [
+            "Tốt nghiệp Đại học chuyên ngành Công nghệ Thông tin",
+            "Có kinh nghiệm làm việc trong lĩnh vực CNTT",
+            "Kỹ năng giải quyết vấn đề tốt"
+        ],
+        "benefits": [
+            "Lương hấp dẫn, thưởng theo hiệu quả công việc",
+            "Được đào tạo và phát triển nghề nghiệp",
+            "Môi trường làm việc năng động, sáng tạo"
+        ],
+        "working_time": "Thứ 2 - Thứ 6, 8:30 - 17:30",
+        "application_method": "Ứng tuyển qua email: hr@ghi.com.vn",
+        "deadline": "30/09/2025"
+    },
+    {
+        "id": 11,
+        "company_id": 11,
+        "company_logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTW_PBq9lIKNnlOLwPAHc3CmMALEz01v5QSXQ&s",
+        "job_title": "Nhân Viên Hành Chính",
+        "company_name": "Công ty TNHH JKL",
+        "salary": "8-10 triệu",
+        "location": "Hà Nội",
+        "industry": "Hành chính",
+        "position": "Nhân Viên Hành Chính",
+        "company": "Công ty TNHH JKL",
+        "workplace": "Hà Nội",
+        "job_description": [
+            "Quản lý hồ sơ nhân sự.",
+            "Hỗ trợ công tác tuyển dụng."
+        ],
+        "requirements": [
+            "Tốt nghiệp Đại học chuyên ngành Quản trị Nhân sự",
+            "Có kinh nghiệm ít nhất 1 năm trong lĩnh vực hành chính",
+            "Kỹ năng giao tiếp và tổ chức tốt"
+        ],
+        "benefits": [
+            "Lương hấp dẫn, thưởng theo hiệu quả công việc",
+            "Được đào tạo và phát triển nghề nghiệp",
+            "Môi trường làm việc chuyên nghiệp"
+        ],
+        "working_time": "Thứ 2 - Thứ 6, 8:30 - 17:30",
+        "application_method": "Ứng tuyển qua email: hr@jkl.com.vn",
+        "deadline": "30/09/2025"
+    },
+    {
+        "id": 12,
+        "company_id": 12,
+        "company_logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRisFkDxusJr1zHM4AKdpBpEestxpP0FSubJQ&s",
+        "job_title": "Nhân Viên Kinh Doanh",
+        "company_name": "Công ty TNHH MNO",
+        "salary": "10-12 triệu",
+        "location": "Hà Nội",
+        "industry": "Kinh doanh",
+        "position": "Nhân Viên Kinh Doanh",
+        "company": "Công ty TNHH MNO",
+        "workplace": "Hà Nội",
+        "job_description": [
+            "Tìm kiếm và phát triển khách hàng mới.",
+            "Chăm sóc khách hàng hiện tại."
+        ],
+        "requirements": [
+            "Tốt nghiệp Đại học chuyên ngành Kinh tế, Quản trị Kinh doanh",
+            "Có kinh nghiệm ít nhất 1 năm trong lĩnh vực bán hàng",
+            "Kỹ năng giao tiếp và thuyết phục tốt"
+        ],
+        "benefits": [
+            "Lương cơ bản + hoa hồng hấp dẫn",
+            "Chế độ đãi ngộ tốt, môi trường làm việc chuyên nghiệp"
+        ],
+        "working_time": "Thứ 2 - Thứ 6, 8:30 - 17:30",
+        "application_method": "Ứng tuyển qua email: hr@mno.com.vn",
+        "deadline": "30/09/2025"
+    },
+    {
+        "id": 13,
+        "company_logo": "1",
+        "company_id": 1,
+        "job_title": "Quản trị nhân sự",
+        "company_name": "Công ty A",
+        "salary": "9 - 10tr",
+        "location": "Trung tâm quản lý dân sự 123",
+        "industry": "Quản lý nhân sự công ty",
+        "position": "ABC",
+        "company": "Coca Cola Company",
+        "workplace": "S606 Vinhomes Grand Park",
+        "job_description": [
+            "[\"1\",\"2\",\"3\"]"
+        ],
+        "requirements": [
+            "[\"1. ffffffffffffffff\",\"2.ddddddddd\",\"3.sssssssssssssss\"]"
+        ],
+        "benefits": [
+            "[\"sưadadevdvfvf\",\"csffrfefrrfrf\",\"csgdthththtrrgt\"]"
+        ],
+        "working_time": "6h - 18h tối",
+        "application_method": "Qua điện thoại: 0343833557",
+        "deadline": "12/12/2025"
+    },
+    {
+        "id": 14,
+        "company_logo": "2",
+        "company_id": 1,
+        "job_title": "Nhân viên kinh doanh",
+        "company_name": "Công ty B",
+        "salary": "10 - 15tr",
+        "location": "Trung tâm quản lý dân sự 456",
+        "industry": "Kinh doanh",
+        "position": "XYZ",
+        "company": "Deer Coffee",
+        "workplace": "S606 Vinhomes Grand Park",
+        "job_description": [
+            "[\"Tìm kiếm và phát triển khách hàng mới.\",\"Chăm sóc khách hàng hiện tại, duy trì mối quan hệ tốt với khách hàng.\"]"
+        ],
+        "requirements": [
+            "[\"Tốt nghiệp Đại học chuyên ngành Kinh tế, Quản trị Kinh doanh\",\"Có kinh nghiệm ít nhất 1 năm trong lĩnh vực bán hàng\",\"Kỹ năng giao tiếp và thuyết phục tốt\",\"Chịu được áp lực công việc\"]"
+        ],
+        "benefits": [
+            "[\"Lương cơ bản + hoa hồng hấp dẫn\",\"Chế độ đãi ngộ tốt, môi trường làm việc chuyên nghiệp\",\"Cơ hội thăng tiến cao\"]"
+        ],
+        "working_time": "8h - 17h30 tối",
+        "application_method": "Qua email: hr@deercoffee.com.vn",
+        "deadline": "30/09/2025"
+    },
+    {
+        "id": 15,
+        "company_id": 1,
+        "company_logo": "1",
+        "job_title": "Quản trị nhân sự",
+        "company_name": "Công ty A",
+        "salary": "9 - 10tr",
+        "location": "Trung tâm quản lý dân sự 123",
+        "industry": "Quản lý nhân sự công ty",
+        "position": "ABC",
+        "company": "Coca Cola Company",
+        "workplace": "S606 Vinhomes Grand Park",
+        "job_description": [
+            "[\"dcdssrgrgregef\",\"sfrgyytjjhttre\",\"rgegerefewfwerre\"]"
+        ],
+        "requirements": [
+            "[\"vvrefjrefkijflaifje\",\"vmvkesiughgiurehfeof\",\"vjarnvreuhwjifjoifjrgoirg\"]"
+        ],
+        "benefits": [
+            "[\"jveriuhreiajlifr\",\"rgrfufjieur84frf\",\"kjrenrekugnurirflrfe\"]"
+        ],
+        "working_time": "6h - 18h tối",
+        "application_method": "Qua điện thoại: 0343833557",
+        "deadline": "12/12/2025"
+    },
+    {
+        "id": 16,
+        "company_id": 1,
+        "company_logo": "2",
+        "job_title": "Quản lý nguyên vật liệu pha cafe",
+        "company_name": "Deer Coffee",
+        "salary": "15 - 20 triệu",
+        "location": "Nhà Văn Hóa Sinh Viên",
+        "industry": "Quản lý nguyên vật liệu pha cafe",
+        "position": "Quản lý nguyên liệu",
+        "company": "Deer Coffee",
+        "workplace": "Nhà văn hóa sinh viên, đường Lưu Hữu Phước, TP. Dĩ An, tỉnh Bình Dương",
+        "job_description": [
+            "[\"Biết cách quản lý hiệu quả cà phê, vật liệu pha\",\"Biết cách quản trị quán\"]"
+        ],
+        "requirements": [
+            "[\"Không\"]"
+        ],
+        "benefits": [
+            "[\"Được hưởng lương ở tháng 13.\",\"Có thưởng, trợ cấp đi lại, xăng xe, ăn uống\"]"
+        ],
+        "working_time": "6h - 18h tối",
+        "application_method": "Qua điện thoại: 0343833557",
+        "deadline": "12/12/2025"
+    }
+]

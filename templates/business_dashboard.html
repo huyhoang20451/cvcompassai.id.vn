@@ -181,7 +181,7 @@
                 <li><a method='get' href="/business-dashboard?username={{username}}&role={{role}}&company={{company}}">Trang chủ</a></li>
                 <li><a method="get" href="/job-storage?username={{username}}&company={{company}}">Quản lý JD</a></li>
                 <li><a method="get" href="/cv-detail-business?username={{username}}&company={{company}}">Danh sách CV</a></li>
-                <li><a method="get" href="#">Quét CV tự động</a></li>
+                <li><a method="get" href="/cv-detail-business?username={{username}}&company={{company}}">Quét CV tự động</a></li>
                 <li><a method="get" href="/pricing-business-logged-in?username={{username}}&role={{role}}&company={{company}}">Nâng cấp Premium</a></li>
             </ul>
         </div>
@@ -207,7 +207,7 @@
                     <p><a href="#" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
                     <p><a href="#" style="text-decoration:none;color:#222;">Lưu trữ JD</a></p>
                     <p><a href="#" style="text-decoration:none;color:#222;">Cài đặt</a></p>
-                    <p><a href="/logout" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
+                    <p><a href="/business-home" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
                 `;
                 document.body.appendChild(box);
                 document.addEventListener('click', function handleClickOutside(event) {

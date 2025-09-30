@@ -142,15 +142,15 @@
       <li>Dùng xu để mở khóa Top 5 doanh nghiệp</li>
       <li>Không tự động cập nhật thông tin doanh nghiệp</li>
     </ul>
-        <!-- gửi package và price lên FastAPI -->
-        <form action="/coin-checkout" method="get">
-            <input type="hidden" name="username" value="{{ username }}">
-            <input type="hidden" name="package" value="Xu">
-            <input type="hidden" name="price" value="10000">
-            <label for="quantity">Số lượng: </label>
-            <input type="number" name="quantity" value="1" min="1">
-      <br><br>
-      <button type="submit" class="btn">Mua ngay</button>
+                <!-- gửi package và price lên FastAPI -->
+    <form id="purchase-form-xu" action="/coin-checkout" method="get">
+        <input type="hidden" name="username" value="{{ username }}">
+        <input type="hidden" name="package" value="xu">
+        <input type="hidden" name="price" value="10000">
+        <label for="quantity">Số lượng: </label>
+        <input type="number" name="quantity" value="1" min="1">
+        <br><br>
+        <button type="submit" class="btn">Mua ngay</button>
     </form>
   </div>
 </body>

@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CV Compass - Admin Dashboard</title>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root{
+      --bg:#fff; /* light */
+      --page-grad-start: #f0f9ff; /* light blue */
+      --page-grad-end: #fefce8; /* light yellow */
+      --card:#ffffff;
+      --accent:#2563eb; /* blue */
+      --accent-2:#f59e0b; /* amber */
+      --text:#0f1724;
+      --muted:#6b7280;
+      --glass: rgba(15,23,36,0.04);
+      --radius:12px;
+      --max-width:1200px;
+      --shadow: 0 6px 18px rgba(15,23,36,0.06);
+    }
+    *{box-sizing:border-box}
+    body{font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin:0; background:linear-gradient(135deg,var(--page-grad-start) 0%, var(--page-grad-end) 100%); color:var(--text)}
+    .container{max-width:var(--max-width); margin:24px auto; display:grid; grid-template-columns:260px 1fr; gap:20px; padding:0 16px}
+
+    /* SIDEBAR */
+    .sidebar{background:linear-gradient(180deg, rgba(255,255,255,0.8), rgba(255,255,255,0.9)); border-radius:var(--radius); padding:18px; height:calc(100vh - 48px); position:sticky; top:24px; box-shadow:var(--shadow); border:1px solid rgba(15,23,36,0.04)}
+    .brand{display:flex; gap:12px; align-items:center; margin-bottom:18px}
+    .brand .logo{width:44px; height:44px; border-radius:10px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:white; display:flex; align-items:center; justify-content:center; font-weight:700; box-shadow:0 6px 14px rgba(37,99,235,0.2)}
+    .nav{margin-top:12px}
+    .nav a{display:flex; gap:12px; align-items:center; padding:10px; color:var(--muted); border-radius:8px; text-decoration:none}
+    .nav a:hover{background:var(--glass); color:var(--text)}
+    .nav a.active{background:linear-gradient(90deg, rgba(37,99,235,0.08), rgba(245,158,11,0.08)); color:var(--accent)}
+
+    /* MAIN */
+    .main{min-height:80vh}
+    .topbar{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px}
+    .search{background:var(--card); padding:10px 12px; border-radius:10px; display:flex; gap:8px; align-items:center; min-width:240px; box-shadow:0 4px 10px rgba(15,23,36,0.04); border:1px solid rgba(15,23,36,0.03)}
+    .search input::placeholder{color:var(--muted)}
+    .cards{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:18px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(250,250,250,0.95)); padding:16px; border-radius:12px; box-shadow:var(--shadow); border:1px solid rgba(15,23,36,0.03)}
+    .card .value{font-size:20px; font-weight:700}
+    .card .label{color:var(--muted); font-size:13px}
+
+    .grid{display:grid; grid-template-columns:2fr 1fr; gap:12px}
+    .panel{background:var(--card); padding:16px; border-radius:12px; box-shadow:var(--shadow); border:1px solid rgba(15,23,36,0.03)}
+    table{width:100%; border-collapse:collapse}
+    thead th{color:var(--muted); text-align:left; padding-bottom:8px}
+    tbody tr{border-top:1px solid rgba(15,23,36,0.03)}
+    td{padding:12px 0}
+    .btn{display:inline-flex; gap:8px; align-items:center; padding:8px 12px; border-radius:8px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:white; font-weight:600; text-decoration:none; box-shadow:0 6px 12px rgba(37,99,235,0.1)}
+
+    /* badges */
+    .badge{display:inline-block;padding:6px 8px;border-radius:999px;font-size:12px;font-weight:600}
+    .badge.green{background:#d1fae5;color:#065f46}
+    .badge.yellow{background:#fff7cd;color:#92400e}
+    .badge.red{background:#fee2e2;color:#b91c1c}
+
+    /* responsive */
+    @media (max-width:900px){
+      .container{grid-template-columns:1fr;}
+      .sidebar{position:relative; height:auto}
+      .cards{grid-template-columns:repeat(2,1fr)}
+      .grid{grid-template-columns:1fr}
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">CV</div>
+        <div>
+          <div style="font-weight:700">CV Compass</div>
+          <div style="font-size:12px;color:var(--muted)">Admin Dashboard</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="/" class="active"><i class="fa fa-chart-line"></i> Tổng quan</a>
+        <a href="/services"><i class="fa fa-box"></i> Dịch vụ</a>
+        <a href="/users"><i class="fa fa-users"></i> Quản lý người dùng</a>
+        <a href="/quality-cv-checker"><i class="fa fa-file-invoice-dollar"></i>Chất lượng quét CV</a>
+        <a href="/transaction-manage"><i class="fa fa-exchange-alt"></i> Quản lý giao dịch</a>
+      </nav>
+      <div style="position:absolute; bottom:24px; left:18px; right:18px; font-size:13px; color:var(--muted)">
+        <div>Phiên: <strong>Hoang</strong></div>
+        <div style="margin-top:6px">© 2025 - CV Compass</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="search">
+          <i class="fa fa-search" style="color:var(--muted)"></i>
+          <input id="searchInput" placeholder="Tìm kiếm..." style="background:transparent;border:0;outline:0;color:var(--text);width:100%" />
+        </div>
+        <div style="display:flex; gap:12px; align-items:center">
+          <div style="text-align:right">
+            <div style="font-weight:700">Xin chào, Hoang</div>
+            <div style="font-size:12px;color:var(--muted)">Quản trị viên</div>
+          </div>
+          <div style="width:44px;height:44px;border-radius:44px;background:var(--glass);display:flex;align-items:center;justify-content:center"><i class="fa fa-bell" style="color:var(--muted)"></i></div>
+        </div>
+      </div>
+
+      <section class="cards">
+        <div class="card">
+          <div class="label">Người dùng mới</div>
+          <div class="value">{{ total_users }}</div>
+        </div>
+        <div class="card">
+          <div class="label">CV đã tạo</div>
+          <div class="value">1,240</div>
+        </div>
+        <div class="card">
+          <div class="label">Dịch vụ đang dùng</div>
+          <div class="value">{{ total_orders }}</div>
+        </div>
+        <div class="card">
+          <div class="label">Tỷ lệ hủy</div>
+          <div class="value">{{ cancelled_percentage }}%</div>
+        </div>
+        <div class="card">
+          <div class="label">Doanh thu</div>
+          <div class="value">{{ total_revenue }} VND</div>
+        </div>
+      </section>
+
+      <div class="grid">
+        <div class="panel">
+          <h3 style="margin-top:0">Biểu đồ CV được tạo</h3>
+          <canvas id="cvChart" height="120"></canvas>
+        </div>
+        <div class="panel">
+          <h4 style="margin-top:0">Hoạt động gần đây</h4>
+          <table>
+            <thead>
+              <tr><th>Người dùng</th><th>Hoạt động</th><th>Thời gian</th></tr>
+            </thead>
+            <tbody id="activityTable">
+              <tr><td>Nguyễn A</td><td>Tạo CV</td><td>10:20</td></tr>
+              <tr><td>Trần B</td><td>Nâng cấp gói</td><td>09:45</td></tr>
+              <tr><td>Lê C</td><td>Xóa CV</td><td>08:15</td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:12px;text-align:right">
+            <a class="btn" href="#">Xem tất cả <i class="fa fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:18px"></div>
+
+      <div class="panel">
+        <h4 style="margin-top:0">Danh sách dịch vụ</h4>
+        <table>
+          <thead>
+            <tr><th>Tên dịch vụ</th><th>Người dùng</th><th>Giá</th><th>Trạng thái</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Gói theo Xu</td><td>{{ coin_users }}</td><td>₫ {{ total_revenue_coin }}</td><td><span class="badge green">Active</span></td></tr>
+            <tr><td>Gói Premium</td><td>{{ premium_users }}</td><td>₫ {{ total_revenue_premium }}</td><td><span class="badge green">Active</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // Search filter for activity table
+    document.getElementById('searchInput').addEventListener('input', function(e){
+      const q = e.target.value.toLowerCase();
+      const rows = document.querySelectorAll('#activityTable tr');
+      rows.forEach(r=>{ r.style.display = (r.innerText.toLowerCase().includes(q) ? '' : 'none'); })
+    });
+
+    // Chart.js example for CV created
+    const ctx = document.getElementById('cvChart').getContext('2d');
+    const cvChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+        datasets: [{
+          label: 'CV tạo (số lượng)',
+          data: [50,80,65,90,120,70,95],
+          fill: true,
+          tension: 0.4,
+          backgroundColor: 'rgba(37,99,235,0.12)',
+          borderColor: 'rgba(37,99,235,0.95)',
+          pointRadius:4
+        }]
+      },
+      options: {
+        plugins:{legend:{display:false}},
+        scales:{y:{beginAtZero:true}}
+      }
+    });
+  </script>
+</body>
+</html>

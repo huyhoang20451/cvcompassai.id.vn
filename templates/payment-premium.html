@@ -142,16 +142,52 @@
       <li>Tự động cập nhật thông tin</li>
       <li>Giới hạn bài đăng</li>
     </ul>
-    <!-- gửi package và price lên FastAPI -->
-    <form action="/premium-checkout" method="get">
-      <input type="hidden" name="package" value="Premium">
-      <input type="hidden" name="username" value="{{ username }}">
-      <input type="hidden" name="price" value="50000">
-      <label for="quantity">Số lượng: </label>
-      <input type="number" name="quantity" value="1" min="1">
-      <br><br>
-      <button type="submit" class="btn">Mua ngay</button>
-    </form>
+        <!-- gửi package và price lên FastAPI -->
+        <form id="purchase-form-premium" action="/premium-checkout" method="get">
+            <input type="hidden" name="package" value="premium">
+            <input type="hidden" name="username" value="{{ username }}">
+            <input type="hidden" name="price" value="50000">
+            <label for="quantity">Số lượng: </label>
+            <input type="number" name="quantity" value="1" min="1">
+            <br><br>
+            <button type="submit" class="btn">Mua ngay</button>
+        </form>
+
+        <!-- VNPay quick checkout button -->
+        <div style="max-width:400px;margin:8px auto;text-align:center;">
+            <button id="vnpay-btn-premium" type="button" class="btn" style="background:#0066cc">Thanh toán VNPay</button>
+        </div>
+
+        <script>
+            document.getElementById('vnpay-btn-premium').addEventListener('click', async function () {
+                try {
+                    const form = document.getElementById('purchase-form-premium');
+                    const quantity = form.querySelector('input[name="quantity"]').value || '1';
+
+                      const price = Number(form.querySelector('input[name="price"]').value || '0');
+                      const amount = price * Number(quantity);
+                      const payload = new URLSearchParams();
+                      // send only the total amount (thành tiền) for VNPay
+                      payload.append('amount', String(amount));
+
+                    const resp = await fetch('/create_payment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: payload.toString(),
+                    });
+                    const data = await resp.json();
+                    if (data && data.payment_url) {
+                        window.location.href = data.payment_url;
+                    } else {
+                        alert('Không tạo được link thanh toán. Vui lòng thử lại.');
+                        console.error('create_payment response', data);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('Lỗi khi tạo thanh toán VNPay');
+                }
+            });
+        </script>
   </div>
 </body>
 </html>
