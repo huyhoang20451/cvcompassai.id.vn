@@ -92,19 +92,20 @@ def jd_to_str(jd: jd) -> str:
 def get_top_10_jds_by_cv(session: Session, cv_id: int) -> List[jd]:
     jds = repo_get_jds(session)
     cv = repo_get_cvs_by_id(session, cv_id)
-    if not cv:
+    if not cv.details:
         raise HTTPException(
             status_code=400,
             detail="Bạn cần quét CV trước khi hệ thống gợi ý công việc."
         )
     cv_details = cv.details
-
-    results = [
-    {
-        "jd": jd,
-        "Ratio": compare_qwen(jd_to_str(jd), cv_details)["Ratio"]
-    }
-    for jd in jds]
+    results = []
+    for jd in jds:
+        print(f"chuỗi JD: {jd_to_str(jd)}")
+        print(f"chuỗi CV: {cv_details}")
+        results.append({
+            "jd": jd,
+            "Ratio": compare_qwen(jd_to_str(jd), cv_details)["Ratio"]
+        })
 
     top_10 = sorted(results, key=lambda x: x["Ratio"], reverse=True)[:10]
     return [r["jd"] for r in top_10]

@@ -167,7 +167,7 @@ async def submit_cv(request: Request,
                                                            "username": user_info.username})
 
 # Lọc top 10 jd theo cv
-@router.get("/compare_cv_vs_jd", response_class=HTMLResponse)
+@router.get("/top10-best-jd", response_class=HTMLResponse)
 def compare_cv_vs_jd(request: Request,
                      cv_id: int, 
                      user_info: user = Depends(authorize_role(["candidate"])),
