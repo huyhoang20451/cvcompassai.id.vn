@@ -202,6 +202,13 @@ def scan_pdf(file: UploadFile):
         text += page.extract_text() or ""
     return text
 
+# So sánh CV và JD chỉ với Qwen (không qua Vintern)
+def compare_qwen(JD, CR):
+    qwen_output = run_qwen(JD, CR)
+    result = clean_and_parse(qwen_output)
+    return result
+
+# So sánh CV và JD
 def compare(url, JD, file_type):
     if file_type == "pdf":
         CR = scan_pdf(url)

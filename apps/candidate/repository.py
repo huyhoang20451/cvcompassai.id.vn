@@ -118,3 +118,10 @@ def add_cv_into_candidate(session: Session, URL: str, user_id: int) -> candidate
     session.refresh(db_obj)  # để lấy id vừa tạo
     
     return candidate_CV.model_validate(db_obj)
+
+def get_cvs_by_id(session: Session, cv_id: int) -> candidate_CV:
+    statement = (select(candidate_CV_db).where(candidate_CV_db.id == cv_id))
+    result = session.exec(statement).first()
+    if result:
+        return candidate_CV.model_validate(result)
+    return None

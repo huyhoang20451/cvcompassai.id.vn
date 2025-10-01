@@ -11,7 +11,8 @@ from .services import (search_jobs,
                        upload_cv,
                        get_candidate_cv_by_id,
                        add_cv_into_jd,
-                       add_cv_into_candidate)
+                       add_cv_into_candidate,
+                       get_top_10_jds_by_cv)
 from db import get_session
 from Core.Auth.schemas import user
 from .schemas import JobResponse, JobSearchRequest, candidate_CV
@@ -165,3 +166,11 @@ async def submit_cv(request: Request,
     return templates.TemplateResponse("finding-jobs.html",{"request": request, 
                                                            "username": user_info.username})
 
+# Lọc top 10 jd theo cv
+@router.get("/compare_cv_vs_jd", response_class=HTMLResponse)
+def compare_cv_vs_jd(request: Request,
+                     cv_id: int, 
+                     user_info: user = Depends(authorize_role(["candidate"])),
+                     session: Session = Depends(get_session)):
+    top_10 = get_top_10_jds_by_cv(session, cv_id)
+    return templates.TemplateResponse("compare_cv_vs_jd.html", {"request": request, "top_10": top_10})

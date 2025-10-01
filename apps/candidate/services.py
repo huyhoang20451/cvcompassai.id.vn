@@ -7,13 +7,15 @@ from .repository import (search_jobs as repo_search_jobs,
                          get_jd_by_id as repo_get_jd_by_id,
                          get_candidate_cv_by_id as repo_get_candidate_cv_by_id,
                          add_cv_into_jd as repo_add_cv_into_jd,
-                         add_cv_into_candidate as repo_add_cv_into_candidate)
-from fastapi import Depends, UploadFile
+                         add_cv_into_candidate as repo_add_cv_into_candidate,
+                         get_cvs_by_id as repo_get_cvs_by_id)
+from fastapi import Depends, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 from typing import Annotated, List
 from .schemas import JobSearchRequest, JobResponse, jd, candidate_CV, jd_CV
 from Core.Auth.schemas import user
 from Core.Auth.dependencies import get_current_user
+from Core.OCR import compare_qwen
 import os
 
 def search_jobs(session: Session, 
@@ -65,3 +67,44 @@ def get_candidate_cv_by_id(session: Session, cv_id: int) -> candidate_CV:
 def add_cv_into_jd(session: Session, URL: str, jd_id: int) -> jd_CV:
     cv = repo_add_cv_into_jd(session, URL, jd_id)
     return cv
+
+def jd_to_str(jd: jd) -> str:
+    """
+    Convert job description fields into a full English text
+    for CV matching / semantic comparison.
+    """
+    parts = [
+        f"Job Title: {jd.title}" if jd.title else "",
+        f"Company: {jd.company_name}" if jd.company_name else "",
+        f"Industry: {jd.industry}" if jd.industry else "",
+        f"Position Level: {jd.position}" if jd.position else "",
+        f"Salary: {jd.salary}" if jd.salary else "",
+        f"Location: {jd.location}" if jd.location else "",
+        f"Workplace Type: {jd.workplace}" if jd.workplace else "",
+        f"Job Description: {jd.job_description}" if jd.job_description else "",
+        f"Requirements: {jd.requirements}" if jd.requirements else "",
+        f"Benefits: {jd.benefits}" if jd.benefits else "",
+        f"Working Time: {jd.working_time}" if jd.working_time else "",
+        f"Application Deadline: {jd.deadline}" if jd.deadline else "",
+    ]
+    return "\n".join([p for p in parts if p])
+
+def get_top_10_jds_by_cv(session: Session, cv_id: int) -> List[jd]:
+    jds = repo_get_jds(session)
+    cv = repo_get_cvs_by_id(session, cv_id)
+    if not cv:
+        raise HTTPException(
+            status_code=400,
+            detail="Bạn cần quét CV trước khi hệ thống gợi ý công việc."
+        )
+    cv_details = cv.details
+
+    results = [
+    {
+        "jd": jd,
+        "Ratio": compare_qwen(jd_to_str(jd), cv_details)["Ratio"]
+    }
+    for jd in jds]
+
+    top_10 = sorted(results, key=lambda x: x["Ratio"], reverse=True)[:10]
+    return [r["jd"] for r in top_10]

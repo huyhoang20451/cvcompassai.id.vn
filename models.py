@@ -48,6 +48,7 @@ class candidate_CV_db(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id")   # liên kết với bảng users
     URL: str = Field(max_length=255)
+    details: Optional[str] = Field(default=None, sa_column_kwargs={"type_": "TEXT"})
 
 class jd_CV_db(SQLModel, table=True):
     __tablename__ = "jd_CV"

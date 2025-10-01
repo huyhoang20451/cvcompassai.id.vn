@@ -19,6 +19,7 @@ class candidate_CV(BaseModel):
     id: int
     user_id: int
     URL: str
+    details: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 
