@@ -20,6 +20,7 @@ class User_db(SQLModel, table=True):
     # Các trường chỉ dành cho business
     company_name: Optional[str] = Field(default=None, max_length=100)
     location: Optional[str] = Field(default=None, max_length=100)
+    premium_expires: Optional[date] = Field(default=None)
 
 class jd_db(SQLModel, table=True):
     __tablename__ = "jd"
@@ -55,7 +56,7 @@ class jd_CV_db(SQLModel, table=True):
     jd_id: int = Field(foreign_key="jd.id")   # liên kết với bảng job
     URL: str = Field(max_length=255)
 
-class Order(SQLModel, table=True):
+class Order_db(SQLModel, table=True):
     __tablename__ = "orders"
 
     id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, index=True)
@@ -72,3 +73,11 @@ class Order(SQLModel, table=True):
             nullable=False
         )
     )
+
+class Service_db(SQLModel, table=True):
+    __tablename__ = "services"
+
+    id: int = Field(default=None, primary_key=True)  # autoincrement mặc định với int PK
+    name: str = Field(nullable=False, max_length=100, unique=True)
+    description: Optional[str] = Field(default=None, max_length=255)
+    price: int = Field(nullable=False)

@@ -1,3 +1,5 @@
+from datetime import date
+from typing import Optional
 from pydantic import BaseModel, ConfigDict
 
 class user(BaseModel):
@@ -6,8 +8,10 @@ class user(BaseModel):
     role: str | None = None
     company_name: str | None = None
     coin: int | None = None
-    model_config = ConfigDict(from_attributes=True)
     avatar_path: str | None = None
+    premium_expires: Optional[date] = None
+
+    model_config = ConfigDict(from_attributes=True)
 
 class userinDB(user):
     hashed_password: str

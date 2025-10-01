@@ -7,6 +7,11 @@ class OrderStatus(str, enum.Enum):
     paid = "paid"
     failed = "failed"
 
+class pricemap(str, enum.Enum):
+    candidate_xu = 10000
+    candidate_premium = 50000
+    business_premium = 500000
+
 class OrderSchema(BaseModel):
     id: str
     user_id: int

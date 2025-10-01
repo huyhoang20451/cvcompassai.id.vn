@@ -34,10 +34,13 @@ async def register_page(request: Request, session: Session = Depends(get_session
         raise HTTPException(status_code=400, detail="Sai username hoặc password")
     username, role, company_name = decode_token(token.access_token)
     print(username, role, company_name)
-    if role == "business":
+    if role in ["business", "business_premium"]:
         url = f"/business-dashboard"
-    else:
+    elif role in ["candidate", "candidate_premium"]:
         url = f"/home-logged-in"
+    else:
+        url = f"/admin-dashboard"
+    
     response = RedirectResponse(url=url, status_code=303)
     response.set_cookie(
         key="access_token",        # tên cookie

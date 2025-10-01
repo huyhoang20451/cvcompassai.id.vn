@@ -5,7 +5,6 @@ from fastapi import FastAPI, HTTPException, Form, Request, requests
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from flask import request
 from passlib.context import CryptContext
 from pydantic import BaseModel
 from typing import List, Optional
