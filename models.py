@@ -2,7 +2,7 @@
 import uuid
 from sqlalchemy import Column, DateTime, func
 from sqlmodel import SQLModel, Field
-from typing import Optional
+from typing import Optional, Text
 from datetime import datetime, timezone, date
 from apps.business.schemas import JD_form
 import json
@@ -48,6 +48,7 @@ class candidate_CV_db(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id")   # liên kết với bảng users
     URL: str = Field(max_length=255)
+    details: Optional[str] = Field(default=None, max_length=2000)  # đổi sang VARCHAR(2000)
 
 class jd_CV_db(SQLModel, table=True):
     __tablename__ = "jd_CV"

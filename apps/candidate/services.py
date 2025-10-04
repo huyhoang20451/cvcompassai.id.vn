@@ -7,13 +7,15 @@ from .repository import (search_jobs as repo_search_jobs,
                          get_jd_by_id as repo_get_jd_by_id,
                          get_candidate_cv_by_id as repo_get_candidate_cv_by_id,
                          add_cv_into_jd as repo_add_cv_into_jd,
-                         add_cv_into_candidate as repo_add_cv_into_candidate)
-from fastapi import Depends, UploadFile
+                         add_cv_into_candidate as repo_add_cv_into_candidate,
+                         get_cvs_by_id as repo_get_cvs_by_id)
+from fastapi import Depends, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 from typing import Annotated, List
 from .schemas import JobSearchRequest, JobResponse, jd, candidate_CV, jd_CV
 from Core.Auth.schemas import user
 from Core.Auth.dependencies import get_current_user
+from Core.OCR import compare_qwen
 import os
 
 def search_jobs(session: Session, 
@@ -80,3 +82,6 @@ def get_top_10_jds_by_cv(session: Session, cv_id: int) -> List[jd]:
     # Tạm thời trả về tất cả JD, sau này có thể cải thiện bằng thuật toán matching
     all_jds = repo_get_jds(session)
     return all_jds[:10]  # Lấy top 10 JD đầu tiên
+
+
+
