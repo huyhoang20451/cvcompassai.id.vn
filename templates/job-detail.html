@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
     <link rel="stylesheet" href="/static/css/job_detail.css">
-    <title>{{ job.job_title }} - {{ job.company_name }}</title>
+    <title>{{ job.title }} - {{ job.workplace }}</title>
 </head>
 <body style="background-color: #F6FCFF">
 
@@ -29,7 +29,7 @@
             <script>
                 async function fetchCoin() {
                     try {
-                    const response = await fetch(`/api/get-coin?username={{username}}`);
+                    const response = await fetch(`/api/get-coin-db`);
                     const data = await response.json();
                     if (data.success) {
                         document.querySelector('.header-actions strong').textContent = data.coin;
@@ -62,7 +62,7 @@
                     <p><a href="/edit-profile?username={{username}}" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
                     <p><a href="/mycv-settings?username={{username}}" style="text-decoration:none;color:#222;">CV của tôi</a></p>
                     <p><a href="/system-settings?username={{username}}" style="text-decoration:none;color:#222;">Cài đặt tài khoản</a></p>
-                    <p><a href="/home" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
+                    <p><a href="/" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
                 `;
                 document.body.appendChild(box);
                 document.addEventListener('click', function handleClickOutside(event) {
@@ -92,8 +92,8 @@
                 <button class="btn-apply">Gửi CV</button>
             </div>
             <div class="job-company">
-                <img src="{{ job.company_logo }}" alt="{{ job.company_name }} Logo">
-                <h2>{{ job.company_name }}</h2>
+                <img src="{% if job.avatar_path %}{{job.avatar_path}}{% elif job.company_logo and job.company_logo != 'None' %}{{job.company_logo}}{% else %}/static/images/business_avatar.png{% endif %}" alt="{% if job.company_name and job.company_name != 'None' %}{{job.company_name}}{% else %}Công ty{% endif %} Logo">
+                <h2>{{ job.workplace }}</h2>
                 <p><b>Ngành:</b> {{ job.industry }}</p>
                 <p><b>Quy mô:</b> {{ job.scale if job.scale else "Đang cập nhật" }}</p>
                 <p><b>Địa chỉ:</b> {{ job.workplace }}</p>
@@ -103,21 +103,25 @@
         <!-- Job Detail Content -->
         <div class="job-content">
             <h3>Mô tả công việc</h3>
-            <p>{{ job.job_description }}</p>
+            {% if job.job_description is string %}
+                <p>{{ job.job_description.replace('\n', '<br>')|safe }}</p>
+            {% else %}
+                <p>{{ job.job_description | join('<br>') | safe }}</p>
+            {% endif %}
 
             <h3>Yêu cầu</h3>
-            <ul>
-                {% for req in job.requirements %}
-                <li>{{ req }}</li>
-                {% endfor %}
-            </ul>
+            {% if job.requirements is string %}
+                <p>{{ job.requirements.replace('\n', '<br>')|safe }}</p>
+            {% else %}
+                <p>{{ job.requirements | join('<br>') | safe }}</p>
+            {% endif %}
 
             <h3>Quyền lợi</h3>
-            <ul>
-                {% for benefit in job.benefits %}
-                <li>{{ benefit }}</li>
-                {% endfor %}
-            </ul>
+            {% if job.benefits is string %}
+                <p>{{ job.benefits.replace('\n', '<br>')|safe }}</p>
+            {% else %}
+                <p>{{ job.benefits | join('<br>') | safe }}</p>
+            {% endif %}
 
             <p><b>Thời gian làm việc:</b> {{ job.working_time }}</p>
             <p><b>Cách ứng tuyển:</b> {{ job.application_method }}</p>

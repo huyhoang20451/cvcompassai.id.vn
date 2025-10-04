@@ -21,7 +21,17 @@ def search_jobs(session: Session,
     jobs = repo_search_jobs(session, 
                             search_params.keyword, 
                             search_params.location)
-    return [JobResponse.model_validate(job) for job in jobs] # Chuyển sang Pydantic
+    job_responses = []
+    for job in jobs:
+        job_response = JobResponse(
+            title=job.title,
+            job_description=job.job_description,
+            location=job.location,
+            salary=job.salary,
+            company_logo=job.company_logo
+        )
+        job_responses.append(job_response)
+    return job_responses
 
 def get_cvs_by_username(username: str, session: Session) -> List[candidate_CV]:
     return repo_get_cvs_by_username(session, 
@@ -65,3 +75,8 @@ def get_candidate_cv_by_id(session: Session, cv_id: int) -> candidate_CV:
 def add_cv_into_jd(session: Session, URL: str, jd_id: int) -> jd_CV:
     cv = repo_add_cv_into_jd(session, URL, jd_id)
     return cv
+
+def get_top_10_jds_by_cv(session: Session, cv_id: int) -> List[jd]:
+    # Tạm thời trả về tất cả JD, sau này có thể cải thiện bằng thuật toán matching
+    all_jds = repo_get_jds(session)
+    return all_jds[:10]  # Lấy top 10 JD đầu tiên
