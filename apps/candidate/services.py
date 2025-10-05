@@ -23,7 +23,17 @@ def search_jobs(session: Session,
     jobs = repo_search_jobs(session, 
                             search_params.keyword, 
                             search_params.location)
-    return [JobResponse.model_validate(job) for job in jobs] # Chuyển sang Pydantic
+    job_responses = []
+    for job in jobs:
+        job_response = JobResponse(
+            title=job.title,
+            job_description=job.job_description,
+            location=job.location,
+            salary=job.salary,
+            company_logo=job.company_logo
+        )
+        job_responses.append(job_response)
+    return job_responses
 
 def get_cvs_by_username(username: str, session: Session) -> List[candidate_CV]:
     return repo_get_cvs_by_username(session, 
@@ -68,44 +78,10 @@ def add_cv_into_jd(session: Session, URL: str, jd_id: int) -> jd_CV:
     cv = repo_add_cv_into_jd(session, URL, jd_id)
     return cv
 
-def jd_to_str(jd: jd) -> str:
-    """
-    Convert job description fields into a full English text
-    for CV matching / semantic comparison.
-    """
-    parts = [
-        f"Job Title: {jd.title}" if jd.title else "",
-        f"Company: {jd.company_name}" if jd.company_name else "",
-        f"Industry: {jd.industry}" if jd.industry else "",
-        f"Position Level: {jd.position}" if jd.position else "",
-        f"Salary: {jd.salary}" if jd.salary else "",
-        f"Location: {jd.location}" if jd.location else "",
-        f"Workplace Type: {jd.workplace}" if jd.workplace else "",
-        f"Job Description: {jd.job_description}" if jd.job_description else "",
-        f"Requirements: {jd.requirements}" if jd.requirements else "",
-        f"Benefits: {jd.benefits}" if jd.benefits else "",
-        f"Working Time: {jd.working_time}" if jd.working_time else "",
-        f"Application Deadline: {jd.deadline}" if jd.deadline else "",
-    ]
-    return "\n".join([p for p in parts if p])
-
 def get_top_10_jds_by_cv(session: Session, cv_id: int) -> List[jd]:
-    jds = repo_get_jds(session)
-    cv = repo_get_cvs_by_id(session, cv_id)
-    if not cv.details:
-        raise HTTPException(
-            status_code=400,
-            detail="Bạn cần quét CV trước khi hệ thống gợi ý công việc."
-        )
-    cv_details = cv.details
-    results = []
-    for jd in jds:
-        print(f"chuỗi JD: {jd_to_str(jd)}")
-        print(f"chuỗi CV: {cv_details}")
-        results.append({
-            "jd": jd,
-            "Ratio": compare_qwen(jd_to_str(jd), cv_details)["Ratio"]
-        })
+    # Tạm thời trả về tất cả JD, sau này có thể cải thiện bằng thuật toán matching
+    all_jds = repo_get_jds(session)
+    return all_jds[:10]  # Lấy top 10 JD đầu tiên
 
-    top_10 = sorted(results, key=lambda x: x["Ratio"], reverse=True)[:10]
-    return [r["jd"] for r in top_10]
+
+

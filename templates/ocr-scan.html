@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,6 +9,10 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=upload" />
     <title>Quét CV của bạn</title>
+    <!-- Thư viện chuyển Markdown sang HTML -->
+    <script src="https://cdn.jsdelivr.net/npm/showdown@2.1.0/dist/showdown.min.js"></script>
+    <!--Thư viện Markdown-->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body style="background-color: #F6FCFF;">
     <!--Bắt đầu phần header-->
@@ -31,7 +36,7 @@
             <script>
                 async function fetchCoin() {
                     try {
-                    const response = await fetch(`/api/get-coin?username={{username}}`);
+                    const response = await fetch(`/api/get-coin-db`);
                     const data = await response.json();
                     if (data.success) {
                         document.querySelector('.header-actions strong').textContent = data.coin;
@@ -65,7 +70,7 @@
                     <p><a href="/edit-profile?username={{username}}" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
                     <p><a href="/mycv-settings?username={{username}}" style="text-decoration:none;color:#222;">CV của tôi</a></p>
                     <p><a href="/system-settings?username={{username}}" style="text-decoration:none;color:#222;">Cài đặt tài khoản</a></p>
-                    <p><a href="/home" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
+                    <p><a href="/" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
                 `;
                 document.body.appendChild(box);
                 document.addEventListener('click', function handleClickOutside(event) {
@@ -93,21 +98,18 @@
             <div class="ocr-title">Quét CV bằng OCR</div>
             <p class="ocr-desc">Tải lên CV của bạn, chúng tôi tự động quét và trích xuất thông tin để so sánh với JD (Job Description)</p>
             <div class="ocr-btn-group">
-                <form style="display: inline-block;" id="uploadForm">
-                    <input type="file" id="myFile" name="filename" accept="image/*,.pdf,.doc,.docx">
-                    <input type="submit" value="Quét CV">
+                <form id="ocrForm" enctype="multipart/form-data">
+                    <label>Upload file ảnh CV:</label><br>
+                    <input type="file" id="file" name="file"><br>
+                    <button type="button" onclick="sendRequest()">Gửi OCR</button>
                 </form>
                 <button onclick="location.href='/create-free-cv'" class="ocr-btn create">Tạo CV miễn phí</button>
             </div>
             <div class="ocr-support">Hỗ trợ các file định dạng JPG, PNG, PDF, .DOC, .DOCX</div>
             <div>Kết quả quét được:</div>
-            <div id="ocr-result" style="margin-top:18px; background:#EAF4FF; border-radius:8px; padding:16px; display: none;">
-                <h3>Kết quả OCR</h3>
-                <div class="field"><span class="label">Họ và tên:</span> <span id="ho_ten"></span></div>
-                <div class="field"><span class="label">Email:</span> <span id="email"></span></div>
-                <div class="field"><span class="label">Vị trí tuyển dụng:</span> <span id="vi_tri"></span></div>
-                <div class="field"><span class="label">Kinh nghiệm:</span> <span id="kinh_nghiem"></span></div>
-            </div>
+            <div id="resultBox" style="display:none;"></div>
+            <div id="markdownResult"></div>
+            <button id="saveCVButton" style="display:none;" onclick="saveCV()">Lưu lại CV</button>
         </div>
         <div class="ocr-right">
             <div class="cv-preview">
@@ -151,115 +153,54 @@
     </div>
   </div>
 </footer>
+
 <script>
-document.getElementById('myFile').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const previewImg = document.querySelector('.cv-img');
-    const previewName = document.querySelector('.cv-filename');
-    // Nếu là ảnh thì hiển thị ảnh, nếu là file khác thì chỉ hiển thị tên
-    if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = function(ev) {
-            previewImg.src = ev.target.result;
-        };
-        reader.readAsDataURL(file);
-    } else {
-        previewImg.src = '/static/images/cv_sample.png'; // giữ ảnh mẫu cho file không phải ảnh
-    }
-    previewName.textContent = file.name;
-});
+         async function sendRequest() {
+             let formData = new FormData();
+             formData.append("file", document.getElementById("file").files[0]);
 
-// Xử lý submit form
-document.getElementById('uploadForm').addEventListener('submit', function(e) {
-    e.preventDefault(); // Ngăn form submit mặc định
-    sendRequest(); // Gọi hàm OCR
-});
+             let response = await fetch("https://5f6b34eb9b95.ngrok-free.app/ocr", {
+                 method: "POST",
+                 body: formData
+             });
+             let data = await response.json();
 
-async function sendRequest() {
-    const fileInput = document.getElementById("myFile");
-    const file = fileInput.files[0];
+             if (data.success && data.data && typeof data.data.raw === "string") {
+                 document.getElementById("resultBox").style.display = "block";
+                 document.getElementById("saveCVButton").style.display = "inline-block";
+                 let rawText = data.data.raw;
+                 // Nếu là Markdown thì dùng marked, nếu là plain text thì vẫn hiển thị đẹp
+                 document.getElementById("markdownResult").innerHTML = marked.parse(rawText);
+             } else {
+                 alert("OCR lỗi: " + (data.error || "Không có dữ liệu trả về"));
+             }
+         }
+            async function saveCV() {
+                let markdown = document.getElementById("markdownResult").innerText;
+                if (!markdown) {
+                    alert("Chưa có nội dung để lưu. Vui lòng quét CV trước.");
+                    return;
+                }
     
-    if (!file) {
-        alert("Vui lòng chọn file để upload!");
-        return;
-    }
+                let payload = new URLSearchParams();
+                payload.append("username", "{{username}}");
+                payload.append("markdown", markdown);
     
-    let formData = new FormData();
-    formData.append("file", file);
-
-    try {
-        let response = await fetch("https://fe704ae8a5ba.ngrok-free.app/ocr", {
-            method: "POST",
-            body: formData,
-            headers: {
-                'ngrok-skip-browser-warning': 'true'
+                let response = await fetch("/api/save_cv", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: payload.toString()
+                });
+                let data = await response.json();
+    
+                if (data.success) {
+                    alert("Lưu CV thành công!");
+                } else {
+                    alert("Lưu CV thất bại: " + (data.error || "Lỗi không xác định"));
+                }
             }
-        });
-        
-        let data = await response.json();
-        console.log('API Response:', data); // Debug
+     </script>
 
-        if (data.success) {
-            document.getElementById("ocr-result").style.display = "block";
-            document.getElementById("ho_ten").textContent = data.data.ho_ten || "Không tìm thấy";
-            document.getElementById("email").textContent = data.data.email || "Không tìm thấy";
-            document.getElementById("vi_tri").textContent = data.data.vi_tri_tuyen_dung || "Không tìm thấy";
-            document.getElementById("kinh_nghiem").textContent = data.data.kinh_nghiem || "Không tìm thấy";
-        } else {
-            alert("OCR lỗi: " + (data.error || "Lỗi không xác định"));
-            console.error('OCR Error:', data);
-        }
-    } catch (error) {
-        console.error('Network Error:', error);
-        alert("Lỗi mạng: " + error.message);
-    }
-}
-
-function processOCR(file) {
-    const resultDiv = document.getElementById('ocr-result');
-    resultDiv.innerHTML = 'Đang xử lý CV...';
-    resultDiv.style.whiteSpace = 'pre-line'; // giữ định dạng xuống dòng
-    // Tạo FormData để upload file
-    const formData = new FormData();
-    formData.append('file', file);
-    // Nếu API cần prompt, có thể thêm dòng này:
-    // formData.append('prompt', 'extract full text');
-    const url_model_load = "https://bc7da55f4a9f.ngrok-free.app/ocr";
-    fetch(url_model_load, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'ngrok-skip-browser-warning': 'true'
-        }
-    })
-    .then(response => response.json())
-    .then(result => {
-        // Nếu API trả về result.data là text đã format sẵn:
-        if (result.success && result.data) {
-            resultDiv.textContent = result.data;
-        } else if (result.success) {
-            // Nếu API trả về từng trường, ghép lại thành text lớn
-            let text = '';
-            if (result.name) text += `Assistant: Họ và tên: ${result.name}\n`;
-            if (result.email) text += `Địa chỉ email: ${result.email}\n`;
-            if (result.position) text += `Vị trí tuyển dụng: ${result.position}\n`;
-            if (result.kinh_nghiem) text += `Kinh nghiệm:\n${result.kinh_nghiem}\n`;
-            if (result.muc_tieu) text += `- Mục tiêu nghề nghiệp:\n${result.muc_tieu}\n`;
-            if (result.hoc_van) text += `- Học vấn:\n${result.hoc_van}\n`;
-            if (result.tin_hoc) text += `- Tin học:\n${result.tin_hoc}\n`;
-            if (result.ngoai_ngu) text += `- Ngoại ngữ:\n${result.ngoai_ngu}\n`;
-            if (result.lien_he) text += `- Người liên hệ: ${result.lien_he}\n`;
-            resultDiv.textContent = text || 'Không tìm thấy';
-        } else {
-            resultDiv.textContent = 'Quét thất bại. Vui lòng thử lại.';
-        }
-    })
-    .catch(error => {
-        console.error('Lỗi khi gọi API OCR:', error);
-        resultDiv.textContent = 'Đã xảy ra lỗi. Vui lòng thử lại.';
-    });
-}
-</script>
 </body>
 </html>
+

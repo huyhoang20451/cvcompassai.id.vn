@@ -3,6 +3,7 @@ import os
 import math
 from fastapi import FastAPI, HTTPException, Form, Request, requests
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
+from fastapi import FastAPI, HTTPException, Form, Request, requests
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from passlib.context import CryptContext
@@ -209,11 +210,18 @@ def login(request: Request, username: str = Form(...), password: str = Form(...)
 # Trang home (sau khi login)
 @app.get("/home-logged-in", response_class=HTMLResponse)
 def home_logged_in(request: Request, username: str, keyword: str = ""):
-    # Nếu có keyword thì lọc kết quả, ngược lại show tất cả
-    if keyword:
-        job_descriptions = search_jobs_by_keyword(keyword)
-    else:
-        job_descriptions = load_jd()
+    # Import để lấy dữ liệu từ database
+    from db import get_session
+    from apps.candidate.repository import search_jobs as repo_search_jobs, get_jds as repo_get_jds
+    
+    with next(get_session()) as session:
+        if keyword:
+            # Tìm kiếm theo keyword
+            job_descriptions = repo_search_jobs(session, keyword, None)
+        else:
+            # Lấy tất cả JD từ database
+            job_descriptions = repo_get_jds(session)
+    
     templates = Jinja2Templates(directory="templates")
     return templates.TemplateResponse("home_logged_in.html", {"request": request, "job_descriptions": job_descriptions, "username": username, "keyword": keyword})
 
@@ -413,6 +421,11 @@ def submit_job(request: Request, company_logo: str = Form(...), job_title: str =
         company_id = company_ids[company]
     else:
         company_id = max(company_ids.values(), default=0) + 1
+    def clean_list_field(field: str):
+        # Loại bỏ dấu [] nếu có, tách dòng, loại bỏ dòng rỗng và khoảng trắng thừa
+        field = field.replace('[', '').replace(']', '')
+        return [line.strip() for line in field.split("\n") if line.strip()]
+
     new_job = {
         "id": new_id,
         "company_id": company_id,
@@ -425,9 +438,9 @@ def submit_job(request: Request, company_logo: str = Form(...), job_title: str =
         "position": position,
         "company": company,
         "workplace": workplace,
-        "job_description": job_description.split("\n"),
-        "requirements": requirements.split("\n"),
-        "benefits": benefits.split("\n"),
+        "job_description": clean_list_field(job_description),
+        "requirements": clean_list_field(requirements),
+        "benefits": clean_list_field(benefits),
         "working_time": working_time,
         "application_method": application_method,
         "deadline": deadline

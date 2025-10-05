@@ -46,6 +46,7 @@ class jd(BaseModel):
     application_method: Optional[str] = None
     deadline: Optional[str] = None
     avatar_path: Optional[str] = None
+    company_logo: Optional[str] = None
 
     business_id: Optional[int] = None
     created_at: datetime

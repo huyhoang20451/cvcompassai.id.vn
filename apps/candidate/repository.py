@@ -5,6 +5,12 @@ from .schemas import candidate_CV, jd, jd_CV
 from sqlalchemy import or_
 from typing import List, Optional
 
+def get_user_by_username(session: Session, username: str) -> User_db:
+    """Get user by username from database"""
+    statement = select(User_db).where(User_db.username == username)
+    result = session.exec(statement).first()
+    return result
+
 # Lấy tất cả JD theo keyword và location trong database
 def search_jobs(session: Session, 
                 keyword: str = None, 

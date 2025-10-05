@@ -252,8 +252,8 @@ body {
         <ul>
             {% for jd in job_position %}
             <li class={%if job and jd.id == job.id%} "active"{% endif %}>
-                <a href="/job-storage/{{ jd.id }}?username={{username}}&role={{role}}&company={{company}}">
-                    {{ jd.job_title }}
+                <a href="/job-storage?jd_id={{ jd.id }}&username={{username}}&role={{role}}&company={{company}}">
+                    {{ jd.title }}
                 </a>
             </li>
             {% endfor %}
@@ -273,7 +273,7 @@ body {
       <section class="job-card">
   {% if job %}
     <!-- Job Summary -->
-    <h3>{{ job.job_title }}</h3>
+    <h3>{{ job.title }}</h3>
     <div class="job-meta">
       <span>Lương thỏa thuận - {{ job.salary }}</span>
       <span>Địa điểm: {{ job.location }}</span>
@@ -286,7 +286,7 @@ body {
         <button>Đề Cử Top 20 CV</button>
       </div>
       <div class="company">
-        <p><strong>{{ job.company_name }}</strong></p>
+        <p><strong>{{ job.workplace }}</strong></p>
         <p>Ngành nghề: {{ job.industry }}</p>
         <p>Quy mô: {{ job.workplace }}</p>
         <p>Địa điểm: {{ job.location }}</p>
