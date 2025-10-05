@@ -44,19 +44,19 @@ def add_cv_into_candidate(session: Session, URL: str, user_id: int) -> candidate
     cv = repo_add_cv_into_candidate(session, URL, user_id)
     return cv
 
-async def upload_cv(file: UploadFile, user_id: int, session: Session) -> str:
+async def upload_cv(file: UploadFile, user_id: int, session: Session):
 
     UPLOAD_DIR = "cv"
     os.makedirs(UPLOAD_DIR, exist_ok=True)
 
     try:
         file_location = os.path.join(UPLOAD_DIR, file.filename)
-        add_cv_into_candidate(session, file_location, user_id)
+        cv = add_cv_into_candidate(session, file_location, user_id)
         # Đọc nội dung file
         content = await file.read()
         with open(file_location, "wb") as f:
             f.write(content)
-        return file_location
+        return file_location, cv
     except Exception as e:
         raise RuntimeError(f"Lỗi khi upload CV: {e}")
 

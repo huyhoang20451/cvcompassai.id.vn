@@ -125,7 +125,7 @@ async def upload(request: Request,
                  file: UploadFile = File(...),
                  user_info: user = Depends(authorize_role(["candidate"])),
                  session: Session = Depends(get_session)):
-    file_path = await upload_cv(file, user_info.id, session)
+    file_path, cv = await upload_cv(file, user_info.id, session)
     if file.content_type == "application/pdf" or file.filename.lower().endswith(".pdf"):
         from Core.OCR import scan_pdf  # hàm đọc PDF
         result = scan_pdf(file_path)
@@ -135,7 +135,9 @@ async def upload(request: Request,
     else:
         result = "File không hỗ trợ"
 
-    return templates.TemplateResponse("ocr-scan.html", {"request": request, "result": result})
+    return templates.TemplateResponse("ocr-scan.html", {"request": request, 
+                                                        "result": result,
+                                                        "cv_id": cv.id})
 
 # Nộp cv cho jd bằng cv có sẵn trong database
 @router.post("/submit-existing-cv", response_class=HTMLResponse)
