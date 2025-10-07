@@ -70,7 +70,8 @@ def get_users(session: Session) -> List[user]:
 def update_user_by_username(
     session: Session, 
     username: str, 
-    hashed_password: str | None = None, 
+    hashed_password: str | None = None,
+    role: str | None = None,
     coin: int | None = None, 
     premium_expires: str | None = None
 ):
@@ -80,6 +81,7 @@ def update_user_by_username(
         return None
     user.username = username
     user.hashed_password = hashed_password
+    user.role = role
     user.coin = coin
     user.premium_expires = premium_expires
 

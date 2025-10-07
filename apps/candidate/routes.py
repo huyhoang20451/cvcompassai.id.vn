@@ -100,7 +100,7 @@ async def deduct_coin(amount: int, user_info: user = Depends(authorize_role(["ca
     return JSONResponse(content={"success": True, "coin": new_coin})
 
 # Lấy số coin trong database
-@router.get("/get-coin")
+@router.get("/api/get-coin-db")
 async def get_coin(user_info: user = Depends(authorize_role(["candidate"]))):
     coin = user_info.coin
     return JSONResponse(content={"success": True, "coin": coin})
@@ -120,7 +120,8 @@ async def finding_jobs(request: Request,
                        user_info: user = Depends(authorize_role(["candidate"]))):
     return templates.TemplateResponse("finding-jobs.html", {"request": request, "username": user_info.username, "user": user_info})
 
-@router.post("/upload", response_class=HTMLResponse)
+# Tìm 10 JD phù hợp nhất với CV upload
+@router.post("/top10-best-jd", response_class=HTMLResponse)
 async def upload(request: Request,
                  file: UploadFile = File(...),
                  user_info: user = Depends(authorize_role(["candidate"])),
@@ -128,16 +129,15 @@ async def upload(request: Request,
     file_path, cv = await upload_cv(file, user_info.id, session)
     if file.content_type == "application/pdf" or file.filename.lower().endswith(".pdf"):
         from Core.OCR import scan_pdf  # hàm đọc PDF
-        result = scan_pdf(file_path)
+        cv_str = scan_pdf(file_path)
     elif file.content_type.startswith("image/") or file.filename.lower().endswith((".jpg", ".jpeg", ".png")):
         from Core.OCR import run_vintern  # hàm OCR
-        result = run_vintern(file_path)
+        cv_str = run_vintern(file_path)
     else:
-        result = "File không hỗ trợ"
+        raise HTTPException(status_code=400, detail="Unsupported file type. Please upload a PDF or image file.")
 
-    return templates.TemplateResponse("ocr-scan.html", {"request": request, 
-                                                        "result": result,
-                                                        "cv_id": cv.id})
+    top_10 = get_top_10_jds_by_cv(session, cv_str)
+    return templates.TemplateResponse("top10-best-jd.html", {"request": request, "job_descriptions": top_10})
 
 # Nộp cv cho jd bằng cv có sẵn trong database
 @router.post("/submit-existing-cv", response_class=HTMLResponse)
@@ -167,4 +167,3 @@ async def submit_cv(request: Request,
 
     return templates.TemplateResponse("finding-jobs.html",{"request": request, 
                                                            "username": user_info.username})
-

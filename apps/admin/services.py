@@ -57,7 +57,8 @@ def update_user(session: Session,
     hashed_password = get_password_hash(password)
     user = repo_update_user_by_username(session, 
                                         username, 
-                                        hashed_password, 
+                                        hashed_password,
+                                        role,
                                         coin, 
                                         premium_expires)
     return user
