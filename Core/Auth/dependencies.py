@@ -10,7 +10,7 @@ from fastapi.security import OAuth2PasswordBearer
 from fastapi.templating import Jinja2Templates
 from db import get_session
 
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory=["templates", "admin_pages"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
 
 # Lấy username từ token

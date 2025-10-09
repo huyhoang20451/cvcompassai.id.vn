@@ -2,19 +2,20 @@
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from sqlmodel import Session
-from .services import (get_orders, get_services, get_total_revenue,
+from .services import (get_orders, 
+                       get_services, 
+                       get_total_revenue,
                        count_orders,
                        count_users,
                        count_users_buy_packages,
                        sum_total_money_by_package,
                        failed_percentage,
-                       get_users,
-                       update_user,
+                       get_users as service_get_users,
+                       update_user as service_update_user,
                        delete_user_by_username)
 from db import get_session
 from Core.Auth.dependencies import templates, authorize_role
 from Core.Auth.schemas import user
-from .schemas import JD_form
 from datetime import datetime, timezone
 from typing import Optional
 from Core.OCR import compare
@@ -36,10 +37,10 @@ async def read_root(request: Request,
         "total_revenue": total_revenue, 
         "total_orders": total_orders, 
         "total_users": total_users, 
-        "candidate_premium_users": package_stats["candidate_premium"],
-        "candidate_xu_users": package_stats["candidate_xu"],
-        "business_premium_users": package_stats["business_premium"],
-        "total_users_buy_packages": package_stats["total_users"],
+        "candidate_premium_users": package_stats.get("candidate_premium", 0),
+        "candidate_xu_users": package_stats.get("candidate_xu", 0),
+        "business_premium_users": package_stats.get("business_premium", 0),
+        "total_users_buy_packages": sum(package_stats.values()),
         "total_revenue_business_premium": total_revenue_by_package.get("business_premium", 0),
         "total_revenue_candidate_premium": total_revenue_by_package.get("candidate_premium", 0),
         "total_revenue_candidate_xu": total_revenue_by_package.get("candidate_xu", 0),
@@ -49,7 +50,7 @@ async def read_root(request: Request,
 @router.get("/users", response_class=HTMLResponse)
 async def get_users(request: Request, 
                     session: Session = Depends(get_session)):
-    users = get_users(session)
+    users = service_get_users(session)
     return templates.TemplateResponse("users.html", {"request": request, "users": users})
 
 @router.post("/update_user", response_class=JSONResponse)
@@ -59,7 +60,11 @@ async def update_user(username: str = Form(...),
                       coin: str = Form(...),
                       premium_expires: str = Form(...),
                       session: Session = Depends(get_session)):
-    user = update_user(session, 
+
+    if premium_expires == "None":
+        premium_expires = None
+
+    user = service_update_user(session, 
                        username, 
                        password, 
                        role, 

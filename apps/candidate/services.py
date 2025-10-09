@@ -54,19 +54,19 @@ def add_cv_into_candidate(session: Session, URL: str, user_id: int) -> candidate
     cv = repo_add_cv_into_candidate(session, URL, user_id)
     return cv
 
-async def upload_cv(file: UploadFile, user_id: int, session: Session) -> str:
+async def upload_cv(file: UploadFile, user_id: int, session: Session):
 
     UPLOAD_DIR = "cv"
     os.makedirs(UPLOAD_DIR, exist_ok=True)
 
     try:
         file_location = os.path.join(UPLOAD_DIR, file.filename)
-        add_cv_into_candidate(session, file_location, user_id)
+        cv = add_cv_into_candidate(session, file_location, user_id)
         # Đọc nội dung file
         content = await file.read()
         with open(file_location, "wb") as f:
             f.write(content)
-        return file_location
+        return file_location, cv
     except Exception as e:
         raise RuntimeError(f"Lỗi khi upload CV: {e}")
 
@@ -78,10 +78,42 @@ def add_cv_into_jd(session: Session, URL: str, jd_id: int) -> jd_CV:
     cv = repo_add_cv_into_jd(session, URL, jd_id)
     return cv
 
-def get_top_10_jds_by_cv(session: Session, cv_id: int) -> List[jd]:
-    # Tạm thời trả về tất cả JD, sau này có thể cải thiện bằng thuật toán matching
-    all_jds = repo_get_jds(session)
-    return all_jds[:10]  # Lấy top 10 JD đầu tiên
+def jd_to_str(jd: jd) -> str:
+    """
+    Convert job description fields into a full English text
+    for CV matching / semantic comparison.
+    """
+    parts = [
+        f"Job Title: {jd.title}" if jd.title else "",
+        f"Company: {jd.company_name}" if jd.company_name else "",
+        f"Industry: {jd.industry}" if jd.industry else "",
+        f"Position Level: {jd.position}" if jd.position else "",
+        f"Salary: {jd.salary}" if jd.salary else "",
+        f"Location: {jd.location}" if jd.location else "",
+        f"Workplace Type: {jd.workplace}" if jd.workplace else "",
+        f"Job Description: {jd.job_description}" if jd.job_description else "",
+        f"Requirements: {jd.requirements}" if jd.requirements else "",
+        f"Benefits: {jd.benefits}" if jd.benefits else "",
+        f"Working Time: {jd.working_time}" if jd.working_time else "",
+        f"Application Deadline: {jd.deadline}" if jd.deadline else "",
+    ]
+    return "\n".join([p for p in parts if p])
 
+def get_top_10_jds_by_cv(session: Session, cv: str) -> List[jd]:
+    jds = repo_get_jds(session)
 
+    results = []
 
+    for jd in jds:
+        try:
+            result = compare_qwen(jd_to_str(jd), cv)
+            ratio = result.get("Ratio", 0)
+            print(f"✅ JD ID: {jd.id} | Ratio: {ratio}")
+            results.append({"jd": jd, "Ratio": ratio})
+        except Exception as e:
+            print(f"❌ Lỗi khi xử lý JD ID {jd.id}: {e}")
+
+    top_10 = sorted(results, key=lambda x: x["Ratio"], reverse=True)[:10]
+    for r in top_10:
+        print(r["jd"].dict())
+    return [r["jd"] for r in top_10]

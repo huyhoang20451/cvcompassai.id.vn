@@ -100,7 +100,7 @@ async def deduct_coin(amount: int, user_info: user = Depends(authorize_role(["ca
     return JSONResponse(content={"success": True, "coin": new_coin})
 
 # Lấy số coin trong database
-@router.get("/get-coin")
+@router.get("/api/get-coin-db")
 async def get_coin(user_info: user = Depends(authorize_role(["candidate"]))):
     coin = user_info.coin
     return JSONResponse(content={"success": True, "coin": coin})
@@ -120,22 +120,24 @@ async def finding_jobs(request: Request,
                        user_info: user = Depends(authorize_role(["candidate"]))):
     return templates.TemplateResponse("finding-jobs.html", {"request": request, "username": user_info.username, "user": user_info})
 
-@router.post("/upload", response_class=HTMLResponse)
+# Tìm 10 JD phù hợp nhất với CV upload
+@router.post("/top10-best-jd", response_class=HTMLResponse)
 async def upload(request: Request,
                  file: UploadFile = File(...),
                  user_info: user = Depends(authorize_role(["candidate"])),
                  session: Session = Depends(get_session)):
-    file_path = await upload_cv(file, user_info.id, session)
+    file_path, cv = await upload_cv(file, user_info.id, session)
     if file.content_type == "application/pdf" or file.filename.lower().endswith(".pdf"):
         from Core.OCR import scan_pdf  # hàm đọc PDF
-        result = scan_pdf(file_path)
+        cv_str = scan_pdf(file_path)
     elif file.content_type.startswith("image/") or file.filename.lower().endswith((".jpg", ".jpeg", ".png")):
         from Core.OCR import run_vintern  # hàm OCR
-        result = run_vintern(file_path)
+        cv_str = run_vintern(file_path)
     else:
-        result = "File không hỗ trợ"
+        raise HTTPException(status_code=400, detail="Unsupported file type. Please upload a PDF or image file.")
 
-    return templates.TemplateResponse("ocr-scan.html", {"request": request, "result": result})
+    top_10 = get_top_10_jds_by_cv(session, cv_str)
+    return templates.TemplateResponse("top10-best-jd.html", {"request": request, "job_descriptions": top_10})
 
 # Nộp cv cho jd bằng cv có sẵn trong database
 @router.post("/submit-existing-cv", response_class=HTMLResponse)
@@ -165,56 +167,4 @@ async def submit_cv(request: Request,
 
     return templates.TemplateResponse("finding-jobs.html",{"request": request, 
                                                            "username": user_info.username})
-@router.get("/pricing-user-loggedin", response_class=HTMLResponse)
-async def pricing_user_logged_in(request: Request,
-                                  user_info: user = Depends(authorize_role(["candidate"]))):
-    
-    return templates.TemplateResponse("pricing-user-loggedin.html", {"request": request, "username": user_info.username, "user": user_info})
-
-@router.get("/top10-best-jd", response_class=HTMLResponse)
-async def top10_best_jd(request: Request,
-                         user_info: user = Depends(authorize_role(["candidate"])),
-                         session: Session = Depends(get_session),
-                         job_description: Optional[int] = None):
-    # If a cv id (job_description) is provided, use the top-10 matching JD function,
-    # otherwise fall back to returning all job descriptions.
-    if job_description:
-        job_descriptions = get_top_10_jds_by_cv(session, job_description)
-    else:
-        job_descriptions = get_jds(session)
-
-    return templates.TemplateResponse(
-        "top10-best-jd.html",
-        {"request": request, "username": user_info.username, "user": user_info, "job_descriptions": job_descriptions},
-    )
-
-@router.get("/top10-best-jd-detail", response_class=HTMLResponse)
-def top10_best_jd_detail(request: Request, 
-                         job_id: Optional[int] = None,
-                         user_info: user = Depends(authorize_role(["candidate"])),
-                         session: Session = Depends(get_session)):
-    # Get list for left column
-    job_descriptions = get_jds(session)
-
-    # If job_id is not provided, default to the first JD in the list (if any)
-    if job_id is None:
-        if not job_descriptions:
-            raise HTTPException(status_code=404, detail="No job descriptions available")
-        jd = job_descriptions[0]
-    else:
-        jd = get_jd_by_id(session, job_id)
-        if not jd:
-            raise HTTPException(status_code=404, detail="Job not found")
-
-    return templates.TemplateResponse(
-        "top10-best-jd-detail.html",
-        {
-            "request": request,
-            "job": jd,
-            "job_description": job_descriptions,
-            "username": user_info.username,
-            "user": user_info,
-            "coin": getattr(user_info, "coin", 0),
-        },
-    )
 
