@@ -32,7 +32,7 @@
             <script>
                 async function fetchCoin() {
                     try {
-                    const response = await fetch(`/api/get-coin-db`);
+                    const response = await fetch(`/get-coin`);
                     const data = await response.json();
                     if (data.success) {
                         document.querySelector('.header-actions strong').textContent = data.coin;
@@ -149,7 +149,7 @@
                 <a style="text-decoration: none;" href="/job-detail/{{ jd.id }}?username={{ username }}">
                     <div class="job-card">
                         <div class="job-card-logo">
-                            <img src="{% if jd.avatar_path %}{{jd.avatar_path}}{% else %}/static/images/business_avatar.png{% endif %}" alt="{% if jd.company_name and jd.company_name != 'None' %}{{jd.company_name}}{% else %}Công ty{% endif %}">
+                            <img src="{{jd.company_logo_url}}" alt="{% if jd.company_name and jd.company_name != 'None' %}{{jd.company_name}}{% else %}Công ty{% endif %}">
                         </div>
                         <div class="job-card-content">
                             <div class="job-card-title">{{jd.title}}</div>
@@ -224,7 +224,7 @@
                 <a style="text-decoration: none;" href="/job-detail/{{ jd.id }}?username={{ username }}">
                     <div class="job-card">
                         <div class="job-card-logo">
-                            <img src="{% if jd.avatar_path %}{{jd.avatar_path}}{% else %}/static/images/business_avatar.png{% endif %}" alt="Công ty">
+                            <img src="{{jd.company_logo_url}}" alt="Công ty">
                         </div>
                         <div class="job-card-content">
                             <div class="job-card-title">{{jd.title}}</div>

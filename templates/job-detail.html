@@ -29,7 +29,7 @@
             <script>
                 async function fetchCoin() {
                     try {
-                    const response = await fetch(`/api/get-coin-db`);
+                    const response = await fetch(`/get-coin`);
                     const data = await response.json();
                     if (data.success) {
                         document.querySelector('.header-actions strong').textContent = data.coin;
@@ -92,7 +92,7 @@
                 <button class="btn-apply">Gửi CV</button>
             </div>
             <div class="job-company">
-                <img src="{% if job.avatar_path %}{{job.avatar_path}}{% elif job.company_logo and job.company_logo != 'None' %}{{job.company_logo}}{% else %}/static/images/business_avatar.png{% endif %}" alt="{% if job.company_name and job.company_name != 'None' %}{{job.company_name}}{% else %}Công ty{% endif %} Logo">
+                <img src="{{ job.company_logo_url }}" alt="{% if job.company_name and job.company_name != 'None' %}{{job.company_name}}{% else %}Công ty{% endif %} Logo">
                 <h2>{{ job.workplace }}</h2>
                 <p><b>Ngành:</b> {{ job.industry }}</p>
                 <p><b>Quy mô:</b> {{ job.scale if job.scale else "Đang cập nhật" }}</p>
@@ -104,21 +104,63 @@
         <div class="job-content">
             <h3>Mô tả công việc</h3>
             {% if job.job_description is string %}
-                <p>{{ job.job_description.replace('\n', '<br>')|safe }}</p>
+                {% set jd = job.job_description %}
+                {% if jd and jd.startswith('[') and jd.endswith(']') %}
+                    {% set clean = jd | replace('[', '') | replace(']', '') | replace('"', '') %}
+                    {% if ',' in clean %}
+                        <ul>
+                        {% for item in clean.split(',') %}
+                            <li>{{ item.strip() }}</li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>{{ clean }}</p>
+                    {% endif %}
+                {% else %}
+                    <p>{{ jd.replace('\n', '<br>')|safe }}</p>
+                {% endif %}
             {% else %}
                 <p>{{ job.job_description | join('<br>') | safe }}</p>
             {% endif %}
 
             <h3>Yêu cầu</h3>
             {% if job.requirements is string %}
-                <p>{{ job.requirements.replace('\n', '<br>')|safe }}</p>
+                {% set rq = job.requirements %}
+                {% if rq and rq.startswith('[') and rq.endswith(']') %}
+                    {% set clean_reqs = rq | replace('[', '') | replace(']', '') | replace('"', '') %}
+                    {% if ',' in clean_reqs %}
+                        <ul>
+                        {% for item in clean_reqs.split(',') %}
+                            <li>{{ item.strip() }}</li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>{{ clean_reqs }}</p>
+                    {% endif %}
+                {% else %}
+                    <p>{{ rq.replace('\n', '<br>')|safe }}</p>
+                {% endif %}
             {% else %}
                 <p>{{ job.requirements | join('<br>') | safe }}</p>
             {% endif %}
 
             <h3>Quyền lợi</h3>
             {% if job.benefits is string %}
-                <p>{{ job.benefits.replace('\n', '<br>')|safe }}</p>
+                {% set bf = job.benefits %}
+                {% if bf and bf.startswith('[') and bf.endswith(']') %}
+                    {% set clean_bf = bf | replace('[', '') | replace(']', '') | replace('"', '') %}
+                    {% if ',' in clean_bf %}
+                        <ul>
+                        {% for item in clean_bf.split(',') %}
+                            <li>{{ item.strip() }}</li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>{{ clean_bf }}</p>
+                    {% endif %}
+                {% else %}
+                    <p>{{ bf.replace('\n', '<br>')|safe }}</p>
+                {% endif %}
             {% else %}
                 <p>{{ job.benefits | join('<br>') | safe }}</p>
             {% endif %}

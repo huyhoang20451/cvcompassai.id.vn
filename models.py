@@ -32,6 +32,7 @@ class jd_db(SQLModel, table=True):
     industry: Optional[str] = Field(default=None, max_length=255)
     position: Optional[str] = Field(default=None, max_length=255)
     company: Optional[str] = Field(default=None, max_length=255)
+    company_logo_url: Optional[str] = Field(default=None, max_length=255)
     workplace: Optional[str] = Field(default=None, max_length=255)
     job_description: Optional[str] = Field(default=None)
     requirements: Optional[str] = Field(default=None)

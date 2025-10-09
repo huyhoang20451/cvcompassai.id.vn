@@ -34,7 +34,7 @@
               // Hàm load số xu có sẵn trong dữ liệu
               async function fetchCoin() {
                   try {
-                      const response = await fetch(`/api/get-coin?username={{username}}`);
+                      const response = await fetch(`/get-coin`);
                       const data = await response.json();
                       if (data.success) {
                           document.querySelector('.header-actions strong').textContent = data.coin;
@@ -121,60 +121,73 @@
     </div>
     <!-- Cột phải: chi tiết JD nổi bật -->
     <div class="jd-detail-col">
-      <h3>Chuyên viên Marketing kỹ thuật số</h3>
+      <h3>{{ job.workplace }}</h3>
       <div class="jd-detail-section">
-        <span class="section-title">Vị trí:</span> Chuyên viên Marketing kỹ thuật số
+        <span class="section-title">Vị trí:</span> {{ job.title }}
       </div>
       <div class="jd-detail-section">
-        <span class="section-title">Công ty:</span> Công ty TNHH ABC Digital Solutions
+        <span class="section-title">Công ty:</span> {{ job.workplace }}
       </div>
       <div class="jd-detail-section">
-        <span class="section-title">Địa điểm:</span> 123 Nguyễn Văn Cừ, Quận 5, TP. Hồ Chí Minh
+        <span class="section-title">Địa điểm:</span> {{ job.location }}
       </div>
       <div class="jd-detail-section">
         <span class="section-title">Mô tả công việc:</span>
-        <ul>
-          <li>Lập kế hoạch và triển khai các chiến dịch marketing kỹ thuật số (Google Ads, Facebook Ads, Email...)</li>
-          <li>Phối hợp với bộ phận thiết kế và nội dung để sản xuất sản phẩm truyền thông</li>
-          <li>Theo dõi hiệu quả chiến dịch, phân tích dữ liệu và tối ưu</li>
-          <li>Báo cáo kết quả định kỳ cho Trưởng phòng Marketing</li>
-        </ul>
+          {% set jd_desc = job.job_description %}
+          {% if jd_desc is iterable and jd_desc is not string %}
+            <ul>
+              {% for item in jd_desc %}
+                <li>{{ item }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            {% set clean = jd_desc | replace('[', '') | replace(']', '') | replace('"', '') %}
+            <p>{{ clean }}</p>
+          {% endif %}
       </div>
       <div class="jd-detail-section">
         <span class="section-title">Yêu cầu:</span>
-        <ul>
-          <li>Tốt nghiệp đại học các ngành Marketing, Truyền thông, Kinh tế...</li>
-          <li>Có từ 1-2 năm kinh nghiệm thực tế trong lĩnh vực Digital Marketing</li>
-          <li>Thành thạo Google Analytics, Meta Ads Manager, Excel</li>
-          <li>Tư duy logic, kỹ năng viết nội dung tốt, chủ động trong công việc</li>
-        </ul>
+          {% set reqs = job.requirements %}
+          {% if reqs is iterable and reqs is not string %}
+            <ul>
+              {% for r in reqs %}
+                <li>{{ r }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            {% set clean_reqs = reqs | replace('[', '') | replace(']', '') | replace('"', '') %}
+            <p>{{ clean_reqs }}</p>
+          {% endif %}
       </div>
       <div class="jd-detail-section">
         <span class="section-title">Quyền lợi:</span>
-        <ul>
-          <li>Lương: 10 – 15 triệu/tháng (theo năng lực)</li>
-          <li>Thưởng theo hiệu suất + tháng 13</li>
-          <li>BHXH, BHYT đầy đủ; bữa ăn trưa, gửi xe</li>
-          <li>Tham gia các khóa học nội bộ và nâng cao chuyên môn</li>
-          <li>Môi trường trẻ trung, sáng tạo, có lộ trình thăng tiến rõ ràng</li>
-        </ul>
+          {% set benefits = job.benefits %}
+          {% if benefits is iterable and benefits is not string %}
+            <ul>
+              {% for b in benefits %}
+                <li>{{ b }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            {% set clean_benefits = benefits | replace('[', '') | replace(']', '') | replace('"', '') %}
+            <p>{{ clean_benefits }}</p>
+          {% endif %}
       </div>
       <div class="jd-detail-section">
         <span class="section-title">Thời gian làm việc:</span>
         <ul>
-          <li>Thứ 2 – Thứ 6: 8h30 – 17h30</li>
-          <li>Nghỉ Thứ 7 & Chủ nhật</li>
+          <li>{{ job.working_time }}</li>
+          <li>{{ job.working_days }}</li>
         </ul>
       </div>
       <div class="jd-detail-section">
         <span class="section-title">Cách ứng tuyển:</span>
         <ul>
-          <li>Gửi CV về email: tuyendung@abcdigitalvn.com</li>
-          <li>Tiêu đề email: [Họ tên] – Ứng tuyển Digital Marketing</li>
+          </li>
         </ul>
       </div>
       <div class="jd-detail-apply">
-        <span class="deadline">Hạn nộp hồ sơ: 31/07/2025</span>
+        <span class="deadline">Hạn nộp hồ sơ: {{ job.application_deadline }}</span>
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#applyModal">Ứng tuyển ngay</button>
         <!-- Modal -->
         <div class="modal fade" id="applyModal" tabindex="-1" aria-labelledby="applyModalLabel" aria-hidden="true">

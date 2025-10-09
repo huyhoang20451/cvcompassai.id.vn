@@ -35,7 +35,7 @@
             // Lấy số coin từ backend và hiển thị
             async function fetchCoin() {
                 try {
-                    const response = await fetch(`/api/get-coin?username={{username}}`);
+                    const response = await fetch(`/get-coin`);
                     const data = await response.json();
                     if (data.success) {
                         document.querySelector('.header-actions strong').textContent = data.coin;

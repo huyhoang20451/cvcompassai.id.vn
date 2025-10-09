@@ -165,4 +165,56 @@ async def submit_cv(request: Request,
 
     return templates.TemplateResponse("finding-jobs.html",{"request": request, 
                                                            "username": user_info.username})
+@router.get("/pricing-user-loggedin", response_class=HTMLResponse)
+async def pricing_user_logged_in(request: Request,
+                                  user_info: user = Depends(authorize_role(["candidate"]))):
+    
+    return templates.TemplateResponse("pricing-user-loggedin.html", {"request": request, "username": user_info.username, "user": user_info})
+
+@router.get("/top10-best-jd", response_class=HTMLResponse)
+async def top10_best_jd(request: Request,
+                         user_info: user = Depends(authorize_role(["candidate"])),
+                         session: Session = Depends(get_session),
+                         job_description: Optional[int] = None):
+    # If a cv id (job_description) is provided, use the top-10 matching JD function,
+    # otherwise fall back to returning all job descriptions.
+    if job_description:
+        job_descriptions = get_top_10_jds_by_cv(session, job_description)
+    else:
+        job_descriptions = get_jds(session)
+
+    return templates.TemplateResponse(
+        "top10-best-jd.html",
+        {"request": request, "username": user_info.username, "user": user_info, "job_descriptions": job_descriptions},
+    )
+
+@router.get("/top10-best-jd-detail", response_class=HTMLResponse)
+def top10_best_jd_detail(request: Request, 
+                         job_id: Optional[int] = None,
+                         user_info: user = Depends(authorize_role(["candidate"])),
+                         session: Session = Depends(get_session)):
+    # Get list for left column
+    job_descriptions = get_jds(session)
+
+    # If job_id is not provided, default to the first JD in the list (if any)
+    if job_id is None:
+        if not job_descriptions:
+            raise HTTPException(status_code=404, detail="No job descriptions available")
+        jd = job_descriptions[0]
+    else:
+        jd = get_jd_by_id(session, job_id)
+        if not jd:
+            raise HTTPException(status_code=404, detail="Job not found")
+
+    return templates.TemplateResponse(
+        "top10-best-jd-detail.html",
+        {
+            "request": request,
+            "job": jd,
+            "job_description": job_descriptions,
+            "username": user_info.username,
+            "user": user_info,
+            "coin": getattr(user_info, "coin", 0),
+        },
+    )
 

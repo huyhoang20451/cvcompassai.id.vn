@@ -62,14 +62,23 @@ async def submit_job(request: Request,
     form = await request.form()
     jd_form = dict(form)
     
+    # Normalize form values: if form provides single-item lists, convert to plain values
+    for k, v in list(jd_form.items()):
+        if isinstance(v, (list, tuple)) and len(v) == 1:
+            jd_form[k] = v[0]
+
     # Map các field name từ form HTML sang schema
     if "job_title" in jd_form:
         jd_form["title"] = jd_form["job_title"]
         del jd_form["job_title"]
-    
-    # Loại bỏ company_logo vì schema không có field này
-    if "company_logo" in jd_form:
+
+    # Accept either `company_logo` (template) or `company_logo_url` and normalize to company_logo_url
+    if "company_logo" in jd_form and jd_form.get("company_logo"):
+        jd_form["company_logo_url"] = jd_form["company_logo"]
         del jd_form["company_logo"]
+    elif "company_logo_url" in jd_form:
+        # already present; ensure it's a plain value
+        jd_form["company_logo_url"] = jd_form["company_logo_url"]
     
     jd_form["business_id"] = user_info.id
     jd_form["created_at"] = datetime.now(timezone.utc)
