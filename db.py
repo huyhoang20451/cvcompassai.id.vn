@@ -1,8 +1,8 @@
 from sqlmodel import create_engine, SQLModel, Session
 
-MYSQL_USER = "another"
-MYSQL_PASSWORD = "17022004"
-MYSQL_HOST = "localhost"
+MYSQL_USER = "Hoang"
+MYSQL_PASSWORD = "123"
+MYSQL_HOST = "26.232.170.108"
 MYSQL_PORT = "3306"
 MYSQL_DB = "recruitment_db"
 
