@@ -1,9 +1,10 @@
 # Truy vấn cơ sỏ dữ liệu
 from sqlmodel import Session, select
-from models import User_db, jd_db, candidate_CV_db, jd_CV_db
+from models import User_db, jd_db, candidate_CV_db, jd_CV_db, SavedJob
 from .schemas import candidate_CV, jd, jd_CV
 from sqlalchemy import or_
 from typing import List, Optional
+from sqlalchemy import or_, and_
 
 def get_user_by_username(session: Session, username: str) -> User_db:
     """Get user by username from database"""
@@ -11,36 +12,58 @@ def get_user_by_username(session: Session, username: str) -> User_db:
     result = session.exec(statement).first()
     return result
 
-# Lấy tất cả JD theo keyword và location trong database
-def search_jobs(session: Session, 
-                keyword: str = None, 
-                location: str = None) -> List[jd]:
+# Lấy tất cả JD theo keyword và các bộ lọc
+def search_jobs(session: Session,
+                job_categories: Optional[List[str]] = None, # danh sách ngành nghề
+                min_filter: Optional[int] = None,  # mức lương tối thiểu
+                max_filter: Optional[int] = None,  # mức lương tối đa
+                keyword: Optional[str] = None,  # từ khóa
+                sort_by: Optional[str] = "newest")-> List[jd]:
+    # 1️⃣ Khởi tạo câu select cơ bản
     statement = (
-        select(jd_db, User_db.avatar_path)
+        select(jd_db, User_db.avatar_path, User_db.company_name)
         .join(User_db, jd_db.business_id == User_db.id)
     )
 
+    # 2️⃣ Bộ lọc điều kiện
+    conditions = []
+
+    if job_categories:
+        conditions.append(jd_db.job_category.in_(job_categories))
+
+    if min_filter:
+        conditions.append(jd_db.min_salary >= min_filter)
+
+    if max_filter:
+        conditions.append(jd_db.max_salary <= max_filter)
+
     if keyword:
-        keyword_pattern = f"%{keyword}%"
-        statement = statement.where(
+        keyword_like = f"%{keyword.lower()}%"
+        conditions.append(
             or_(
-                jd_db.title.ilike(keyword_pattern),
-                jd_db.job_description.ilike(keyword_pattern)  # dùng đúng tên cột
+                jd_db.title.ilike(keyword_like),
+                jd_db.job_description.ilike(keyword_like),
+                jd_db.requirements.ilike(keyword_like),
             )
         )
-    if location:
-        location_pattern = f"%{location}%"
-        statement = statement.where(jd_db.location.ilike(location_pattern))
+
+    if conditions:
+        statement = statement.where(and_(*conditions))
+
+    # 3️⃣ Sắp xếp
+    if sort_by == "newest":
+        statement = statement.order_by(jd_db.created_at.desc())
+    elif sort_by == "highest_salary":
+        statement = statement.order_by(jd_db.min_salary.desc())
+    elif sort_by == "expiring_soon":
+        statement = statement.order_by(jd_db.deadline.asc())
 
     results = session.exec(statement).all()
 
-    jobs = []
-    for jd_in_db, avatar_path in results:
-        job = jd.model_validate(jd_in_db, from_attributes=True)
-        job.avatar_path = avatar_path
-        jobs.append(job)
-
-    return jobs
+    return [
+        jd.model_validate({**jd.model_dump(), "avatar_path": a, "company_name": c})
+        for jd, a, c in results
+    ]
 
 # Lấy tất cả CV theo username trong database
 def get_cvs_by_username(session: Session, 
@@ -57,30 +80,36 @@ def get_cvs_by_username(session: Session,
 # Lấy tất cả JD trong database
 def get_jds(session: Session) -> List[jd]:
     statement = (
-        select(jd_db, User_db.avatar_path)
+        select(jd_db, 
+               User_db.avatar_path,
+               User_db.company_name)
         .join(User_db, jd_db.business_id == User_db.id)
     )
     results = session.exec(statement).all()
 
     jds = []
-    for jd_in_db, avatar_path in results:
+    for jd_in_db, avatar_path, company_name in results:
         jd_obj = jd.model_validate(jd_in_db, from_attributes=True)
         jd_obj.avatar_path = avatar_path
+        jd_obj.company_name = company_name
         jds.append(jd_obj)
 
     return jds
 
 def get_jd_by_id(session: Session, id: int) -> jd:
     statement = (
-        select(jd_db, User_db.avatar_path)
+        select(jd_db, 
+               User_db.avatar_path,
+               User_db.company_name)
         .join(User_db, jd_db.business_id == User_db.id)
         .where(jd_db.id == id)
     )
     result = session.exec(statement).first()
     if result:
-        jd_in_db, avatar_path = result
+        jd_in_db, avatar_path, company_name = result
         jd_obj = jd.model_validate(jd_in_db, from_attributes=True)
         jd_obj.avatar_path = avatar_path
+        jd_obj.company_name = company_name
         return jd_obj
     return None
 
@@ -131,3 +160,22 @@ def get_cvs_by_id(session: Session, cv_id: int) -> candidate_CV:
     if result:
         return candidate_CV.model_validate(result)
     return None
+
+def save_jd(session: Session, candidate_id: int, job_id: int):
+    # Kiểm tra xem job đã được lưu chưa
+    existing = session.exec(
+        select(SavedJob)
+        .where(SavedJob.candidate_id == candidate_id)
+        .where(SavedJob.job_id == job_id)
+    ).first()
+
+    if existing:
+        return None  # hoặc raise HTTPException nếu muốn báo lỗi
+
+    # Tạo bản ghi mới
+    saved_job = SavedJob(candidate_id=candidate_id, job_id=job_id)
+    session.add(saved_job)
+    session.commit()
+    session.refresh(saved_job)  # cập nhật lại instance với id mới sinh ra
+
+    return saved_job

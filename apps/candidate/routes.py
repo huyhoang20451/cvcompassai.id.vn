@@ -13,7 +13,8 @@ from .services import (search_jobs,
                        get_candidate_cv_by_id,
                        add_cv_into_jd,
                        add_cv_into_candidate,
-                       get_top_10_jds_by_cv)
+                       get_top_10_jds_by_cv,
+                       save_jd as service_save_jd)
 from db import get_session
 from Core.Auth.schemas import user
 from .schemas import JobResponse, JobSearchRequest, candidate_CV, jd
@@ -72,18 +73,39 @@ async def finding_jobs(request: Request,
                                                             "user": user_info, 
                                                             "job_descriptions": job_descriptions})
 
-# Thanh tìm kiếm job
+# Thanh tìm kiếm job theo từ khóa và filter
 @router.post("/jobs_search", response_model=list[jd])
-async def jobs_search_endpoint(keyword: str,
+async def jobs_search_endpoint(request: Request,
+                               job_categories: List[str] = None, # danh sách ngành nghề
+                               min_filter: int = None,  # mức lương tối thiểu
+                               max_filter: int = None,  # mức lương tối đa
+                               keyword: str = None,  # từ khóa
+                               sort_by: Optional[str] = "newest",
+                               user_info: user = Depends(authorize_role(["candidate"])),
                                session: Session = Depends(get_session)):
     try:
-        jobs = search_jobs(session, keyword)
+        jobs = search_jobs(session, 
+                           job_categories=job_categories,
+                           min_filter=min_filter,
+                           max_filter=max_filter,
+                           keyword=keyword,
+                           sort_by=sort_by)
         return templates.TemplateResponse(" home_logged_in.html", {"request": request, 
                                                                    "job_descriptions": jobs})
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Lỗi hệ thống: {str(e)}")
 
 # Màn hình chi tiết JD
+@router.get("/job-detail/{job_id}", response_class=HTMLResponse)
+def job_detail(request: Request,
+               job_id: int,
+               user_info: user = Depends(authorize_role(["candidate"])),
+               session: Session = Depends(get_session)):
+    jd = get_jd_by_id(session, job_id)
+    if not jd:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return templates.TemplateResponse("job-detail.html", {"request": request, "job": jd, "username": user_info.username})
+
 @router.get("/job-detail/{job_id}", response_class=HTMLResponse)
 def job_detail(request: Request,
                job_id: int,
@@ -232,4 +254,14 @@ def top10_best_jd_detail(request: Request,
         },
     )
 
-
+# Lưu công việc vào danh sách yêu thích
+@router.post("/save-jd", response_class=HTMLResponse)
+async def save_jd(request: Request,
+                  jd_id: int,
+                  user_info: user = Depends(authorize_role(["candidate"])),
+                  session: Session = Depends(get_session)):
+    jd = service_save_jd(session, user_info.id, jd_id)
+    if jd is None:
+        return JSONResponse(content={"success": False, "msg": "Công việc đã được lưu trước đó."})
+    
+    return JSONResponse(content={"success": True, "msg": "Đã lưu công việc thành công!"})

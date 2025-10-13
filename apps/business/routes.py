@@ -8,11 +8,10 @@ from .services import (get_jds_by_user_name,
                        get_cvs_by_jd_id, 
                        detect_file_type,
                        get_jd_by_id)
-from .repository import get_jd_by_id
 from db import get_session
 from Core.Auth.dependencies import templates, authorize_role
 from Core.Auth.schemas import user
-from .schemas import JD_form
+from .schemas import JD_create
 from datetime import datetime, timezone
 from typing import Optional
 from Core.OCR import compare
@@ -63,32 +62,21 @@ async def submit_job(request: Request,
     form = await request.form()
     jd_form = dict(form)
     
-    # Normalize form values: if form provides single-item lists, convert to plain values
+    # Chuyển các giá trị form từ list có 1 phần tử sang giá trị đơn
     for k, v in list(jd_form.items()):
         if isinstance(v, (list, tuple)) and len(v) == 1:
             jd_form[k] = v[0]
 
-    # Map các field name từ form HTML sang schema
     if "job_title" in jd_form:
         jd_form["title"] = jd_form["job_title"]
         del jd_form["job_title"]
-
-    # Accept either `company_logo` (template) or `company_logo_url` and normalize to company_logo_url
-    if "company_logo" in jd_form and jd_form.get("company_logo"):
-        jd_form["company_logo_url"] = jd_form["company_logo"]
-        del jd_form["company_logo"]
-    elif "company_logo_url" in jd_form:
-        # already present; ensure it's a plain value
-        jd_form["company_logo_url"] = jd_form["company_logo_url"]
     
     jd_form["business_id"] = user_info.id
     jd_form["created_at"] = datetime.now(timezone.utc)
-    jd_form = JD_form(**jd_form)
+    jd_form = JD_create(**jd_form)
     jd = add_jd(session, jd_form)
-    
-    # Fallback cho company_name nếu bị None
-    company_name = user_info.company_name or user_info.username or "Unknown"
-    return RedirectResponse(url=f"/job-storage?company={company_name}&username={user_info.username}", status_code=303)
+
+    return RedirectResponse(url=f"/job-storage?company={user_info.company_name}&username={user_info.username}", status_code=303)
 
 @router.get("/dang-tuyen-ngay", response_class=HTMLResponse)
 def dang_tuyen_ngay(request: Request, 
@@ -124,11 +112,9 @@ def compare_cv_vs_jd(request: Request,
                         "met": comparison.get("Met", []),
                         "not_met": comparison.get("Not_Met", [])})
     print(results)
-    # Fallback cho company_name nếu bị None
-    company_name = user_info.company_name or user_info.username or "Công ty chưa cập nhật"
     return templates.TemplateResponse("cv-detail-business.html", {"request": request,
                                                                   "username": user_info.username,                                                             "company": company_name,
-                                                                  "company": company_name,
+                                                                  "company": user_info.company_name or user_info.username or "Công ty chưa cập nhật",
                                                                   "results": results})
 
 # Update jd by job.id

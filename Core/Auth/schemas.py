@@ -9,6 +9,7 @@ class user(BaseModel):
     company_name: str | None = None
     coin: int | None = None
     avatar_path: str | None = None
+    full_name: Optional[str] = None
     premium_expires: Optional[date] = None
 
     model_config = ConfigDict(from_attributes=True)
@@ -36,14 +37,6 @@ class BusinessCreate(BaseModel):
     email: str | None = None
     role: str = "business"
     company_name: str | None = None
-
-class SignupRequest(BaseModel):
-    username: str
-    password: str
-    email: str
-    role: str
-    company_name: str | None = None
-    full_name: str | None = None
 
 class Login_form(BaseModel):
     username: str | None = None

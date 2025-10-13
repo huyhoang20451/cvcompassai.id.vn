@@ -8,7 +8,7 @@ from .services import (authenticate_user,
                        login_for_access_token,
                        get_user_by_username)
 from sqlmodel import Session
-from .schemas import Token, CandidateCreate, BusinessCreate, Login_form, SignupRequest
+from .schemas import Token, CandidateCreate, BusinessCreate, Login_form
 from ..config import settings
 from datetime import timedelta
 from db import get_session

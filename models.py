@@ -1,10 +1,9 @@
 # Chứa các models của database
 import uuid
 from sqlalchemy import Column, DateTime, func
-from sqlmodel import SQLModel, Field
+from sqlmodel import SQLModel, Field, UniqueConstraint
 from typing import Optional, Text
 from datetime import datetime, timezone, date
-from apps.business.schemas import JD_form
 import json
 from apps.payment.schemas import OrderStatus
 class User_db(SQLModel, table=True):
@@ -26,25 +25,23 @@ class User_db(SQLModel, table=True):
     company_name: Optional[str] = Field(default=None, max_length=100)
 
 class jd_db(SQLModel, table=True):
-    __tablename__ = "jd"
-    
-    id: Optional[int] = Field(default=None, primary_key=True)
-    title: str = Field(nullable=False, max_length=100)
-    location: str = Field(nullable=False, max_length=1000)
-    salary: Optional[str] = Field(default=None, max_length=50)
-    industry: Optional[str] = Field(default=None, max_length=255)
-    position: Optional[str] = Field(default=None, max_length=255)
-    company: Optional[str] = Field(default=None, max_length=255)
-    company_logo_url: Optional[str] = Field(default=None, max_length=255)
-    workplace: Optional[str] = Field(default=None, max_length=255)
-    job_description: Optional[str] = Field(default=None)
-    requirements: Optional[str] = Field(default=None)
-    benefits: Optional[str] = Field(default=None)
-    working_time: Optional[str] = Field(default=None, max_length=255)
-    application_method: Optional[str] = Field(default=None, max_length=255)
-    deadline: Optional[str] = Field(default=None, max_length=255)
-    business_id: Optional[int] = Field(default=None, foreign_key="user.id")
-    created_at: datetime = Field(nullable=True)
+    __tablename__ = "jd"  # Tên bảng trong database: lưu thông tin các job posting (tin tuyển dụng)
+
+    id: Optional[int] = Field(default=None, primary_key=True) # ID duy nhất của mỗi tin tuyển dụng (primary key, auto-increment)
+    title: str = Field(nullable=False, max_length=100) # Tiêu đề tin tuyển dụng, ví dụ: "Lập trình viên Python", "Chuyên viên Marketing"
+    location: str = Field(nullable=False, max_length=1000) # Địa điểm làm việc, có thể bao gồm nhiều nơi hoặc mô tả chi tiết như "Hà Nội / Remote"
+    min_salary: Optional[int] = Field(default=None, description="Mức lương tối thiểu (đơn vị: VNĐ)")
+    max_salary: Optional[int] = Field(default=None, description="Mức lương tối đa (đơn vị: VNĐ)")
+    business_id: Optional[int] = Field(default=None, foreign_key="user.id") # Khóa ngoại liên kết đến bảng `user` — xác định người/tài khoản doanh nghiệp nào đăng tin
+    created_at: datetime = Field(nullable=True) # Ngày tạo tin (thường set mặc định = thời điểm đăng tuyển)
+    job_category: Optional[str] = Field(default=None, max_length=255) # Ngành nghề hoặc lĩnh vực (ví dụ: "Công nghệ thông tin", "Thiết kế", "Kế toán")
+    position: Optional[str] = Field(default=None, max_length=255) # Vị trí cụ thể trong công ty, ví dụ: "Trưởng nhóm", "Nhân viên", "Thực tập sinh"
+    job_description: Optional[str] = Field(default=None) # Mô tả công việc chi tiết – các nhiệm vụ, trách nhiệm chính của vị trí
+    requirements: Optional[str] = Field(default=None) # Yêu cầu ứng viên: kỹ năng, kinh nghiệm, trình độ học vấn...
+    benefits: Optional[str] = Field(default=None) # Quyền lợi được hưởng: lương thưởng, chế độ nghỉ, bảo hiểm, phúc lợi...
+    working_time: Optional[str] = Field(default=None, max_length=255) # Thời gian làm việc: "T2–T6", "Ca xoay", "Giờ hành chính"...
+    application_method: Optional[str] = Field(default=None, max_length=255) # Cách thức ứng tuyển: "Gửi CV qua email", "Ứng tuyển trên web", "Liên hệ trực tiếp"
+    deadline: Optional[str] = Field(default=None, max_length=255) # Hạn chót nộp hồ sơ (deadline tuyển dụng)
     
 class candidate_CV_db(SQLModel, table=True):
     __tablename__ = "candidate_CV"
@@ -86,3 +83,12 @@ class Service_db(SQLModel, table=True):
     name: str = Field(nullable=False, max_length=100, unique=True)
     description: Optional[str] = Field(default=None, max_length=255)
     price: int = Field(nullable=False)
+
+class SavedJob(SQLModel, table=True):
+    __tablename__ = "saved_jobs"
+    __table_args__ = (UniqueConstraint("candidate_id", "job_id", name="unique_saved_job"),)
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    candidate_id: int = Field(foreign_key="user.id", nullable=False)
+    job_id: int = Field(foreign_key="jd.id", nullable=False)
+    saved_at: datetime = Field(default_factory=datetime.utcnow)

@@ -5,15 +5,15 @@ from .repository import (get_jds_by_user_name as repo_get_jds_by_user_name,
                          get_jd_by_id as repo_get_jd_by_id)
 from fastapi import Depends
 from typing import Annotated, List
-from .schemas import JD_form, OCR_result, jd_CV
+from .schemas import JD_create, jd_response, OCR_result, jd_CV
 from Core.Auth.schemas import user
 from Core.Auth.dependencies import get_current_user
 from Core.OCR import compare
 
-def get_jds_by_user_name(session: Session, username: str) -> List[JD_form]:
+def get_jds_by_user_name(session: Session, username: str) -> List[jd_response]:
     return repo_get_jds_by_user_name(session, username)
 
-def add_jd(session: Session, jd: JD_form) -> JD_form:
+def add_jd(session: Session, jd: JD_create) -> JD_create:
     return repo_add_jd(session, jd)
 
 def OCR(image, JD: str) -> OCR_result:

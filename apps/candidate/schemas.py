@@ -1,6 +1,6 @@
 # Chứa các models của dữ liệu giữa các API
 from datetime import date, datetime
-from pydantic import BaseModel, HttpUrl, ConfigDict
+from pydantic import BaseModel, Field, HttpUrl, ConfigDict
 from typing import Optional
 class JobSearchRequest(BaseModel):
     keyword: str | None = None
@@ -33,9 +33,11 @@ class jd_CV(BaseModel):
 class jd(BaseModel):
     id: Optional[int] = None
     title: str
-    salary: str
+    category: Optional[str] = None
+    min_salary: Optional[int] = None
+    max_salary: Optional[int] = None
     location: str
-    industry: Optional[str] = None
+    job_category: Optional[str] = None
     position: Optional[str] = None
     company_name: Optional[str] = None
     workplace: Optional[str] = None

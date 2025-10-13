@@ -8,20 +8,29 @@ from .repository import (search_jobs as repo_search_jobs,
                          get_candidate_cv_by_id as repo_get_candidate_cv_by_id,
                          add_cv_into_jd as repo_add_cv_into_jd,
                          add_cv_into_candidate as repo_add_cv_into_candidate,
-                         get_cvs_by_id as repo_get_cvs_by_id)
+                         get_cvs_by_id as repo_get_cvs_by_id,
+                         save_jd as repo_save_jd)
 from fastapi import Depends, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
-from typing import Annotated, List
+from typing import Annotated, List, Optional
 from .schemas import JobSearchRequest, JobResponse, jd, candidate_CV, jd_CV
 from Core.Auth.schemas import user
 from Core.Auth.dependencies import get_current_user
 from Core.OCR import compare_qwen
 import os
 
-def search_jobs(session: Session, 
-                search_params: JobSearchRequest) -> list[jd]:
-    jobs = repo_search_jobs(session, 
-                            search_params.keyword)
+def search_jobs(session: Session,
+                job_categories: List[str] = None, # danh sách ngành nghề
+                min_filter: int = None,  # mức lương tối thiểu
+                max_filter: int = None,  # mức lương tối đa
+                keyword: str = None,  # từ khóa
+                sort_by: Optional[str] = "newest")-> List[jd]:
+    jobs = repo_search_jobs(session,
+                            job_categories=job_categories,
+                            min_filter=min_filter,
+                            max_filter=max_filter,
+                            keyword=keyword,
+                            sort_by=sort_by)
     return jobs
 
 def get_cvs_by_username(username: str, session: Session) -> List[candidate_CV]:
@@ -106,3 +115,7 @@ def get_top_10_jds_by_cv(session: Session, cv: str) -> List[jd]:
     for r in top_10:
         print(r["jd"].dict())
     return [r["jd"] for r in top_10]
+
+def save_jd(session: Session, candidate_id: int, job_id: int):
+    jd = repo_save_jd(session, candidate_id, job_id)
+    return jd
