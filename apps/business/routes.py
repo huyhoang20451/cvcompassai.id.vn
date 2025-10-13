@@ -18,8 +18,10 @@ from Core.OCR import compare
 router = APIRouter(tags=["business"])
 
 @router.get("/business-home", response_class=HTMLResponse)
-async def business_home(request: Request):
-    return templates.TemplateResponse("home-business.html", {"request": request})
+async def business_home(request: Request,
+                        user_info: user = Depends(authorize_role(["business"]))):
+    return templates.TemplateResponse("home-business.html", {"request": request, 
+                                                             "user_info": user_info})
 
 @router.get("/business-dashboard", response_class=HTMLResponse)
 async def business_dashboard(request: Request,
@@ -27,14 +29,16 @@ async def business_dashboard(request: Request,
     print(user_info.company_name)
     # Fallback cho company_name nếu bị None
     company_name = user_info.company_name or user_info.username or "Công ty chưa cập nhật"
-    return templates.TemplateResponse("business_dashboard.html", {"request": request, "username": user_info.username, "company": company_name})
+    return templates.TemplateResponse("business_dashboard.html", {"request": request, 
+                                                                  "user_info": user_info})
 
 @router.get("/pricing-business-logged-in", response_class=HTMLResponse)
 async def pricing_business_logged_in(request: Request, 
                                      user_info: user = Depends(authorize_role(["business"]))):
     # Fallback cho company_name nếu bị None
     company_name = user_info.company_name or user_info.username or "Công ty chưa cập nhật"
-    return templates.TemplateResponse("pricing_business_logged_in.html", {"request": request, "username": user_info.username, "company": company_name})
+    return templates.TemplateResponse("pricing_business_logged_in.html", {"request": request, 
+                                                                          "user_info": user_info})
 
 @router.get("/job-storage", response_class=HTMLResponse)
 async def job_storage(request: Request,
@@ -44,16 +48,11 @@ async def job_storage(request: Request,
     job_descriptions = get_jds_by_user_name(session, user_info.username)
     job = next((jd for jd in job_descriptions if jd.id == jd_id), None)
 
-    # Fallback cho company_name nếu bị None
-    company_name = user_info.company_name or user_info.username or "Công ty chưa cập nhật"
-
     return templates.TemplateResponse("job-storage.html", 
                                       {"request": request,
                                        "job_position": job_descriptions,
                                        "job": job,
-                                       "username": user_info.username,
-                                       "role": user_info.role,
-                                       "company": company_name})
+                                       "user_info": user_info})
 
 @router.post("/submit-job", response_class=HTMLResponse)
 async def submit_job(request: Request, 
@@ -85,8 +84,7 @@ def dang_tuyen_ngay(request: Request,
     company_name = user_info.company_name or user_info.username or "Công ty chưa cập nhật"
     
     return templates.TemplateResponse("form-dang-tuyen-ngay.html", {"request": request, 
-                                                                    "username": user_info.username, 
-                                                                    "company": company_name})
+                                                                    "user_info": user_info})
 
 @router.get("/cv-detail-business", response_class=HTMLResponse)
 def cv_detail_business(request: Request, 
@@ -94,8 +92,7 @@ def cv_detail_business(request: Request,
     # Fallback cho company_name nếu bị None
     company_name = user_info.company_name or user_info.username or "Công ty chưa cập nhật"
     return templates.TemplateResponse("cv-detail-business.html", {"request": request, 
-                                                                  "username": user_info.username, 
-                                                                  "company": company_name})
+                                                                  "user_info": user_info})
 
 @router.get("/compare_cv_vs_jd", response_class=HTMLResponse)
 def compare_cv_vs_jd(request: Request,
@@ -113,8 +110,7 @@ def compare_cv_vs_jd(request: Request,
                         "not_met": comparison.get("Not_Met", [])})
     print(results)
     return templates.TemplateResponse("cv-detail-business.html", {"request": request,
-                                                                  "username": user_info.username,                                                             "company": company_name,
-                                                                  "company": user_info.company_name or user_info.username or "Công ty chưa cập nhật",
+                                                                  "user_info": user_info,
                                                                   "results": results})
 
 # Update jd by job.id

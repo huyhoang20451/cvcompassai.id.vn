@@ -63,16 +63,14 @@ async def register(request: Request, session: Session = Depends(get_session)):
     form_data = dict(form)
     print(form_data)
     role = form_data.get("role")
-
+    print(role)
     try:
         if role == "candidate":
             user_in = CandidateCreate(**form_data)
         elif role == "business":
             user_in = BusinessCreate(**form_data)
         else:
-            return templates.TemplateResponse(
-                "register.html", {"request": request, 
-                                  "error": "Loại tài khoản không hợp lệ"})
+            raise ValueError("Vai trò không hợp lệ")
     except Exception as e:
         return templates.TemplateResponse(
             "register.html", {"request": request, 

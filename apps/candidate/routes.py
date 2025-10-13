@@ -32,34 +32,33 @@ async def home(request: Request,
     job_descriptions = get_jds(session)
     return templates.TemplateResponse("home_logged_in.html", {"request": request, 
                                                               "job_descriptions": job_descriptions, 
-                                                              "username": user_info.username})
+                                                              "user_info": user_info})
 
 @router.get("/aboutus-logged-in", response_class=HTMLResponse)
 async def about_us(request: Request,
                    user_info: user = Depends(authorize_role(["candidate"]))):
     return templates.TemplateResponse("aboutus-logged-in.html", {"request": request, 
-                                                                 "username": user_info.username})
+                                                                 "user_info": user_info})
 
 @router.get("/pricing-user-logged-in", response_class=HTMLResponse)
 async def pricing(request: Request,
                   user_info: user = Depends(authorize_role(["candidate"]))):
     return templates.TemplateResponse("pricing-user-logged-in.html", {"request": request, 
-                                                                      "username": user_info.username})
+                                                                      "user_info": user_info})
 
 @router.get("/ocr-scan-logged-in", response_class=HTMLResponse)
 async def ocr_scan(request: Request,
                    user_info: user = Depends(authorize_role(["candidate"]))):
     return templates.TemplateResponse("ocr-scan.html", {"request": request, 
-                                                        "username": user_info.username})
+                                                        "user_info": user_info})
 
 @router.get("/finding-jobs", response_class=HTMLResponse)
 async def finding_jobs(request: Request,
                        user_info: user = Depends(authorize_role(["candidate"])),
                        session: Session = Depends(get_session)):
     job_descriptions = get_jds(session)
-    return templates.TemplateResponse("finding-jobs.html", {"request": request, 
-                                                            "username": user_info.username, 
-                                                            "user": user_info, 
+    return templates.TemplateResponse("finding-jobs.html", {"request": request,
+                                                            "user_info": user_info,
                                                             "job_descriptions": job_descriptions})
 
 # Thanh tìm kiếm job theo từ khóa và filter
@@ -79,7 +78,8 @@ async def jobs_search_endpoint(request: Request,
                            max_filter=max_filter,
                            keyword=keyword,
                            sort_by=sort_by)
-        return templates.TemplateResponse(" home_logged_in.html", {"request": request, 
+        return templates.TemplateResponse(" home_logged_in.html", {"request": request,
+                                                                   "user_info": user_info,
                                                                    "job_descriptions": jobs})
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Lỗi hệ thống: {str(e)}")
@@ -93,7 +93,9 @@ def job_detail(request: Request,
     jd = get_jd_by_id(session, job_id)
     if not jd:
         raise HTTPException(status_code=404, detail="Job not found")
-    return templates.TemplateResponse("job-detail.html", {"request": request, "job": jd, "username": user_info.username})
+    return templates.TemplateResponse("job-detail.html", {"request": request, 
+                                                          "job": jd, 
+                                                          "user_info": user_info})
 
 @router.get("/job-detail/{job_id}", response_class=HTMLResponse)
 def job_detail(request: Request,
@@ -103,7 +105,9 @@ def job_detail(request: Request,
     jd = get_jd_by_id(session, job_id)
     if not jd:
         raise HTTPException(status_code=404, detail="Job not found")
-    return templates.TemplateResponse("job-detail.html", {"request": request, "job": jd, "username": user_info.username})
+    return templates.TemplateResponse("job-detail.html", {"request": request, 
+                                                          "job": jd, 
+                                                          "user_info": user_info})
 
 # Lấy tất cả CVs theo username lấy từ token
 @router.get("/get_cvs", response_model= List[candidate_CV])
@@ -130,17 +134,20 @@ async def get_coin(user_info: user = Depends(authorize_role(["candidate"]))):
 @router.get("/create-free-cv", response_class=HTMLResponse)
 async def create_free_cv(request: Request, 
                    user_info: user = Depends(authorize_role(["candidate"]))):
-    return templates.TemplateResponse("create-free-cv.html", {"request": request})
+    return templates.TemplateResponse("create-free-cv.html", {"request": request, 
+                                                              "user_info": user_info})
 
 @router.get("/mycv-settings", response_class=HTMLResponse)
 async def mycv_settings(request: Request,
                   user_info: user = Depends(authorize_role(["candidate"]))):
-    return templates.TemplateResponse("mycv-settings.html", {"request": request, "username": user_info.username, "user": user_info})
+    return templates.TemplateResponse("mycv-settings.html", {"request": request, 
+                                                             "user_info": user_info})
 
 @router.get("/finding-jobs", response_class=HTMLResponse)
 async def finding_jobs(request: Request,
                        user_info: user = Depends(authorize_role(["candidate"]))):
-    return templates.TemplateResponse("finding-jobs.html", {"request": request, "username": user_info.username, "user": user_info})
+    return templates.TemplateResponse("finding-jobs.html", {"request": request, 
+                                                            "user_info": user_info})
 
 # Tìm 10 JD phù hợp nhất với CV upload
 @router.post("/top10-best-jd", response_class=HTMLResponse)
@@ -159,7 +166,9 @@ async def upload(request: Request,
         raise HTTPException(status_code=400, detail="Unsupported file type. Please upload a PDF or image file.")
 
     top_10 = get_top_10_jds_by_cv(session, cv_str)
-    return templates.TemplateResponse("top10-best-jd.html", {"request": request, "job_descriptions": top_10})
+    return templates.TemplateResponse("top10-best-jd.html", {"request": request, 
+                                                             "user_info": user_info, 
+                                                             "job_descriptions": top_10})
 
 # Nộp cv cho jd bằng cv có sẵn trong database
 @router.post("/submit-existing-cv", response_class=HTMLResponse)
@@ -173,7 +182,7 @@ async def submit_cv(request: Request,
     cv = add_cv_into_jd(session, URL, jd_id) # Add cv vào bảng jd_CV
 
     return templates.TemplateResponse("finding-jobs.html",{"request": request, 
-                                                           "username": user_info.username})
+                                                           "user_info": user_info})
 
 # Nộp cv cho jd bằng cv upload từ máy
 @router.post("/submit-upload-cv", response_class=HTMLResponse)
@@ -188,13 +197,14 @@ async def submit_cv(request: Request,
     cv = add_cv_into_jd(session, file_path, jd_id) # Add cv vào bảng jd_CV
 
     return templates.TemplateResponse("finding-jobs.html",{"request": request, 
-                                                           "username": user_info.username})
+                                                           "user_info": user_info})
 
 @router.get("/pricing-user-loggedin", response_class=HTMLResponse)
 async def pricing_user_logged_in(request: Request,
                                   user_info: user = Depends(authorize_role(["candidate"]))):
     
-    return templates.TemplateResponse("pricing-user-loggedin.html", {"request": request, "username": user_info.username, "user": user_info})
+    return templates.TemplateResponse("pricing-user-loggedin.html", {"request": request, 
+                                                                     "user_info": user_info})
 
 @router.get("/top10-best-jd", response_class=HTMLResponse)
 async def top10_best_jd(request: Request,
@@ -210,7 +220,9 @@ async def top10_best_jd(request: Request,
 
     return templates.TemplateResponse(
         "top10-best-jd.html",
-        {"request": request, "username": user_info.username, "user": user_info, "job_descriptions": job_descriptions},
+        {"request": request, 
+         "user_info": user_info, 
+         "job_descriptions": job_descriptions},
     )
 
 @router.get("/top10-best-jd-detail", response_class=HTMLResponse)
@@ -237,8 +249,7 @@ def top10_best_jd_detail(request: Request,
             "request": request,
             "job": jd,
             "job_description": job_descriptions,
-            "username": user_info.username,
-            "user": user_info,
+            "user_info": user_info,
             "coin": getattr(user_info, "coin", 0),
         },
     )
