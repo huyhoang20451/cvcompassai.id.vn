@@ -8,7 +8,7 @@ from .services import (authenticate_user,
                        login_for_access_token,
                        get_user_by_username)
 from sqlmodel import Session
-from .schemas import Token, UserCreate, Login_form
+from .schemas import Token, CandidateCreate, BusinessCreate, Login_form, SignupRequest
 from ..config import settings
 from datetime import timedelta
 from db import get_session
@@ -62,12 +62,28 @@ async def register(request: Request, session: Session = Depends(get_session)):
     form = await request.form()
     form_data = dict(form)
     print(form_data)
-    user_in = UserCreate(**form_data)  # parse sang Pydantic model
-    new_user = create_user(session, 
-                           user_in.username, 
-                           user_in.password,
-                           user_in.role,
-                           user_in.company_name)
+    role = form_data.get("role")
+
+    try:
+        if role == "candidate":
+            user_in = CandidateCreate(**form_data)
+        elif role == "business":
+            user_in = BusinessCreate(**form_data)
+        else:
+            return templates.TemplateResponse(
+                "register.html", {"request": request, 
+                                  "error": "Loại tài khoản không hợp lệ"})
+    except Exception as e:
+        return templates.TemplateResponse(
+            "register.html", {"request": request, 
+                              "error": f"Dữ liệu không hợp lệ: {e}"})
+    new_user = create_user(session,
+                           username=user_in.username,
+                           password=user_in.password,
+                           email=user_in.email,
+                           role=user_in.role,
+                           company_name=getattr(user_in, "company_name", None),
+                           full_name=getattr(user_in, "full_name", None))
     if not new_user:
         raise templates.TemplateResponse("register.html", {"request": request, "error": "Tên người dùng đã tồn tại"})
     return templates.TemplateResponse("login.html", {"request": request, "success": "Đăng ký thành công"})

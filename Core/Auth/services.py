@@ -69,11 +69,18 @@ def login_for_access_token(login_form = Login_form, session = Session) -> Token:
 def create_user(session: Session,
                 username: str,
                 password: str,
+                email: str,
                 role: str,
-                company_name: str):
+                company_name: str,
+                full_name: str):
     user = get_user_by_username(session, username)
     if user:
         return False # Đã có username trong database
     hashed_password = get_password_hash(password)
-    new_user = User_db(username=username, hashed_password=hashed_password, role=role, company_name=company_name)
+    new_user = User_db(username=username, 
+                       hashed_password=hashed_password,
+                       email=email,
+                       role=role, 
+                       company_name=company_name,
+                       full_name=full_name)
     return repo_save_user_to_db(session, new_user)

@@ -23,11 +23,27 @@ class Token(BaseModel):
     access_token: str
     Token_type: str
 
-class UserCreate(BaseModel):
+class CandidateCreate(BaseModel):
     username: str | None = None
     password: str
-    role: str | None = None
+    email: str | None = None
+    role: str = "candidate"
+    full_name: str | None = None
+
+class BusinessCreate(BaseModel):
+    username: str | None = None
+    password: str
+    email: str | None = None
+    role: str = "business"
     company_name: str | None = None
+
+class SignupRequest(BaseModel):
+    username: str
+    password: str
+    email: str
+    role: str
+    company_name: str | None = None
+    full_name: str | None = None
 
 class Login_form(BaseModel):
     username: str | None = None

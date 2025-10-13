@@ -13,14 +13,17 @@ class User_db(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     username: str = Field(nullable=False, max_length=100, unique=True)
     hashed_password: str = Field(nullable=False, max_length=255)
+    email: Optional[str] = Field(default=None, max_length=100, unique=True)
     role: str = Field(nullable=False, max_length=50)  # "candidate" hoặc "business"
     avatar_path: Optional[str] = Field(default=None, max_length=255)
     coin: Optional[int] = Field(default=0)
+    premium_expires: Optional[date] = Field(default=None)
+
+    # Các trường chỉ dành cho candidate
+    full_name: Optional[str] = Field(default=None, max_length=100)
 
     # Các trường chỉ dành cho business
     company_name: Optional[str] = Field(default=None, max_length=100)
-    location: Optional[str] = Field(default=None, max_length=100)
-    premium_expires: Optional[date] = Field(default=None)
 
 class jd_db(SQLModel, table=True):
     __tablename__ = "jd"
