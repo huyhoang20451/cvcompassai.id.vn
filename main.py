@@ -6,6 +6,7 @@ from apps.candidate.routes import router as candidate_router
 from apps.business.routes import router as business_router
 from apps.setting.routes import router as setting_router
 from apps.admin.routes import router as admin_router
+#from apps.payment.routes import router as payment_router
 from Core.Auth.routes import router as auth_router
 from Core.Auth.dependencies import authorize_role, templates
 from Core.Auth.schemas import user
@@ -21,6 +22,7 @@ app.include_router(candidate_router)
 app.include_router(business_router)
 app.include_router(setting_router)
 app.include_router(admin_router)
+#app.include_router(payment_router)
 
 @app.on_event("startup")
 def on_startup():
