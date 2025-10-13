@@ -29,21 +29,10 @@ router = APIRouter(tags=["candidate"])
 async def home(request: Request, 
                user_info: user = Depends(authorize_role(["candidate"])), 
                session: Session = Depends(get_session)):
-    # Tìm kiếm job theo từ khóa và vị trí
-    keyword = request.query_params.get("keyword", "")
-    location = request.query_params.get("location", "")
-    if keyword or location:
-        search_params = JobSearchRequest(keyword=keyword if keyword else None, location=location if location else None)
-        job_descriptions = search_jobs(session, search_params)
-    else:
-        job_descriptions = get_jds(session)
-    user_avatar = getattr(user_info, "avatar_path", None)
+    job_descriptions = get_jds(session)
     return templates.TemplateResponse("home_logged_in.html", {"request": request, 
                                                               "job_descriptions": job_descriptions, 
-                                                              "username": user_info.username, 
-                                                              "user_avatar": user_avatar, 
-                                                              "keyword": keyword, 
-                                                              "location": location})
+                                                              "username": user_info.username})
 
 @router.get("/aboutus-logged-in", response_class=HTMLResponse)
 async def about_us(request: Request,
