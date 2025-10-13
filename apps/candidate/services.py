@@ -19,21 +19,10 @@ from Core.OCR import compare_qwen
 import os
 
 def search_jobs(session: Session, 
-                search_params: JobSearchRequest) -> list[JobResponse]:
+                search_params: JobSearchRequest) -> list[jd]:
     jobs = repo_search_jobs(session, 
-                            search_params.keyword, 
-                            search_params.location)
-    job_responses = []
-    for job in jobs:
-        job_response = JobResponse(
-            title=job.title,
-            job_description=job.job_description,
-            location=job.location,
-            salary=job.salary,
-            company_logo_url=job.company_logo_url
-        )
-        job_responses.append(job_response)
-    return job_responses
+                            search_params.keyword)
+    return jobs
 
 def get_cvs_by_username(username: str, session: Session) -> List[candidate_CV]:
     return repo_get_cvs_by_username(session, 

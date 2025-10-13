@@ -1,5 +1,6 @@
 # Chứa API
 from typing import Annotated, List, Optional
+from urllib import request
 from fastapi import APIRouter, Depends, HTTPException, Request, Cookie, File, UploadFile, Form
 from fastapi.responses import HTMLResponse, JSONResponse
 from sqlmodel import Session
@@ -15,7 +16,7 @@ from .services import (search_jobs,
                        get_top_10_jds_by_cv)
 from db import get_session
 from Core.Auth.schemas import user
-from .schemas import JobResponse, JobSearchRequest, candidate_CV
+from .schemas import JobResponse, JobSearchRequest, candidate_CV, jd
 from Core.Auth.dependencies import templates, get_current_user, decode_token, authorize_role
 from Core.OCR import run_vintern
 
@@ -36,41 +37,49 @@ async def home(request: Request,
     else:
         job_descriptions = get_jds(session)
     user_avatar = getattr(user_info, "avatar_path", None)
-    return templates.TemplateResponse("home_logged_in.html", {"request": request, "job_descriptions": job_descriptions, "username": user_info.username, "user_avatar": user_avatar, "keyword": keyword, "location": location})
+    return templates.TemplateResponse("home_logged_in.html", {"request": request, 
+                                                              "job_descriptions": job_descriptions, 
+                                                              "username": user_info.username, 
+                                                              "user_avatar": user_avatar, 
+                                                              "keyword": keyword, 
+                                                              "location": location})
 
 @router.get("/aboutus-logged-in", response_class=HTMLResponse)
 async def about_us(request: Request,
                    user_info: user = Depends(authorize_role(["candidate"]))):
-    return templates.TemplateResponse("aboutus-logged-in.html", {"request": request, "username": user_info.username})
+    return templates.TemplateResponse("aboutus-logged-in.html", {"request": request, 
+                                                                 "username": user_info.username})
 
 @router.get("/pricing-user-logged-in", response_class=HTMLResponse)
 async def pricing(request: Request,
                   user_info: user = Depends(authorize_role(["candidate"]))):
-    return templates.TemplateResponse("pricing-user-logged-in.html", {"request": request, "username": user_info.username})
+    return templates.TemplateResponse("pricing-user-logged-in.html", {"request": request, 
+                                                                      "username": user_info.username})
 
 @router.get("/ocr-scan-logged-in", response_class=HTMLResponse)
 async def ocr_scan(request: Request,
                    user_info: user = Depends(authorize_role(["candidate"]))):
-    return templates.TemplateResponse("ocr-scan.html", {"request": request, "username": user_info.username})
+    return templates.TemplateResponse("ocr-scan.html", {"request": request, 
+                                                        "username": user_info.username})
 
 @router.get("/finding-jobs", response_class=HTMLResponse)
 async def finding_jobs(request: Request,
                        user_info: user = Depends(authorize_role(["candidate"])),
                        session: Session = Depends(get_session)):
     job_descriptions = get_jds(session)
-    return templates.TemplateResponse("finding-jobs.html", {"request": request, "username": user_info.username, "user": user_info, "job_descriptions": job_descriptions})
+    return templates.TemplateResponse("finding-jobs.html", {"request": request, 
+                                                            "username": user_info.username, 
+                                                            "user": user_info, 
+                                                            "job_descriptions": job_descriptions})
 
 # Thanh tìm kiếm job
-@router.post("/jobs_search", response_model=list[JobResponse])
-async def jobs_search_endpoint(search_params: JobSearchRequest, 
-                      session: Session = Depends(get_session)):
-    """Endpoint wrapper that calls the candidate.services.search_jobs function.
-
-    Renamed to avoid shadowing the imported `search_jobs` service.
-    """
+@router.post("/jobs_search", response_model=list[jd])
+async def jobs_search_endpoint(keyword: str,
+                               session: Session = Depends(get_session)):
     try:
-        jobs = search_jobs(session, search_params)
-        return jobs
+        jobs = search_jobs(session, keyword)
+        return templates.TemplateResponse(" home_logged_in.html", {"request": request, 
+                                                                   "job_descriptions": jobs})
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Lỗi hệ thống: {str(e)}")
 
