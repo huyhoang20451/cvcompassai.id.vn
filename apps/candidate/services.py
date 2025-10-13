@@ -30,7 +30,7 @@ def search_jobs(session: Session,
             job_description=job.job_description,
             location=job.location,
             salary=job.salary,
-            company_logo=job.company_logo
+            company_logo_url=job.company_logo_url
         )
         job_responses.append(job_response)
     return job_responses

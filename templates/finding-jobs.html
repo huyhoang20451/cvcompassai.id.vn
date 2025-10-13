@@ -179,7 +179,7 @@ body {
             <script>
                 async function fetchCoin() {
                     try {
-                    const response = await fetch(`/get-coin`);
+                    const response = await fetch(`/api/get-coin-db`);
                     const data = await response.json();
                     if (data.success) {
                         document.querySelector('.header-actions strong').textContent = data.coin;
@@ -280,38 +280,25 @@ body {
     </aside>
 
     <!-- Danh sách việc -->
+    {%for job in job_descriptions%}
     <main class="job-list">
       <div class="job-item">
-        <img src="https://via.placeholder.com/40" alt="logo" class="company-logo">
+        <img style="width: 40px; height: 40px;" src="{{ job.company_logo_url }}" alt="logo" class="company-logo">
         <div class="job-info">
-          <h4>Công ty TNHH ABC Digital Solutions</h4>
-          <p>💼 Digital Marketing Executive</p>
-          <p>🔑 Thành thạo tin học, tiếng Anh sơ cấp</p>
-          <p>💰 10-15 triệu/tháng | ⏰ T2-T6</p>
-          <p><b>Hạn nộp:</b> 31/07/2025</p>
+          <h4>{{ job.workplace }}</h4>
+          <p>💼 {{ job.position }}</p>
+          <!--Bỏ các ký tự lạ ở job.requirements-->
+          <p>🔑 {{ job.job_description | replace(", ", ",") | replace("[", "") | replace("]", "") | replace("'", "") | replace('"', '') }}</p>
+          <p>💰 {{ job.salary }} | ⏰ {{ job.working_time }}</p>
+          <p><b>Hạn nộp:</b> {{ job.deadline }}</p>
         </div>
         <div class="job-actions">
-          <a href="#" class="cv-detail">Xem chi tiết >></a><br>
+          <a href="/job-detail/{{ job.id }}?username={{ username }}&role={{ user.role }}" class="cv-detail">Xem chi tiết >></a><br>
           <button class="btn-orange">Quan tâm</button>
           <button class="btn-blue">Ứng tuyển ngay</button>
         </div>
       </div>
-
-      <div class="job-item">
-        <img src="https://via.placeholder.com/40" alt="logo" class="company-logo">
-        <div class="job-info">
-          <h4>Công ty TNHH ABC Digital Solutions</h4>
-          <p>💼 Digital Marketing Executive</p>
-          <p>🔑 Thành thạo tin học, tiếng Anh sơ cấp</p>
-          <p>💰 10-15 triệu/tháng | ⏰ T2-T6</p>
-          <p><b>Hạn nộp:</b> 31/07/2025</p>
-        </div>
-        <div class="job-actions">
-          <a href="#" class="cv-detail">Xem chi tiết >></a><br>
-          <button class="btn-orange">Quan tâm</button>
-          <button class="btn-blue">Ứng tuyển ngay</button>
-        </div>
-      </div>
+      {%endfor%}
 
       <!-- phân trang -->
       <div class="pagination">

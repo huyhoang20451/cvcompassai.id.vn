@@ -29,7 +29,7 @@
             <script>
                 async function fetchCoin() {
                     try {
-                    const response = await fetch(`/get-coin`);
+                    const response = await fetch(`/api/get-coin-db`);
                     const data = await response.json();
                     if (data.success) {
                         document.querySelector('.header-actions strong').textContent = data.coin;

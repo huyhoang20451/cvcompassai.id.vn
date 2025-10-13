@@ -248,10 +248,10 @@ body {
     <div class="container">
         <!-- Sidebar -->
         <aside class="sidebar">
-        <h3>Thư mục</h3>
+        <h3>Các JD gần đây</h3>
         <ul>
-            {% for jd in job_position %}
-            <li class={%if job and jd.id == job.id%} "active"{% endif %}>
+      {% for jd in job_position %}
+      <li class="{% if job and jd.id == job.id %}active{% endif %}">
                 <a href="/job-storage?jd_id={{ jd.id }}&username={{username}}&role={{role}}&company={{company}}">
                     {{ jd.title }}
                 </a>
@@ -296,9 +296,84 @@ body {
     <div class="job-detail">
       <h4>Mô tả công việc</h4>
       <div class="buttons">
-        <button class="edit">Chỉnh sửa</button>
+        <!--Tạo format chỉnh sửa-->
+        <form style="display:inline;">
+            <input type="hidden" name="title" value="{{ job.title }}">
+            <input type="hidden" name="description" value="{{ job.job_description }}">
+            <input type="hidden" name="requirements" value="{{ job.requirements }}">
+            <input type="hidden" name="benefits" value="{{ job.benefits }}">
+            <input type="hidden" name="working_time" value="{{ job.working_time }}">
+            <input type="hidden" name="application_method" value="{{ job.application_method }}">
+            <button type="button" class="edit" onclick="appear_form()">Chỉnh sửa</button>
+        </form>
+        <!-- Modal overlay và form cập nhật user -->
+        <div id="update-modal-overlay" style="display:none; position:fixed; z-index:1000; top:0; left:0; width:300vw; height:100vh; background:rgba(0,0,0,0.5);"></div>
+        <div id="update-form-modal" style="display:none; position:fixed; z-index:1001; left:50%; top:50%; transform:translate(-50%,-50%); min-width:340px; background:#fff; border-radius:10px; box-shadow:0 4px 24px #0005; padding:28px 24px;">
+            <form id="real-update-form" action="/update-jd/{{ job.id }}" method="POST" autocomplete="off">
+                <div style="font-weight:bold; margin-bottom:14px; font-size:18px; text-align:center;">Cập nhật người dùng</div>
+                <input type="hidden" name="id" id="update-id">
+                <div style="margin-bottom:14px;">
+                    <label>Tên việc làm:</label>
+                    <textarea type="text" name="title" id="update-title" required style="width:100%"></textarea>
+                </div>
+                <div style="margin-bottom:14px;">
+                    <label>Mô tả:</label>
+                    <textarea name="description" id="update-description" required style="width:100%"></textarea>
+                </div>
+                <div style="margin-bottom:14px;">
+                    <label>Yêu cầu công việc:</label>
+                    <textarea name="requirements" id="update-requirements" required style="width:100%"></textarea>
+                </div>
+                <div style="margin-bottom:14px;">
+                    <label>Chính sách hưởng lợi:</label>
+                    <textarea name="benefits" id="update-benefits" style="width:100%"></textarea>
+                </div>
+                <div style="margin-bottom:18px;">
+                    <label>Giờ làm việc:</label>
+                    <textarea name="working_time" id="update-working-time" style="width:100%"></textarea>
+                </div>
+                <div style="margin-bottom:18px;">
+                    <label>Hình thức ứng tuyển:</label>
+                    <textarea name="application_method" id="update-application-method" style="width:100%"></textarea>
+                </div>
+                <div style="text-align:center;">
+                    <button type="submit" style="background:green;color:#fff;padding:8px 24px;border:none;border-radius:4px;">Cập nhật</button>
+                    <button type="button" onclick="closeUpdateFormModal()" style="margin-left:12px; padding:8px 24px;">Hủy</button>
+                </div>
+            </form>
+        </div>
         <button class="delete">Xóa</button>
       </div>
+      <script>
+        function appear_form() {
+          // read hidden inputs inside the inline form (closest form)
+          const inlineForm = event ? event.target.closest('form') : document.querySelector('form[style*="display:inline"]');
+          const title = inlineForm.querySelector('input[name="title"]').value || '';
+          const description = inlineForm.querySelector('input[name="description"]').value || '';
+          const requirements = inlineForm.querySelector('input[name="requirements"]').value || '';
+          const benefits = inlineForm.querySelector('input[name="benefits"]').value || '';
+          const working_time = inlineForm.querySelector('input[name="working_time"]').value || '';
+          const application_method = inlineForm.querySelector('input[name="application_method"]').value || '';
+
+          document.getElementById('update-title').value = title;
+          document.getElementById('update-description').value = description;
+          document.getElementById('update-requirements').value = requirements;
+          document.getElementById('update-benefits').value = benefits;
+          document.getElementById('update-working-time').value = working_time;
+          document.getElementById('update-application-method').value = application_method;
+          document.getElementById('update-id').value = '{{ job.id }}';
+
+          document.getElementById('update-modal-overlay').style.display = 'block';
+          document.getElementById('update-form-modal').style.display = 'block';
+        }
+
+        function closeUpdateFormModal() {
+          document.getElementById('update-modal-overlay').style.display = 'none';
+          document.getElementById('update-form-modal').style.display = 'none';
+        }
+
+        document.getElementById('update-modal-overlay').addEventListener('click', closeUpdateFormModal);
+      </script>
       <p>{{ job.description }}</p>
 
       <h4>Yêu cầu công việc</h4>

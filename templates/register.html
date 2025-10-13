@@ -5,6 +5,23 @@
   <title>Đăng ký</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; } body { background: #f5f7fa; display: flex; justify-content: center; align-items: center; height: 100vh; } .container { display: flex; background: #fff; border-radius: 15px; box-shadow: 0px 8px 20px rgba(0,0,0,0.15); overflow: hidden; width: 1000px; max-width: 95%; } .left { flex: 1; background: #f9fbfc; display: flex; align-items: center; justify-content: center; padding: 20px; } .left img { width: 90%; max-width: 400px; } .right { flex: 1; padding: 40px; display: flex; flex-direction: column; justify-content: center; } .right h2 { font-size: 28px; color: #2d4f87; margin-bottom: 25px; text-align: center; } .input-group { position: relative; margin-bottom: 18px; } .input-group input { width: 100%; padding: 12px 45px 12px 40px; border: 1px solid #ccc; border-radius: 25px; outline: none; font-size: 14px; transition: 0.3s; } .input-group input:focus { border-color: #2d4f87; } .input-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888; } .divider { text-align: center; margin: 15px 0; font-size: 14px; color: #666; position: relative; } .divider::before, .divider::after { content: ""; position: absolute; width: 40%; height: 1px; background: #ccc; top: 50%; } .divider::before { left: 0; } .divider::after { right: 0; } .google-btn { display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid #ccc; border-radius: 25px; padding: 10px; background: #fff; cursor: pointer; font-weight: bold; margin-bottom: 20px; } .google-btn img { width: 20px; } .actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; } .actions a { text-decoration: none; color: #2d4f87; font-size: 14px; } .btn-register { background: #2d4f87; color: #fff; padding: 12px; border: none; border-radius: 25px; cursor: pointer; width: 100px; transition: 0.3s; } .btn-register:hover { background: #1b376b; } .btn-login { background: transparent; border: 1px solid #2d4f87; color: #2d4f87; padding: 12px; border-radius: 25px; cursor: pointer; width: 100px; transition: 0.3s; } .btn-login:hover { background: #2d4f87; color: #fff; }
+    select {
+      width: 100%;
+      padding: 12px 40px 12px 40px;
+      border: 1px solid #ccc;
+      border-radius: 25px;
+      outline: none;
+      font-size: 14px;
+      transition: 0.3s;
+      background: white;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%205%22%3E%3Cpath%20fill%3D%22none%22%20stroke%3D%22%23333%22%20stroke-width%3D%221.5%22%20d%3D%22M0.5%201.5l1.5%201.5l1.5-1.5%22%2F%3E%3C%2Fsvg%3E');
+      background-repeat: no-repeat;
+      background-position: right 15px center;
+      background-size: 10px 10px;
+    }
   </style>
 </head>
 <body>
@@ -38,7 +55,18 @@
           <i>📱</i>
           <input id="phone" type="tel" name="phone" placeholder="Số điện thoại">
         </div>
+        <!-- Single select with placeholder text as the first disabled option -->
+        <select name="role" id="role" onchange="toggleCompanyField()" required aria-label="Loại tài khoản">
+          <option value="" disabled selected>Bạn là ai?</option>
+          <option value="user">Người dùng thường</option>
+          <option value="business">Doanh nghiệp</option>
+        </select>
 
+        <div class="input-group">
+          <div id="company-field" style="display:none;">
+            <input type="text" id="company" name="company" placeholder="Tên công ty">
+          </div>
+        </div>
         <div class="divider">Hoặc</div>
 
         <button type="button" class="google-btn">
@@ -46,17 +74,6 @@
           Đăng ký bằng Google
         </button>
         
-        <label>Loại tài khoản:</label>
-        <select name="role" id="role" onchange="toggleCompanyField()">
-            <option value="user">Người dùng thường</option>
-            <option value="business">Business</option>
-        </select>
-
-        <div id="company-field" style="display:none;">
-          <label for="company">Tên công ty:</label>
-          <input type="text" id="company" name="company"><br>
-        </div>
-
         <div class="actions">
           <button onclick="location.href='/login'" type="button" class="btn-login">Đăng nhập</button>
           <button type="submit" class="btn-register">Đăng ký</button>
@@ -66,16 +83,24 @@
   </div>
 
   <script>
-    function toggleCompanyField() {
-        var role = document.getElementById('role').value;
-        var companyField = document.getElementById('company-field');
-        if (role === 'business') {
-            companyField.style.display = 'block';
-        } else {
-            companyField.style.display = 'none';
-        }
+  function toggleCompanyField() {
+    var role = document.getElementById('role').value;
+    var companyField = document.getElementById('company-field');
+    var companyInput = document.getElementById('company');
+    if (!companyField) return;
+    if (role === 'business') {
+      companyField.style.display = 'block';
+      if (companyInput) companyInput.required = true;
+    } else {
+      companyField.style.display = 'none';
+      if (companyInput) {
+        companyInput.required = false;
+        companyInput.value = '';
+      }
     }
-    window.onload = function() { toggleCompanyField(); };
+  }
+
+  window.onload = function() { toggleCompanyField(); };
   </script>
 </body>
 </html>

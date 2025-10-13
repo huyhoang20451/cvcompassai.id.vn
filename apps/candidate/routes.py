@@ -36,7 +36,7 @@ async def home(request: Request,
     else:
         job_descriptions = get_jds(session)
     user_avatar = getattr(user_info, "avatar_path", None)
-    return templates.TemplateResponse("home_logged_in.html", {"request": request, "job_descriptions": job_descriptions, "username": user_info.username, "user_avatar": user_avatar})
+    return templates.TemplateResponse("home_logged_in.html", {"request": request, "job_descriptions": job_descriptions, "username": user_info.username, "user_avatar": user_avatar, "keyword": keyword, "location": location})
 
 @router.get("/aboutus-logged-in", response_class=HTMLResponse)
 async def about_us(request: Request,
@@ -55,8 +55,10 @@ async def ocr_scan(request: Request,
 
 @router.get("/finding-jobs", response_class=HTMLResponse)
 async def finding_jobs(request: Request,
-                       user_info: user = Depends(authorize_role(["candidate"]))):
-    return templates.TemplateResponse("finding-jobs.html", {"request": request, "username": user_info.username, "user": user_info})
+                       user_info: user = Depends(authorize_role(["candidate"])),
+                       session: Session = Depends(get_session)):
+    job_descriptions = get_jds(session)
+    return templates.TemplateResponse("finding-jobs.html", {"request": request, "username": user_info.username, "user": user_info, "job_descriptions": job_descriptions})
 
 # Thanh tìm kiếm job
 @router.post("/jobs_search", response_model=list[JobResponse])
