@@ -2,7 +2,8 @@ from sqlmodel import Session
 from .repository import (get_jds_by_user_name as repo_get_jds_by_user_name,
                          add_jd as repo_add_jd,
                          get_cvs_by_jd_id as repo_get_cvs_by_jd_id,
-                         get_jd_by_id as repo_get_jd_by_id)
+                         get_jd_by_id as repo_get_jd_by_id,
+                         delete_jd_by_id as repo_delete_jd_by_id)
 from fastapi import Depends
 from typing import Annotated, List
 from .schemas import JD_create, jd_response, OCR_result, jd_CV
@@ -42,3 +43,6 @@ def get_jd_by_id(session: Session, jd_id: int) -> str:
     if jd.job_description: parts.append(f"Mô tả công việc: {jd.job_description}")
     if jd.requirements: parts.append(f"Yêu cầu: {jd.requirements}")
     return "\n".join(parts)
+
+def delete_jd_by_id(session: Session, jd_id: int, user_id: int) -> bool:
+    return repo_delete_jd_by_id(session, jd_id, user_id)

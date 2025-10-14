@@ -61,3 +61,14 @@ def get_jd_by_id(session: Session, jd_id: int) -> jd_response:
     jd_data = jd_in_db.model_dump()
     jd_data.update({"username": username, "company_name": company_name})
     return jd_response.model_validate(jd_data)
+
+# Xóa JD, chỉ được xóa bởi chính user tạo ra nó
+def delete_jd_by_id(session: Session, jd_id: int, user_id: int) -> bool:
+    jd = session.exec(
+        select(jd_db).where(jd_db.id == jd_id, jd_db.business_id == user_id)
+    ).first()
+    if not jd:
+        return False
+    session.delete(jd)
+    session.commit()
+    return True

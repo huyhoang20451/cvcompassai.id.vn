@@ -7,7 +7,8 @@ from .services import (get_jds_by_user_name,
                        OCR, 
                        get_cvs_by_jd_id, 
                        detect_file_type,
-                       get_jd_by_id)
+                       get_jd_by_id,
+                       delete_jd_by_id as service_delete_jd_by_id)
 from db import get_session
 from Core.Auth.dependencies import templates, authorize_role
 from Core.Auth.schemas import user
@@ -164,3 +165,14 @@ async def update_jd(request: Request,
     company_name = user_info.company_name or user_info.username or "Unknown"
     return RedirectResponse(url=f"/job-storage?company={company_name}&username={user_info.username}&jd_id={jd_id}", status_code=303)
     
+@router.get("/delete-jd", response_class=HTMLResponse)
+def delete_jd_by_id(request: Request,
+                    jd_id: int,
+                    session: Session = Depends(get_session),
+                    user_info: user = Depends(authorize_role(["business"]))):
+    # Fallback cho company_name nếu bị None
+    result = service_delete_jd_by_id(session, jd_id, user_info.id)
+    if result is False:
+        raise HTTPException(status_code=404, detail="Job description not found or not authorized to delete")
+    return templates.TemplateResponse("form-dang-tuyen-ngay.html", {"request": request, 
+                                                                    "user_info": user_info})
