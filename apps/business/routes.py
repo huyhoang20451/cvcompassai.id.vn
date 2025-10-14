@@ -18,10 +18,8 @@ from Core.OCR import compare
 router = APIRouter(tags=["business"])
 
 @router.get("/business-home", response_class=HTMLResponse)
-async def business_home(request: Request,
-                        user_info: user = Depends(authorize_role(["business"]))):
-    return templates.TemplateResponse("home-business.html", {"request": request, 
-                                                             "user_info": user_info})
+async def business_home(request: Request):
+    return templates.TemplateResponse("home-business.html", {"request": request})
 
 @router.get("/business-dashboard", response_class=HTMLResponse)
 async def business_dashboard(request: Request,
