@@ -165,14 +165,12 @@ async def update_jd(request: Request,
     company_name = user_info.company_name or user_info.username or "Unknown"
     return RedirectResponse(url=f"/job-storage?company={company_name}&username={user_info.username}&jd_id={jd_id}", status_code=303)
     
-@router.get("/delete-jd", response_class=HTMLResponse)
+@router.post("/delete-jd", response_class=HTMLResponse)
 def delete_jd_by_id(request: Request,
                     jd_id: int,
                     session: Session = Depends(get_session),
                     user_info: user = Depends(authorize_role(["business"]))):
-    # Fallback cho company_name nếu bị None
     result = service_delete_jd_by_id(session, jd_id, user_info.id)
     if result is False:
         raise HTTPException(status_code=404, detail="Job description not found or not authorized to delete")
-    return templates.TemplateResponse("form-dang-tuyen-ngay.html", {"request": request, 
-                                                                    "user_info": user_info})
+    return RedirectResponse(url=f"/job-storage?company={user_info.company_name}&username={user_info.username}", status_code=303)
