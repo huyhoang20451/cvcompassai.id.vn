@@ -24,11 +24,11 @@ async def business_home(request: Request):
 
 @router.get("/business-dashboard", response_class=HTMLResponse)
 async def business_dashboard(request: Request,
-                             user_info: user = Depends(authorize_role(["business"]))):
-    print(user_info.company_name)
-    # Fallback cho company_name nếu bị None
-    company_name = user_info.company_name or user_info.username or "Công ty chưa cập nhật"
-    return templates.TemplateResponse("business_dashboard.html", {"request": request, 
+                             user_info: user = Depends(authorize_role(["business"])),
+                             session: Session = Depends(get_session)):
+    job_descriptions = get_jds_by_user_name(session, user_info.username)
+    return templates.TemplateResponse("business_dashboard.html", {"request": request,
+                                                                  "job_descriptions": job_descriptions,
                                                                   "user_info": user_info})
 
 @router.get("/pricing-business-logged-in", response_class=HTMLResponse)
