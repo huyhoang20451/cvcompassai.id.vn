@@ -133,7 +133,7 @@ def update_coin(session: Session,
     return result.coin
 
 def get_candidate_cv_by_id(session: Session, cv_id:int) -> candidate_CV:
-    cv = session.exec(select(candidate_CV_db).where(candidate_CV_db.cv_id == cv_id)).first()
+    cv = session.exec(select(candidate_CV_db).where(candidate_CV_db.id == cv_id)).first()
     return candidate_CV.model_validate(cv)
 
 def add_cv_into_jd(session: Session, URL: str, jd_id: int) -> jd_CV:

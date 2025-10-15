@@ -178,7 +178,7 @@ async def upload(request: Request,
 @router.post("/submit-existing-cv", response_class=HTMLResponse)
 async def submit_cv(request: Request,
                     jd_id: int,
-                    existing_cv_id: Optional[int] = Form(None),
+                    existing_cv_id: int,
                     user_info: user = Depends(authorize_role(["candidate"])),
                     session: Session = Depends(get_session)):
     cv = get_candidate_cv_by_id(session, existing_cv_id) # Lấy cv trong bảng candidate_cv
