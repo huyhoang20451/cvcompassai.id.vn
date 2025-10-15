@@ -72,3 +72,16 @@ def delete_jd_by_id(session: Session, jd_id: int, user_id: int) -> bool:
     session.delete(jd)
     session.commit()
     return True
+
+def update_jd_by_id(session: Session, jd_id: int, new_jd: dict, user_id: int) -> bool:
+    jd = session.exec(
+        select(jd_db).where(jd_db.id == jd_id, jd_db.business_id == user_id)
+    ).first()
+    if not jd:
+        return False
+    for key, value in new_jd.items():
+        setattr(jd, key, value)
+    session.add(jd)
+    session.commit()
+    session.refresh(jd)
+    return True

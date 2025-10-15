@@ -8,7 +8,8 @@ from .services import (get_jds_by_user_name,
                        get_cvs_by_jd_id, 
                        detect_file_type,
                        get_jd_by_id,
-                       delete_jd_by_id as service_delete_jd_by_id)
+                       delete_jd_by_id as service_delete_jd_by_id,
+                       update_jd_by_id as service_update_jd_by_id)
 from db import get_session
 from Core.Auth.dependencies import templates, authorize_role
 from Core.Auth.schemas import user
@@ -114,57 +115,17 @@ def compare_cv_vs_jd(request: Request,
 
 # Update jd by job.id
 @router.post("/update-jd/{jd_id}", response_class=HTMLResponse)
-async def update_jd(request: Request,
-                     jd_id: Optional[int] = None,
-                     user_info: user = Depends(authorize_role(["business"])),
-                     session: Session = Depends(get_session)):
+async def update_jd_by_id(request: Request,
+                          jd_id: Optional[int] = None,
+                          user_info: user = Depends(authorize_role(["business"])),
+                          session: Session = Depends(get_session)):
     form = await request.form()
     jd_form = dict(form)
-    
-    # Normalize form values: if form provides single-item lists, convert to plain values
-    for k, v in list(jd_form.items()):
-        if isinstance(v, (list, tuple)) and len(v) == 1:
-            jd_form[k] = v[0]
+    result = service_update_jd_by_id(session, jd_id, jd_form, user_info.id)
+    if result is False:
+        raise HTTPException(status_code=404, detail="Job description not found or not authorized to update")
+    return RedirectResponse(url=f"/job-storage?company={user_info.company_name}&username={user_info.username}&jd_id={jd_id}", status_code=303)
 
-    # Map các field name từ form HTML sang schema
-    if "job_title" in jd_form:
-        jd_form["title"] = jd_form["job_title"]
-        del jd_form["job_title"]
-
-    # Map template's `description` -> model `job_description`
-    if "description" in jd_form:
-        jd_form["job_description"] = jd_form.pop("description")
-
-    # Accept either `company_logo` (template) or `company_logo_url` and normalize to company_logo_url
-    if "company_logo" in jd_form and jd_form.get("company_logo"):
-        jd_form["company_logo_url"] = jd_form["company_logo"]
-        del jd_form["company_logo"]
-    elif "company_logo_url" in jd_form:
-        # already present; ensure it's a plain value
-        jd_form["company_logo_url"] = jd_form["company_logo_url"]
-    
-    # prefer path param jd_id if provided, otherwise use form id
-    if jd_id is None:
-        jd_id = int(jd_form.get("id"))
-    else:
-        # ensure form id is set for consistency
-        jd_form["id"] = jd_id
-    existing_jd = get_jd_by_id(session, jd_id)
-    if not existing_jd:
-        raise HTTPException(status_code=404, detail="Job description not found")
-    
-    for key, value in jd_form.items():
-        if hasattr(existing_jd, key):
-            setattr(existing_jd, key, value)
-    
-    session.add(existing_jd)
-    session.commit()
-    session.refresh(existing_jd)
-    
-    # Fallback cho company_name nếu bị None
-    company_name = user_info.company_name or user_info.username or "Unknown"
-    return RedirectResponse(url=f"/job-storage?company={company_name}&username={user_info.username}&jd_id={jd_id}", status_code=303)
-    
 @router.post("/delete-jd", response_class=HTMLResponse)
 def delete_jd_by_id(request: Request,
                     jd_id: int,

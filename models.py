@@ -24,7 +24,7 @@ class User_db(SQLModel, table=True):
     # Các trường chỉ dành cho business
     company_name: Optional[str] = Field(default=None, max_length=100)
 
-class jd_db(SQLModel, table=True):
+class d_db(SQLModel, table=True):
     __tablename__ = "jd"  # Tên bảng trong database: lưu thông tin các job posting (tin tuyển dụng)
 
     id: Optional[int] = Field(default=None, primary_key=True) # ID duy nhất của mỗi tin tuyển dụng (primary key, auto-increment)
