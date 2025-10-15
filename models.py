@@ -23,6 +23,10 @@ class User_db(SQLModel, table=True):
 
     # Các trường chỉ dành cho business
     company_name: Optional[str] = Field(default=None, max_length=100)
+    company_description: Optional[str] = Field(default=None)  # TEXT trong MySQL
+    website: Optional[str] = Field(default=None, max_length=255)
+    phone_number: Optional[str] = Field(default=None, max_length=20)
+    address: Optional[str] = Field(default=None, max_length=255)
 
 class jd_db(SQLModel, table=True):
     __tablename__ = "jd"  # Tên bảng trong database: lưu thông tin các job posting (tin tuyển dụng)

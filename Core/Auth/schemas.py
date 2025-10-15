@@ -9,8 +9,17 @@ class user(BaseModel):
     company_name: str | None = None
     coin: int | None = None
     avatar_path: str | None = None
-    full_name: Optional[str] = None
     premium_expires: Optional[date] = None
+
+    # Các trường chỉ dành cho candidate
+    full_name: Optional[str] = None
+
+    # Các trường chỉ dành cho business
+    company_name: Optional[str] = None
+    company_description: Optional[str] = None
+    website: Optional[str] = None
+    phone_number: Optional[str] = None
+    address: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 

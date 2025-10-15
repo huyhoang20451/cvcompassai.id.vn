@@ -4,7 +4,8 @@ from .repository import (get_jds_by_user_name as repo_get_jds_by_user_name,
                          get_cvs_by_jd_id as repo_get_cvs_by_jd_id,
                          get_jd_by_id as repo_get_jd_by_id,
                          delete_jd_by_id as repo_delete_jd_by_id,
-                         update_jd_by_id as repo_update_jd_by_id)
+                         update_jd_by_id as repo_update_jd_by_id,
+                         update_business_by_id as repo_update_business_by_id)
 from fastapi import Depends
 from typing import Annotated, List
 from .schemas import JD_create, jd_response, OCR_result, jd_CV
@@ -48,5 +49,8 @@ def get_jd_by_id(session: Session, jd_id: int) -> str:
 def delete_jd_by_id(session: Session, jd_id: int, user_id: int) -> bool:
     return repo_delete_jd_by_id(session, jd_id, user_id)
 
-def update_jd_by_id(session: Session, jd_id: int, new_jd: dict, user_id: int) -> bool:
-    return repo_update_jd_by_id(session, jd_id, new_jd, user_id)
+def update_jd_by_id(session: Session, jd_id: int, new_jd: dict) -> bool:
+    return repo_update_jd_by_id(session, jd_id, new_jd)
+
+def update_business_by_id(session: Session, business_id: int, new_business: dict) -> bool:
+    return repo_update_business_by_id(session, business_id, new_business)

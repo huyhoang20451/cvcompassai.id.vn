@@ -73,15 +73,24 @@ def delete_jd_by_id(session: Session, jd_id: int, user_id: int) -> bool:
     session.commit()
     return True
 
-def update_jd_by_id(session: Session, jd_id: int, new_jd: dict, user_id: int) -> bool:
-    jd = session.exec(
-        select(jd_db).where(jd_db.id == jd_id, jd_db.business_id == user_id)
-    ).first()
-    if not jd:
+def update_jd_by_id(session: Session, jd_id: int, new_jd: dict) -> bool:
+    existing_jd = get_jd_by_id(session, jd_id)
+    if not existing_jd:
         return False
     for key, value in new_jd.items():
-        setattr(jd, key, value)
-    session.add(jd)
+        setattr(existing_jd, key, value)
+    session.add(existing_jd)
     session.commit()
-    session.refresh(jd)
+    session.refresh(existing_jd)
+    return True
+
+def update_business_by_id(session: Session, business_id: int, new_business: dict) -> bool:
+    result = session.exec(select(User_db).where(User_db.id == business_id)).first()
+    if not result:
+        return False
+    for key, value in new_business.items():
+        setattr(result, key, value)
+    session.add(result)
+    session.commit()
+    session.refresh(result)
     return True
