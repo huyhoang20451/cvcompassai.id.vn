@@ -172,6 +172,7 @@ async def update_business_info(request: Request,
                                user_info: user = Depends(authorize_role(["business"]))):
     form = await request.form()
     business_info = dict(form)
+    print(business_info)
     result = service_update_business_info(session, user_info.id, business_info)
     if result is False:
         raise HTTPException(status_code=404, detail="Business information not found")
