@@ -1,26 +1,29 @@
 # Chứa API
+from threading import Thread
+from time import time
 from typing import Annotated, List, Optional
 from urllib import request
+import uuid
 from fastapi import APIRouter, Depends, HTTPException, Request, Cookie, File, UploadFile, Form
 from fastapi.responses import HTMLResponse, JSONResponse
 from sqlmodel import Session
-from .services import (search_jobs, 
+from .services import (jd_to_str, search_jobs, 
                        get_cvs_by_username as service_get_cvs_by_username, 
                        get_jds, 
                        update_coin,
                        get_jd_by_id,
-                       upload_cv,
+                       upload_cv as service_upload_cv,
                        get_candidate_cv_by_id,
                        add_cv_into_jd,
                        add_cv_into_candidate,
                        get_top_10_jds_by_cv,
                        save_jd as service_save_jd,
                        get_job_categories)
-from db import get_session
+from db import get_session, engine
 from Core.Auth.schemas import user
 from .schemas import JobResponse, JobSearchRequest, candidate_CV, jd
 from Core.Auth.dependencies import templates, get_current_user, decode_token, authorize_role
-from Core.OCR import run_vintern
+from Core.OCR import compare_qwen, run_vintern
 
 router = APIRouter(tags=["candidate"])
 
@@ -161,25 +164,25 @@ async def finding_jobs(request: Request,
                                                             "user_info": user_info})
 
 # Tìm 10 JD phù hợp nhất với CV upload
-@router.post("/top10-best-jd", response_class=HTMLResponse)
-async def upload(request: Request,
-                 file: UploadFile = File(...),
-                 user_info: user = Depends(authorize_role(["candidate"])),
-                 session: Session = Depends(get_session)):
-    file_path, cv = await upload_cv(file, user_info.id, session)
-    if file.content_type == "application/pdf" or file.filename.lower().endswith(".pdf"):
-        from Core.OCR import scan_pdf  # hàm đọc PDF
-        cv_str = scan_pdf(file_path)
-    elif file.content_type.startswith("image/") or file.filename.lower().endswith((".jpg", ".jpeg", ".png")):
-        from Core.OCR import run_vintern  # hàm OCR
-        cv_str = run_vintern(file_path)
-    else:
-        raise HTTPException(status_code=400, detail="Unsupported file type. Please upload a PDF or image file.")
-
-    top_10 = get_top_10_jds_by_cv(session, cv_str)
-    return templates.TemplateResponse("top10-best-jd.html", {"request": request, 
-                                                             "user_info": user_info, 
-                                                             "job_descriptions": top_10})
+#@router.post("/top10-best-jd", response_class=HTMLResponse)
+#async def upload(request: Request,
+#                 file: UploadFile = File(...),
+#                 user_info: user = Depends(authorize_role(["candidate"])),
+#                 session: Session = Depends(get_session)):
+#    file_path, cv = await upload_cv(file, user_info.id, session)
+#    if file.content_type == "application/pdf" or file.filename.lower().endswith(".pdf"):
+#        from Core.OCR import scan_pdf  # hàm đọc PDF
+#        cv_str = scan_pdf(file_path)
+#    elif file.content_type.startswith("image/") or file.filename.lower().endswith((".jpg", ".jpeg", ".png")):
+#        from Core.OCR import run_vintern  # hàm OCR
+#        cv_str = run_vintern(file_path)
+#    else:
+#        raise HTTPException(status_code=400, detail="Unsupported file type. Please upload a PDF or image file.")
+#
+#    top_10 = get_top_10_jds_by_cv(session, cv_str)
+#    return templates.TemplateResponse("top10-best-jd.html", {"request": request, 
+#                                                             "user_info": user_info, 
+#                                                             "job_descriptions": top_10})
 
 # Nộp cv cho jd bằng cv có sẵn trong database
 @router.post("/submit-existing-cv", response_class=HTMLResponse)
@@ -228,3 +231,113 @@ async def save_jd(request: Request,
         return JSONResponse(content={"success": False, "msg": "Công việc đã được lưu trước đó."})
     
     return JSONResponse(content={"success": True, "msg": "Đã lưu công việc thành công!"})
+
+# Tìm 10 JD phù hợp nhất với CV upload
+#@router.post("/top10-best-jd", response_class=HTMLResponse)
+#async def upload(request: Request,
+#                 file: UploadFile = File(...),
+#                 user_info: user = Depends(authorize_role(["candidate"])),
+#                 session: Session = Depends(get_session)):
+#    file_path, cv = await upload_cv(file, user_info.id, session)
+#    if file.content_type == "application/pdf" or file.filename.lower().endswith(".pdf"):
+#        from Core.OCR import scan_pdf  # hàm đọc PDF
+#        cv_str = scan_pdf(file_path)
+#    elif file.content_type.startswith("image/") or file.filename.lower().endswith((".jpg", ".jpeg", ".png")):
+#        from Core.OCR import run_vintern  # hàm OCR
+#        cv_str = run_vintern(file_path)
+#    else:
+#        raise HTTPException(status_code=400, detail="Unsupported file type. Please upload a PDF or image file.")
+#
+#    top_10 = get_top_10_jds_by_cv(session, cv_str)
+#    return templates.TemplateResponse("top10-best-jd.html", {"request": request, 
+#                                                             "user_info": user_info, 
+#                                                             "job_descriptions": top_10})
+
+# --- Bộ nhớ lưu tiến độ công việc ---
+progress_store = {}  # {"progress": int, "total": int, "done": bool}
+result_store = []  # [{"jd": jd, "Ratio": float}, ...]
+
+# --- Giả lập xử lý JD ---
+def process_cv(cv_str: str):
+    with Session(engine) as session:
+        global progress_store, result_store
+        jds = get_jds(session)
+        progress_store = {"progress": 0, "total": len(jds), "done": False}
+        result_store = []
+
+        for i, jd in enumerate(jds):
+            try:
+                result = compare_qwen(jd_to_str(jd), cv_str)
+                ratio = result.get("Ratio", 0)
+                print(f"✅ JD ID: {jd.id} | Ratio: {ratio}")
+                result_store.append({"jd": jd, "Ratio": ratio})
+            except Exception as e:
+                print(f"❌ Lỗi khi xử lý JD ID {jd.id}: {e}")
+            progress_store["progress"] = i + 1
+            print(f"✅ Đã xử lý JD {i}/{len(jds)}")
+        
+        progress_store["done"] = True
+
+# --- Route upload CV ---
+@router.post("/top10-best-jd", response_class=HTMLResponse)
+async def upload_cv(request: Request, 
+                    file: UploadFile = File(...),
+                    user_info: user = Depends(authorize_role(["candidate"])),
+                    session: Session = Depends(get_session)):
+    file_path, cv = await service_upload_cv(file, user_info.id, session)
+    if file.content_type == "application/pdf" or file.filename.lower().endswith(".pdf"):
+        from Core.OCR import scan_pdf  # hàm đọc PDF
+        cv_str = scan_pdf(file_path)
+    elif file.content_type.startswith("image/") or file.filename.lower().endswith((".jpg", ".jpeg", ".png")):
+        from Core.OCR import run_vintern  # hàm OCR
+        cv_str = run_vintern(file_path)
+    else:
+        raise HTTPException(status_code=400, detail="Unsupported file type. Please upload a PDF or image file.")
+        
+    # Chạy luồng nền
+    thread = Thread(target=process_cv, args=(cv_str,))
+    thread.start()
+
+    # Trả về giao diện HTML hiển thị tiến trình
+    html = f"""
+    <html>
+    <body>
+      <h3>Đang xử lý CV...</h3>
+      <progress id="bar" value="0" max="10" style="width:300px;"></progress>
+      <div id="status">Bắt đầu xử lý...</div>
+
+      <script>
+        async function checkProgress() {{
+            const res = await fetch(`/progress`);
+            const data = await res.json();
+            document.getElementById('bar').value = data.progress;
+            document.getElementById('status').innerText = 
+                data.done ? "✅ Hoàn tất! Chuyển hướng tới kết quả..." :
+                `Đã xử lý ${{data.progress}} / ${{data.total}} JD...`;
+
+            if (!data.done) {{
+                setTimeout(checkProgress, 5000);
+            }} else {{
+                // khi hoàn tất → chuyển tới trang kết quả
+                window.location.href = `/result`;
+            }}
+        }}
+        checkProgress();
+      </script>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=html)
+
+# --- Route cho client polling ---
+@router.get("/progress")
+async def get_progress():
+    return JSONResponse(progress_store)
+
+# --- Route kết quả ---
+@router.get("/result", response_class=HTMLResponse)
+async def result_page():
+    result_store.sort(key=lambda x: x["Ratio"], reverse=True)
+    top_10 = result_store[:10]
+    return templates.TemplateResponse("top10-best-jd.html", {"request": request, 
+                                                             "job_descriptions": [jd['jd'] for jd in top_10]})

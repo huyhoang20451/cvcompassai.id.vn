@@ -84,17 +84,17 @@ def jd_to_str(jd: jd) -> str:
     """
     parts = [
         f"Job Title: {jd.title}" if jd.title else "",
-        f"Company: {jd.company_name}" if jd.company_name else "",
-        f"Industry: {jd.industry}" if jd.industry else "",
+        f"Category: {jd.job_category or jd.category}" if (jd.job_category or jd.category) else "",
         f"Position Level: {jd.position}" if jd.position else "",
-        f"Salary: {jd.salary}" if jd.salary else "",
+        f"Company: {jd.company_name}" if jd.company_name else "",
         f"Location: {jd.location}" if jd.location else "",
         f"Workplace Type: {jd.workplace}" if jd.workplace else "",
+        f"Minimum Salary: {jd.min_salary}" if jd.min_salary else "",
+        f"Maximum Salary: {jd.max_salary}" if jd.max_salary else "",
         f"Job Description: {jd.job_description}" if jd.job_description else "",
         f"Requirements: {jd.requirements}" if jd.requirements else "",
         f"Benefits: {jd.benefits}" if jd.benefits else "",
         f"Working Time: {jd.working_time}" if jd.working_time else "",
-        f"Application Deadline: {jd.deadline}" if jd.deadline else "",
     ]
     return "\n".join([p for p in parts if p])
 

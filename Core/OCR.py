@@ -6,6 +6,7 @@
 # pip install einops timm
 # pip install flash-attn --no-build-isolation
 # pip install pillow
+import re
 import torch
 import torchvision.transforms as T
 from PIL import Image
@@ -171,15 +172,30 @@ def parse_evaluation(eval_json: dict):
 
 def clean_and_parse(result_json: str):
     cleaned = result_json.strip()
+
+    # Gỡ bỏ ký tự đánh dấu code block như ```json ... ```
     if cleaned.startswith("```"):
         cleaned = cleaned.strip("`")
         cleaned = cleaned.replace("json", "", 1).strip()
+
+    # Loại bỏ comment kiểu // ...
+    cleaned = re.sub(r'//.*', '', cleaned)
+
+    #  Loại bỏ comment kiểu # ...
+    cleaned = re.sub(r'#.*', '', cleaned)
+
+    #  Loại bỏ dấu phẩy thừa trước dấu đóng ngoặc }
+    cleaned = re.sub(r',\s*([}\]])', r'\1', cleaned)
+
+    # Xử lý ký tự đặc biệt không hợp lệ (nếu có)
+    cleaned = cleaned.replace("\u2013", "-").replace("\u2014", "-")
 
     try:
         data = json.loads(cleaned)
     except json.JSONDecodeError as e:
         print("❌ JSON parse error:", e)
         print("Raw output:\n", result_json)
+        print("\n--- Cleaned Attempt ---\n", cleaned)
         raise ValueError("Invalid JSON format from model")
 
     return parse_evaluation(data)
