@@ -171,70 +171,64 @@
     </div> <!-- kết thúc phần introduction -->
     <div class="container">
         <div class="left-panel">
-            <h2>Top 20 CV</h2>
-            <div class="cv-items">
-                <img src="https://via.placeholder.com/40" alt="cv">
-                <div class=cv-info>
-                    <p>CV1.pdf</p>
-                    <p class="cv-status">IELTS 7.5 - MOS</p>
+            <h2>Top CV</h2>
+            {% if results %}
+                {% for r in results %}
+                <div class="cv-items" onclick="showDetail({{ loop.index0 }})" style="cursor:pointer;">
+                    <img src="https://via.placeholder.com/40" alt="cv">
+                    <div class="cv-info">
+                        <p><a href="{{ r.cv_url }}" target="_blank">{{ r.cv_url }}</a></p>
+                        <p class="cv-status">Met: {{ r.met|length }} | Not met: {{ r.not_met|length }}</p>
+                    </div>
+                    <span>#{% if loop.index0 is defined %}{{ loop.index }}{% else %}{{ loop.index }}{% endif %}</span>
                 </div>
-                <span>🥇</span>
-            </div>
-            <div class="cv-items">
-                <img src="https://via.placeholder.com/40" alt="cv">
-                <div class=cv-info>
-                    <p>CV1.pdf</p>
-                    <p class="cv-status">IELTS 7.5 - MOS</p>
-                </div>
-                <span>🥇</span>
-            </div>
-            <div class="cv-items">
-                <img src="https://via.placeholder.com/40" alt="cv">
-                <div class=cv-info>
-                    <p>CV1.pdf</p>
-                    <p class="cv-status">IELTS 7.5 - MOS</p>
-                </div>
-                <span>🥇</span>
-            </div>
-            <div class="cv-items">
-                <img src="https://via.placeholder.com/40" alt="cv">
-                <div class=cv-info>
-                    <p>CV1.pdf</p>
-                    <p class="cv-status">IELTS 7.5 - MOS</p>
-                </div>
-                <span>🥇</span>
-            </div>
-            <div class="cv-items">
-                <img src="https://via.placeholder.com/40" alt="cv">
-                <div class=cv-info>
-                    <p>CV1.pdf</p>
-                    <p class="cv-status">IELTS 7.5 - MOS</p>
-                </div>
-                <span>🥇</span>
-            </div>
+                {% endfor %}
+            {% else %}
+                <p>Không có kết quả.</p>
+            {% endif %}
         </div>
-        
-        <div class="cv-detail">
-            <img src="/static/images/cv4.png" alt="cv">
+
+        <div class="cv-detail" id="cv-detail-panel">
+            {% if results and results[0] %}
+                <div id="detail-0">
+                    <h3>Chi tiết CV: <a href="{{ results[0].cv_url }}" target="_blank">Mở CV</a></h3>
+                    <h4>Đã đạt (Met)</h4>
+                    <ul>
+                        {% for item in results[0].met %}
+                            <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                    <h4>Chưa đạt (Not met)</h4>
+                    <ul>
+                        {% for item in results[0].not_met %}
+                            <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% else %}
+                <p>Không có kết quả để hiển thị.</p>
+            {% endif %}
         </div>
-        <div class="nav-buttons">
-            <button>&lt;</button>
-            <button>&gt;</button>
-        </div>
+
         <div class="right-panel">
-            <div class="card advantages">
+            <div class="card advantages" id="advantages-card">
                 <h3>Ưu điểm</h3>
-                <ul>
-                    <li>✔ Ielts 7.5</li>
-                    <li>✔ M.O.S</li>
-                    <li>✔ Có khả năng giải quyết vấn đề tốt</li>
+                <ul id="advantages-list">
+                    {% if results and results[0] %}
+                        {% for item in results[0].met %}
+                            <li>{{ item }}</li>
+                        {% endfor %}
+                    {% endif %}
                 </ul>
             </div>
-            <div class="card disadvantages">
+            <div class="card disadvantages" id="disadvantages-card">
                 <h3>Nhược điểm</h3>
-                <ul>
-                    <li>✖ Chưa có kinh nghiệm làm việc</li>
-                    <li>✖ Kỹ năng giao tiếp chưa tốt</li>
+                <ul id="disadvantages-list">
+                    {% if results and results[0] %}
+                        {% for item in results[0].not_met %}
+                            <li>{{ item }}</li>
+                        {% endfor %}
+                    {% endif %}
                 </ul>
             </div>
         </div>
@@ -279,3 +273,35 @@
 </footer> 
 </body>
 </html>
+<script>
+    function showDetail(idx){
+        // find the selected result data from server-side rendered lists
+        const details = document.querySelectorAll('[id^="detail-"]');
+        // if details for other indexes not present, replace panel by cloning server data
+        // simple approach: request reload with anchor? For now, try to find template block
+        // Fallback: just scroll to top of detail panel (server rendered first item only)
+        const panel = document.getElementById('cv-detail-panel');
+        if(!panel) return;
+        // Try to find element with id detail-<idx>
+        const target = document.getElementById('detail-' + idx);
+        if(target){
+            // hide others
+            details.forEach(d=>d.style.display='none');
+            target.style.display = 'block';
+        } else {
+            // Not pre-rendered: just show a message
+            panel.innerHTML = '<p>Chi tiết CV được chọn (mục ' + (idx+1) + '). Thực hiện tải lại trang để xem chi tiết.</p>';
+        }
+        // update advantages/disadvantages lists if alternative items exist
+        const adv = document.getElementById('advantages-list');
+        const dis = document.getElementById('disadvantages-list');
+        if(adv && dis){
+            // naive: if multiple detail-N blocks exist, copy lists
+            const t = document.getElementById('detail-' + idx);
+            if(t){
+                const mets = t.querySelectorAll('h4 + ul > li');
+                // Not robust to structure changes; leave as-is for now
+            }
+        }
+    }
+</script>

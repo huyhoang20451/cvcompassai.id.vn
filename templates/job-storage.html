@@ -291,6 +291,9 @@ body {
         <p>Quy mô: {{ job.workplace }}</p>
         <p>Địa điểm: {{ job.location }}</p>
       </div>
+      <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
+        <a class="view-cv" href="/compare_cv_vs_jd?jd_id={{ job.id }}" style="display:inline-block; padding:8px 12px; background:#2b6cb0; color:#fff; border-radius:6px; text-decoration:none;">So sánh CV</a>
+      </div>
     </div>
     <!-- Job Details -->
     <div class="job-detail">
@@ -388,7 +391,6 @@ body {
       <h4>Hình thức ứng tuyển</h4>
       <p>{{ job.application_method }}</p>
 
-      <button class="view-cv">Xem CV ứng tuyển</button>
   {% else %}
     <div class="job-card-empty">
       <p>Chọn một JD ở bên trái để xem chi tiết.</p>
