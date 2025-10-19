@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/x-icon" href="../static/favicon.ico">
-    <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script src="/static/js/theme.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=upload" />
     <title>Tìm việc làm cùng CV Compass</title>
@@ -165,34 +166,18 @@ body {
         </div>
         <div class="header-menu"> <!-- Menu lựa chọn -->
             <ul>
-                <li><a method='get' href="/home-logged-in?username={{username}}">Trang chủ</a></li>
-                <li><a method="get" href="/aboutus-logged-in?username={{username}}">Về chúng tôi</a></li>
-                <li><a method="get" href="/finding-jobs?username={{username}}">Tìm việc làm</a></li>
-                <li><a method="get" href="/ocr-scan-logged-in?username={{username}}">Quét CV bằng OCR</a></li>
-                <li><a method="get" href="/pricing-user-loggedin?username={{username}}">Gói dịch vụ</a></li>
+                <li><a method='get' href="/home-logged-in">Trang chủ</a></li>
+                <li><a method="get" href="/aboutus-logged-in">Về chúng tôi</a></li>
+                <li><a method="get" href="/finding-jobs">Tìm việc làm</a></li>
+                <li><a method="get" href="/ocr-scan-logged-in">Quét CV bằng OCR</a></li>
+                <li><a method="get" href="/pricing-user-loggedin">Gói dịch vụ</a></li>
             </ul>
         </div>
         <div class="header-actions">
             <!--Chào mừng khi đăng nhập thành công-->
-            <p id="welcome-user">Chào mừng, {{username}}!</p>
-            <p style="display: flex; align-items: center; background-color: #D1E9F6; padding: 5px 10px; border-radius: 5px;"><img style="width: 20px; height: 20px;" src="/static/images/coin.png" alt="Coin"><strong></strong></p>
-            <script>
-                async function fetchCoin() {
-                    try {
-                    const response = await fetch(`/api/get-coin-db`);
-                    const data = await response.json();
-                    if (data.success) {
-                        document.querySelector('.header-actions strong').textContent = data.coin;
-                    } else {
-                        console.error('Lỗi khi lấy số coin:', data.msg);
-                    }
-                } catch (error) {
-                    console.error('Lỗi mạng khi lấy số coin:', error);
-                }
-            }
-            // Gọi hàm khi trang được tải
-            window.onload = fetchCoin;
-            </script>
+            <p id="welcome-user">Chào mừng, {{user_info.full_name}}!</p>
+            <p style="display: flex; align-items: center; background-color: #D1E9F6; padding: 5px 10px; border-radius: 5px;"><img style="width: 20px; height: 20px;" src="/static/images/coin.png" alt="Coin"><strong>{{user_info.coin}}</strong></p>
+            
         </div>
         <div class="user-avatar">
             <img onclick="boxAppear()" style="width: 40px; height: 40px; border-radius: 50%;" src="/static/images/user_avatar.png" alt="User Avatar">
@@ -238,54 +223,60 @@ body {
             <div class="title_content">
                 <h1>Tìm việc làm</h1>
             </div>
-            <div class="search-box">
-                <input type="text" placeholder="Tìm kiếm công việc">
-                <button class="search-btn">Tìm kiếm</button>
-            </div>
+      <div class="search-box">
+        <input id="globalKeyword" type="text" placeholder="Tìm kiếm công việc">
+        <button id="globalSearchBtn" class="search-btn" type="button">Tìm kiếm</button>
+      </div>
         </div>
     </div> <!-- kết thúc phần introduction -->
     <div class="jobs-container">
     <!-- Bộ lọc -->
+    <!-- Search/filter form: collects values and posts to /jobs_search -->
     <aside class="filter">
+      <form id="searchForm" action="/jobs_search" method="POST">
       <h3>Bộ lọc</h3>
       <h4>Ngành nghề</h4>
-      <label><input type="checkbox"> Công nghệ thông tin</label><br>
-      <label><input type="checkbox"> Kế toán</label><br>
-      <label><input type="checkbox"> Nhân sự</label><br>
-      <label><input type="checkbox"> Marketing</label><br>
-      <label><input type="checkbox"> Bán hàng</label><br>
-      <label><input type="checkbox"> Thiết kế</label><br>
+      <label><input class="job-cat" type="checkbox" value="Công nghệ thông tin"> Công nghệ thông tin</label><br>
+      <label><input class="job-cat" type="checkbox" value="Kế toán"> Kế toán</label><br>
+      <label><input class="job-cat" type="checkbox" value="Nhân sự"> Nhân sự</label><br>
+      <label><input class="job-cat" type="checkbox" value="Marketing"> Marketing</label><br>
+      <label><input class="job-cat" type="checkbox" value="Bán hàng"> Bán hàng</label><br>
+      <label><input class="job-cat" type="checkbox" value="Thiết kế"> Thiết kế</label><br>
 
-      <h4>Mức lương</h4>
-      <label><input type="checkbox"> Dưới 10 triệu</label><br>
-      <label><input type="checkbox"> 10-15 triệu</label><br>
-      <label><input type="checkbox"> 15-20 triệu</label><br>
-      <label><input type="checkbox"> Trên 20 triệu</label><br>
+  <h4>Mức lương</h4>
+  <label><input class="salary-range" type="checkbox" data-min="0" data-max="10000000"> Dưới 10 triệu</label><br>
+  <label><input class="salary-range" type="checkbox" data-min="10000000" data-max="15000000"> 10-15 triệu</label><br>
+  <label><input class="salary-range" type="checkbox" data-min="15000000" data-max="20000000"> 15-20 triệu</label><br>
+  <label><input class="salary-range" type="checkbox" data-min="20000000" data-max="1000000000"> Trên 20 triệu</label><br>
 
-      <h4>Kinh nghiệm</h4>
-      <label><input type="checkbox"> 0-1 năm</label><br>
-      <label><input type="checkbox"> 2-3 năm</label><br>
-      <label><input type="checkbox"> 3-5 năm</label><br>
-      <label><input type="checkbox"> 5 năm+</label><br>
+  <h4>Kinh nghiệm</h4>
+  <label><input name="experience" type="checkbox" value="0-1"> 0-1 năm</label><br>
+  <label><input name="experience" type="checkbox" value="2-3"> 2-3 năm</label><br>
+  <label><input name="experience" type="checkbox" value="3-5"> 3-5 năm</label><br>
+  <label><input name="experience" type="checkbox" value="5+"> 5 năm+</label><br>
 
       <h4>Sắp xếp theo</h4>
-      <select>
-        <option>Mới nhất</option>
-        <option>Lương cao nhất</option>
-        <option>Sắp hết hạn</option>
+      <select id="sortBySelect">
+        <option value="newest">Mới nhất</option>
+        <option value="highest_salary">Lương cao nhất</option>
+        <option value="expiring_soon">Sắp hết hạn</option>
       </select>
 
-      <button class="apply-btn">Áp dụng</button>
-      <button class="reset-btn">Xóa bộ lọc</button>
+      <!-- Hidden inputs container (will be filled by JS) -->
+      <div id="hiddenFields"></div>
+
+      <button type="button" onclick="applyFilters()" class="apply-btn">Áp dụng</button>
+      <button type="button" id="resetFilters" class="reset-btn">Xóa bộ lọc</button>
+      </form>
     </aside>
 
     <!-- Danh sách việc -->
     {%for job in job_descriptions%}
     <main class="job-list">
       <div class="job-item">
-        <img style="width: 40px; height: 40px;" src="{{ job.company_logo_url }}" alt="logo" class="company-logo">
+        <img style="width: 40px; height: 40px;" src="{{ job.company_logo_url or '/static/images/business_avatar.png' }}" alt="logo" class="company-logo">
         <div class="job-info">
-          <h4>{{ job.workplace }}</h4>
+          <h4>{{ job.location }}</h4>
           <p>💼 {{ job.position }}</p>
           <!--Bỏ các ký tự lạ ở job.requirements-->
           <p>🔑 {{ job.job_description | replace(", ", ",") | replace("[", "") | replace("]", "") | replace("'", "") | replace('"', '') }}</p>
@@ -293,7 +284,7 @@ body {
           <p><b>Hạn nộp:</b> {{ job.deadline }}</p>
         </div>
         <div class="job-actions">
-          <a href="/job-detail/{{ job.id }}?username={{ username }}&role={{ user.role }}" class="cv-detail">Xem chi tiết >></a><br>
+          <a href="/job-detail/{{ job.id }}" class="cv-detail">Xem chi tiết >></a><br>
           <button class="btn-orange">Quan tâm</button>
           <button class="btn-blue">Ứng tuyển ngay</button>
         </div>
@@ -344,5 +335,74 @@ body {
     </div>
   </div>
 </footer>
+
+<script>
+  // Collect filter inputs and fetch results, then inject into this page
+  async function applyFilters(){
+    // build payload object
+    const keyword = document.getElementById('globalKeyword').value || '';
+    const cats = Array.from(document.querySelectorAll('.job-cat:checked')).map(n=>n.value);
+    const salaryChecked = document.querySelector('.salary-range:checked');
+    const min_filter = salaryChecked ? Number(salaryChecked.dataset.min || 0) : undefined;
+    const max_filter = salaryChecked ? Number(salaryChecked.dataset.max || 0) : undefined;
+    const sort_by = document.getElementById('sortBySelect').value || 'newest';
+
+    const payload = {
+      keyword: keyword,
+      job_categories: cats,
+      sort_by: sort_by
+    };
+    if (min_filter !== undefined) payload.min_filter = min_filter;
+    if (max_filter !== undefined) payload.max_filter = max_filter;
+
+    try{
+      // Build query string with repeated job_categories and other params so FastAPI reads them from query
+      const params = new URLSearchParams();
+      if (keyword) params.append('keyword', keyword);
+      if (sort_by) params.append('sort_by', sort_by);
+      if (min_filter !== undefined) params.append('min_filter', String(min_filter));
+      if (max_filter !== undefined) params.append('max_filter', String(max_filter));
+      // append job_categories repeated
+      cats.forEach(c => params.append('job_categories', c));
+
+      const url = '/jobs_search?' + params.toString();
+      const resp = await fetch(url, { method: 'POST' });
+      const html = await resp.text();
+      // Parse returned HTML and try to extract the job-list fragment
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      // Try to find the main.job-list or the jobs-container
+      const newJobList = doc.querySelector('main.job-list') || doc.querySelector('.jobs-container') || doc.querySelector('.job-list');
+      if (newJobList) {
+        // If we got a main.job-list, replace the existing one
+        const currentMain = document.querySelector('main.job-list');
+        if (currentMain && newJobList.tagName.toLowerCase() === 'main') {
+          currentMain.innerHTML = newJobList.innerHTML;
+        } else if (currentMain && newJobList) {
+          // If the returned fragment is .jobs-container, replace its inner HTML into our container
+          if (newJobList.classList.contains('jobs-container')){
+            const currentContainer = document.querySelector('.jobs-container');
+            if (currentContainer) currentContainer.innerHTML = newJobList.innerHTML;
+          } else {
+            currentMain.innerHTML = newJobList.innerHTML;
+          }
+        } else {
+          // fallback to replacing the whole document
+          document.open(); document.write(html); document.close();
+        }
+      } else {
+        // fallback: replace whole page
+        document.open(); document.write(html); document.close();
+      }
+    }catch(err){
+      console.error('Search request failed', err);
+      alert('Lỗi khi tìm kiếm. Vui lòng thử lại.');
+    }
+  }
+
+  document.getElementById('globalSearchBtn').addEventListener('click', applyFilters);
+  document.getElementById('resetFilters').addEventListener('click', function(){ document.getElementById('searchForm').reset(); });
+</script>
+
 </body>
 </html>

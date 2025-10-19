@@ -58,13 +58,20 @@
         <!-- Single select with placeholder text as the first disabled option -->
         <select name="role" id="role" onchange="toggleCompanyField()" required aria-label="Loại tài khoản">
           <option value="" disabled selected>Bạn là ai?</option>
-          <option value="user">Người dùng thường</option>
+          <option value="candidate">Người dùng thường</option>
           <option value="business">Doanh nghiệp</option>
         </select>
 
-        <div class="input-group">
+        <div class="input-group" style="margin-top:18px;">
           <div id="company-field" style="display:none;">
             <input type="text" id="company" name="company" placeholder="Tên công ty">
+            <input type="text" id="company-logo-url" name="company_logo" placeholder="URL logo công ty">
+          </div>
+        </div>
+
+        <div class="input-group">
+          <div id="user-field" style="display:none;">
+            <input type="text" id="full_name" name="full_name" placeholder="Họ và tên">
           </div>
         </div>
         <div class="divider">Hoặc</div>
@@ -84,19 +91,24 @@
 
   <script>
   function toggleCompanyField() {
-    var role = document.getElementById('role').value;
-    var companyField = document.getElementById('company-field');
-    var companyInput = document.getElementById('company');
-    if (!companyField) return;
+    const role = document.getElementById('role')?.value;
+    const companyField = document.getElementById('company-field');
+    const companyInput = document.getElementById('company');
+    const userField = document.getElementById('user-field');
+    if (!companyField || !userField) return;
+
+    const show = (el) => el.style.display = 'block';
+    const hide = (el) => el.style.display = 'none';
+
     if (role === 'business') {
-      companyField.style.display = 'block';
+      show(companyField); hide(userField);
       if (companyInput) companyInput.required = true;
+    } else if (role === 'candidate') {
+      hide(companyField); show(userField);
+      if (companyInput) { companyInput.required = false; companyInput.value = ''; }
     } else {
-      companyField.style.display = 'none';
-      if (companyInput) {
-        companyInput.required = false;
-        companyInput.value = '';
-      }
+      hide(companyField); hide(userField);
+      if (companyInput) { companyInput.required = false; companyInput.value = ''; }
     }
   }
 

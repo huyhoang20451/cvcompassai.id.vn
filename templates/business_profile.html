@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="../static/favicon.ico">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script src="/static/js/theme.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=upload" />
+    <title>Dashboard - Doanh nghiệp (CV Compass)</title>
+    <title>Hồ sơ doanh nghiệp - CV Compass</title>
+    <style>
+      :root{ --accent:#3674B5; --muted:#667; }
+      body { font-family: Arial, Helvetica, sans-serif; background-color: #F6FCFF; color:#222; margin:0; padding:24px; }
+      .container{ max-width:1000px; margin:20px auto; }
+      .profile-card{ display:flex; gap:20px; background:#fff; padding:20px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.06); }
+      .logo-box{ width:220px; flex:0 0 220px; display:flex; align-items:center; justify-content:center; }
+      .logo-preview{ width:180px; height:180px; border-radius:12px; background:#f4f6fa; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+      .logo-preview img{ max-width:100%; max-height:100%; display:block; }
+      .profile-body{ flex:1; }
+      .profile-body h2{ margin:0 0 8px 0; color:var(--accent); }
+      .meta{ color:var(--muted); margin-bottom:12px; }
+      .form-row{ display:flex; gap:12px; margin-bottom:10px; }
+      .form-row input[type="text"], .form-row input[type="url"], .form-row input[type="tel"], textarea, select{ width:100%; padding:10px; border-radius:6px; border:1px solid #d6dbe6; }
+      textarea{ min-height:120px; resize:vertical; }
+      label{ display:block; margin-bottom:6px; font-weight:600; }
+      .actions{ display:flex; gap:12px; margin-top:14px; }
+      .btn{ padding:10px 16px; border-radius:8px; border:none; cursor:pointer; }
+      .btn-primary{ background:var(--accent); color:#fff; }
+      .btn-secondary{ background:#eef3fa; color:var(--accent); }
+      .small{ font-size:13px; color:#666; }
+
+      @media(max-width:740px){ .profile-card{ flex-direction:column; } .logo-box{ width:100%; } }
+
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          font-family: Arial, sans-serif;
+        }
+
+      body {
+          background: #f0f5fb;
+          color: #333;
+        }
+
+/* Header */
+.header {
+  background: white;
+  color: black;
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 30px;
+  align-items: center;
+}
+.header .logo {
+  font-weight: bold;
+  font-size: 20px;
+}
+.header .menu a {
+  color: #fff;
+  margin: 0 10px;
+  text-decoration: none;
+}
+.header .menu a:hover {
+  text-decoration: underline;
+}
+.header .profile {
+  font-size: 14px;
+}
+
+/* Layout */
+.container {
+  display: flex;
+  padding: 20px;
+}
+  </style>
+  </head>
+  <body style="background-color: #F6FCFF">
+    <!--Bắt đầu phần header-->
+    <div class="header">
+        <div class="header-logo">
+            <img src="/static/images/Screenshot 2025-08-25 150046.png" alt="Logo CV Compass">
+        </div>
+        <div class="header-menu"> <!-- Menu lựa chọn -->
+            <ul>
+                <li><a href="/business-dashboard">Trang chủ</a></li>
+                <li><a href="/job-storage">Quản lý JD</a></li>
+                <li><a href="/cv-detail-business">Danh sách CV</a></li>
+                <li><a href="#">Quét CV tự động</a></li>
+                <li><a href="/pricing-business-logged-in">Nâng cấp Premium</a></li>
+            </ul>
+        </div>
+        <div class="header-actions">
+            <!--Chào mừng khi đăng nhập thành công-->
+            <p id="welcome-user">Chào mừng, {{ user_info.company_name }}!</p>
+        </div>
+        <div class="user-avatar">
+            <img onclick="boxAppear()" style="width: 40px; height: 40px; border-radius: 50%;" src="/static/images/business_avatar.png" alt="User Avatar">
+        </div>
+        <script>
+            function boxAppear() {
+                const box = document.createElement('div');
+                box.style.position = 'absolute';
+                box.style.top = '60px';
+                box.style.right = '20px';
+                box.style.backgroundColor = '#fff';
+                box.style.border = '1px solid #ccc';
+                box.style.borderRadius = '5px';
+                box.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+                box.style.padding = '10px';
+                box.innerHTML = `
+                    <p><a href="/business-profile" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
+                    <p><a href="/job-storage" style="text-decoration:none;color:#222;">Lưu trữ JD</a></p>
+                    <p><a href="#" style="text-decoration:none;color:#222;">Cài đặt</a></p>
+                    <p><a href="/business-home" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
+                `;
+                document.body.appendChild(box);
+                document.addEventListener('click', function handleClickOutside(event) {
+                    if (!box.contains(event.target) && event.target !== document.querySelector('.user-avatar img')) {
+                        box.remove();
+                        document.removeEventListener('click', handleClickOutside);
+                    }
+                });
+            }
+        </script>
+    </div> <!-- kết thúc phần header -->
+    <div class="container">
+      <div class="profile-card">
+        <div class="logo-box">
+          <div class="logo-preview" id="logoPreview">
+            {% if user_info.avatar_path %}
+              <img src="{{ user_info.avatar_path }}" alt="Company logo" id="logoImg">
+            {% else %}
+              <div style="text-align:center;color:#9aa;">Logo<br>Chưa có</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!--Chỗ này thêm thông báo Cập nhật thành công-->
+        <div class="alert alert-success" id="successMessage" style="display:none;">
+          Cập nhật thành công!
+        </div>
+
+        <div class="profile-body">
+          <h6>{{business_info}}</h6>
+          <h2>{{ user_info.company_name }}</h2>
+          <div class="meta">Người quản lý: <strong>{{ user_info.username }}</strong></div>
+
+          <form id="businessProfileForm" action="/update-business-profile" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="id" value="{{ user_info.id }}">
+            <div class="form-row">
+              <div style="flex:1;">
+                <label for="company_name">Tên công ty</label>
+                <input id="company_name" name="company_name" type="text" value="{{ user_info.company_name }}" required>
+              </div>
+              <div style="width:220px;">
+                <label for="logo">Logo (png/jpg)</label>
+                <input id="logo" name="avatar_path" type="file" accept="image/*">
+                <div class="small">Kích thước đề xuất: 400x400</div>
+              </div>
+            </div>
+
+            <div style="margin-bottom:10px;">
+              <label for="company_description">Mô tả ngắn</label>
+              <textarea id="company_description" name="company_description">{{ user_info.company_description }}</textarea>
+            </div>
+
+            <div class="form-row">
+              <div style="flex:1;">
+                <label for="website">Website</label>
+                <input id="website" name="website" type="url" value="{{ user_info.website }}">
+              </div>
+              <div style="width:220px;">
+                <label for="phone_number">Số điện thoại</label>
+                <input id="phone_number" name="phone_number" type="tel" value="{{ user_info.phone_number }}">
+              </div>
+            </div>
+
+            <div style="margin-bottom:8px;">
+              <label for="address">Địa chỉ</label>
+              <input id="address" name="address" type="text" value="{{ user_info.address }}">
+            </div>
+
+            <div class="actions">
+              <button type="submit" class="btn btn-primary">Lưu thông tin</button>
+              <button type="button" class="btn btn-secondary" onclick="resetPreview()">Huỷ</button>
+            </div>
+            <div style="margin-top:10px;" class="small">Lưu ý: Thay đổi sẽ cập nhật lên hồ sơ công ty.</div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Logo preview
+      const logoInput = document.getElementById('logo');
+      const logoPreview = document.getElementById('logoPreview');
+      function resetPreview(){
+        // revert file input and do nothing else
+        if(logoInput) logoInput.value = '';
+      }
+      if (logoInput) {
+        logoInput.addEventListener('change', function(e){
+          const f = e.target.files && e.target.files[0];
+          if (!f) return;
+          const img = document.createElement('img');
+          img.onload = function(){ /* nothing */ };
+          img.src = URL.createObjectURL(f);
+          img.style.maxWidth = '100%'; img.style.maxHeight = '100%';
+          logoPreview.innerHTML = '';
+          logoPreview.appendChild(img);
+        });
+      }
+    </script>
+  </body>
+</html>

@@ -1,3 +1,23 @@
+.theme-light body {
+  background-color: #F6FCFF;
+  color: #111;
+}
+
+/* Dark theme overrides */
+html.theme-dark body {
+  background-color: #061022 !important;
+  color: #E6EEF8 !important;
+}
+html.theme-dark .header { background-color: #071428 !important; }
+html.theme-dark .header-menu ul li a { color: #CFE6FF !important; }
+html.theme-dark .header-actions button.btn-login { background-color: transparent !important; color: #E6EEF8 !important; border-color: #3B82F6 !important; }
+html.theme-dark .job-card { background: #071428 !important; box-shadow: 0 8px 24px rgba(2,6,23,0.6) !important; }
+html.theme-dark .job-card-title, html.theme-dark .job-card-company, html.theme-dark .job-card-category { color: #E6EEF8 !important; }
+html.theme-dark .job-card-tags, html.theme-dark .job-card-company { color: #C9D8EE !important; }
+html.theme-dark .feature-item, html.theme-dark .mission-block, html.theme-dark .vision-block, html.theme-dark .commit-block { background: #071428 !important; box-shadow: none !important; color: #DDEBFF !important; }
+html.theme-dark .footer, html.theme-dark .footer a { color: #C9D8EE !important; }
+html.theme-dark .jobs-carousel-wrapper .carousel-btn { background: rgba(255,255,255,0.06) !important; color: #E6EEF8 !important; }
+
 .job_category_section {
     margin: 32px 0;
     padding: 32px 24px;
