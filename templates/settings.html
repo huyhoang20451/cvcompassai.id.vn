@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/x-icon" href="../static/favicon.ico">
-    <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script src="/static/js/theme.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=upload" />
     <title>Cài đặt tài khoản</title>
@@ -174,25 +175,9 @@ body {
         </div>
         <div class="header-actions">
             <!--Chào mừng khi đăng nhập thành công-->
-            <p id="welcome-user">Chào mừng, {{username}}!</p>
-            <p style="display: flex; align-items: center; background-color: #D1E9F6; padding: 5px 10px; border-radius: 5px;"><img style="width: 20px; height: 20px;" src="/static/images/coin.png" alt="Coin"><strong></strong></p>
-            <script>
-                async function fetchCoin() {
-                    try {
-                    const response = await fetch(`/api/get-coin-db`);
-                    const data = await response.json();
-                    if (data.success) {
-                        document.querySelector('.header-actions strong').textContent = data.coin;
-                    } else {
-                        console.error('Lỗi khi lấy số coin:', data.msg);
-                    }
-                } catch (error) {
-                    console.error('Lỗi mạng khi lấy số coin:', error);
-                }
-            }
-            // Gọi hàm khi trang được tải
-            window.onload = fetchCoin;
-            </script>
+            <p id="welcome-user">Chào mừng, {{user_info.full_name}}!</p>
+            <p style="display: flex; align-items: center; background-color: #D1E9F6; padding: 5px 10px; border-radius: 5px;"><img style="width: 20px; height: 20px;" src="/static/images/coin.png" alt="Coin"><strong>{{user_info.coin}}</strong></p>
+            
         </div>
         <div class="user-avatar">
             <img onclick="boxAppear()" style="width: 40px; height: 40px; border-radius: 50%;" src="/static/images/user_avatar.png" alt="User Avatar">
@@ -245,11 +230,11 @@ body {
             <button class="back-btn">← Quay lại</button>
             <h2>Cài đặt</h2>
             <ul class="menu">
-                <li class="active"><a style="text-decoration: none;" href="/edit-profile?username={{username}}">Thông tin cá nhân</a></li>
-                <li><a style="text-decoration: none;" href="/mycv-settings?username={{username}}">CV của tôi</a></li>
+                <li class="active"><a style="text-decoration: none;" href="/edit-profile">Thông tin cá nhân</a></li>
+                <li><a style="text-decoration: none;" href="/mycv-settings">CV của tôi</a></li>
                 <li>Công việc/Đã lưu</li>
                 <li>Lịch sử ứng tuyển</li>
-                <li><a style="text-decoration: none;" href="/system-settings?username={{username}}">Cài đặt hệ thống</a></li>
+                <li><a style="text-decoration: none;" href="/system-settings">Cài đặt hệ thống</a></li>
             </ul>
         </aside>
         <!--Main content-->
@@ -268,7 +253,7 @@ body {
 
             <form class="form">
                 <label for="fullname">Họ và tên <span>*</span></label>
-                <input type="text" id="fullname" value="{{ username }}" required>
+                <input type="text" id="fullname" value="{{ user_info.full_name }}" required>
 
                 <label for="email">Email <span>*</span></label>
                 <input type="email" id="email" value="" required>

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/x-icon" href="../static/favicon.ico">
     <link rel="stylesheet" href="/static/css/style.css">
+    <script src="/static/js/theme.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=upload" />
     <title>Giá dịch vụ cho Doanh nghiệp</title>
@@ -17,16 +18,16 @@
         </div>
         <div class="header-menu"> <!-- Menu lựa chọn -->
             <ul>
-                <li><a href="/business-dashboard?username={{username}}&role={{role}}&company={{company}}">Trang chủ</a></li>
-                <li><a href="/job-storage?username={{username}}&role={{role}}&company={{company}}">Quản lý JD</a></li>
-                <li><a href="/cv-detail-business?username={{username}}&role={{role}}&company={{company}}">Danh sách CV</a></li>
-                <li><a href="#">Quét CV tự động</a></li>
-                <li><a href="/pricing-business-logged-in?username={{username}}&role={{role}}&company={{company}}">Nâng cấp Premium</a></li>
+                <li><a href="/business-dashboard">Trang chủ</a></li>
+                <li><a href="/job-storage">Quản lý JD</a></li>
+                <li><a href="/cv-detail-business">Danh sách CV</a></li>
+                <li><a href="/cv-detail-business">Quét CV tự động</a></li>
+                <li><a href="/pricing-business-logged-in">Nâng cấp Premium</a></li>
             </ul>
         </div>
         <div class="header-actions">
             <!--Chào mừng khi đăng nhập thành công-->
-            <p id="welcome-user">Chào mừng, {{company}}!</p>
+            <p id="welcome-user">Chào mừng, {{user_info.company_name}}!</p>
         </div>
 
         <div class="user-avatar">

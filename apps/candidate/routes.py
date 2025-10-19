@@ -82,10 +82,12 @@ async def jobs_search_endpoint(request: Request,
                            max_filter=max_filter,
                            keyword=keyword,
                            sort_by=sort_by)
-        print (jobs)
+
         return templates.TemplateResponse("home_logged_in.html", {"request": request,
-                                                                  "user_info": user_info,
-                                                                  "job_descriptions": jobs})
+                                                                   "user_info": user_info,
+                                                                   "job_descriptions": jobs})
+
+        
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Lỗi hệ thống: {str(e)}")
 
