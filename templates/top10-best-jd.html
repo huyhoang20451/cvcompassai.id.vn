@@ -47,10 +47,10 @@
                 box.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
                 box.style.padding = '10px';
                 box.innerHTML = `
-                    <p><a href="/edit-profile?username={{username}}" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
-                    <p><a href="/mycv-settings?username={{username}}" style="text-decoration:none;color:#222;">CV của tôi</a></p>
-                    <p><a href="/system-settings?username={{username}}" style="text-decoration:none;color:#222;">Cài đặt tài khoản</a></p>
-                    <p><a href="/home" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
+                    <p><a href="/edit-profile" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
+                    <p><a href="/mycv-settings" style="text-decoration:none;color:#222;">CV của tôi</a></p>
+                    <p><a href="/system-settings" style="text-decoration:none;color:#222;">Cài đặt tài khoản</a></p>
+                    <p><a href="/" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
                 `;
                 document.body.appendChild(box);
                 document.addEventListener('click', function handleClickOutside(event) {
@@ -79,11 +79,11 @@
         <script>
             function unlockTop5JD() {
                 // Lay tong so xu o trang top-10-best-jd-unblur
-                fetch(`/api/deduct-coin?username={{username}}&amount=5`)
+                fetch(`/api/deduct-coin&amount=5`)
                   .then(res => res.json())
                   .then(data => {
                     if (data.success) {
-                      window.location.href = '/top10-best-jd-unblur?username={{username}}&job_id=1';
+                      window.location.href = '/top10-best-jd-unblur&job_id=1';
                     } else {
                       alert(data.msg || "Bạn không đủ coin để mở khóa. Vui lòng nạp thêm coin.");
                     }
@@ -96,18 +96,18 @@
             <div class="jd-item jd-blur">
                 <div class="jd-rank">#{{ loop.index }}</div>
                 <div class="jd-info">
-                    <div class="jd-name">{{ jd.job_title }}</div>
-                    <div class="jd-company">{{ jd.company_name }}</div>
+                    <div class="jd-name">{{ jd.title }}</div>
+                    <div class="jd-company">{{ jd.location }}</div>
                     <div class="jd-desc">Bạn cần mở khóa để xem chi tiết JD này.</div>
                 </div>
             </div>
             {%endfor%}
             <!--Top 6-10 JD hiển thị bình thường-->
             {% for job in job_descriptions[5:10] %}
-            <div onclick="location.href='/top10-best-jd-detail?username={{username}}'" class="jd-item">
+            <div onclick="location.href='/top10-best-jd-detail'" class="jd-item">
                 <div class="jd-rank">#{{ job.id }}</div>
                 <div class="jd-info">
-                    <div class="jd-name">{{ job.job_title }}</div>
+                    <div class="jd-name">{{ job.title }}</div>
                     <div class="jd-company">{{ job.company_name }}</div>
                     <div class="jd-location">{{ job.location }}</div>
                 </div>
@@ -138,9 +138,9 @@
     </div>
     <div class="footer-links-group">
       <div class="footer-links-title">Company</div>
-      <a href="/home-logged-in?username={{username}}">Home</a>
-      <a href="/aboutus-logged-in?username={{username}}">About us</a>
-      <a href="/pricing-user-loggedin?username={{username}}">Pricing</a>
+      <a href="/home-logged-in">Home</a>
+      <a href="/aboutus-logged-in">About us</a>
+      <a href="/pricing-user-loggedin">Pricing</a>
     </div>
     <div class="footer-links-group">
       <div class="footer-links-title">Follow us</div>
