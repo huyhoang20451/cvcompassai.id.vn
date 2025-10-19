@@ -1,5 +1,5 @@
 from sqlmodel import Session, select
-from models import User_db, jd_db, jd_CV_db, candidate_CV_db
+from models import JobCategory_db, User_db, jd_db, jd_CV_db, candidate_CV_db
 from .schemas import JD_create, jd_response, jd_CV, candidate_CV
 from typing import List
 
@@ -40,10 +40,6 @@ def get_cvs_by_jd_id(session: Session, jd_id: int) -> List[jd_CV]:
     return cvs
 
 def get_jd_by_id(session: Session, jd_id: int) -> jd_response:
-    jd = session.exec(select(jd_db).where(jd_db.id == jd_id)).first()
-    return jd
-
-def get_jd_by_id(session: Session, jd_id: int) -> jd_response:
     statement = (
         select(
             jd_db,
@@ -74,12 +70,15 @@ def delete_jd_by_id(session: Session, jd_id: int, user_id: int) -> bool:
     return True
 
 def update_jd_by_id(session: Session, jd_id: int, new_jd: dict) -> bool:
-    existing_jd = get_jd_by_id(session, jd_id)
+    statement = select(jd_db).where(jd_db.id == jd_id)
+    existing_jd = session.exec(statement).first()
+
     if not existing_jd:
         return False
+    
     for key, value in new_jd.items():
         setattr(existing_jd, key, value)
-    session.add(existing_jd)
+
     session.commit()
     session.refresh(existing_jd)
     return True
@@ -94,3 +93,8 @@ def update_business_by_id(session: Session, business_id: int, new_business: dict
     session.commit()
     session.refresh(result)
     return True
+
+def get_job_categories(session: Session):
+    statement = select(JobCategory_db)
+    results = session.exec(statement).all()
+    return [JobCategory.model_validate(job_category) for job_category in results]

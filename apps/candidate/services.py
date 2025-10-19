@@ -9,11 +9,12 @@ from .repository import (search_jobs as repo_search_jobs,
                          add_cv_into_jd as repo_add_cv_into_jd,
                          add_cv_into_candidate as repo_add_cv_into_candidate,
                          get_cvs_by_id as repo_get_cvs_by_id,
-                         save_jd as repo_save_jd)
+                         save_jd as repo_save_jd,
+                         get_job_categories as repo_get_job_categories)
 from fastapi import Depends, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 from typing import Annotated, List, Optional
-from .schemas import JobSearchRequest, JobResponse, jd, candidate_CV, jd_CV
+from .schemas import JobCategory, JobSearchRequest, JobResponse, jd, candidate_CV, jd_CV
 from Core.Auth.schemas import user
 from Core.Auth.dependencies import get_current_user
 from Core.OCR import compare_qwen
@@ -119,3 +120,6 @@ def get_top_10_jds_by_cv(session: Session, cv: str) -> List[jd]:
 def save_jd(session: Session, candidate_id: int, job_id: int):
     jd = repo_save_jd(session, candidate_id, job_id)
     return jd
+
+def get_job_categories(session: Session) -> List[JobCategory]:
+    return repo_get_job_categories(session)

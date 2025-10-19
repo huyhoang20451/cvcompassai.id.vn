@@ -10,7 +10,8 @@ from .services import (get_jds_by_user_name,
                        get_jd_by_id,
                        delete_jd_by_id as service_delete_jd_by_id,
                        update_jd_by_id as service_update_jd_by_id,
-                       update_business_by_id as service_update_business_info)
+                       update_business_by_id as service_update_business_info,
+                       get_job_categories)
 from db import get_session
 from Core.Auth.dependencies import templates, authorize_role
 from Core.Auth.schemas import user
@@ -87,18 +88,17 @@ async def submit_job(request: Request,
 
 @router.get("/dang-tuyen-ngay", response_class=HTMLResponse)
 def dang_tuyen_ngay(request: Request, 
-                    user_info: user = Depends(authorize_role(["business"]))):
-    # Fallback cho company_name nếu bị None
-    company_name = user_info.company_name or user_info.username or "Công ty chưa cập nhật"
-    
+                    user_info: user = Depends(authorize_role(["business"])),
+                    session: Session = Depends(get_session)):
+    job_categories = get_job_categories(session)
+
     return templates.TemplateResponse("form-dang-tuyen-ngay.html", {"request": request, 
-                                                                    "user_info": user_info})
+                                                                    "user_info": user_info,
+                                                                    "job_categories": job_categories})
 
 @router.get("/cv-detail-business", response_class=HTMLResponse)
 def cv_detail_business(request: Request, 
                        user_info: user = Depends(authorize_role(["business"]))):
-    # Fallback cho company_name nếu bị None
-    company_name = user_info.company_name or user_info.username or "Công ty chưa cập nhật"
     return templates.TemplateResponse("cv-detail-business.html", {"request": request, 
                                                                   "user_info": user_info})
 

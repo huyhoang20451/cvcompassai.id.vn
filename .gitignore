@@ -12,3 +12,5 @@ __pycache__/
 
 # Thư mục cv
 uploads/
+
+apps/payment/
