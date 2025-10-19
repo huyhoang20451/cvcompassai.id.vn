@@ -5,10 +5,11 @@ from .repository import (get_jds_by_user_name as repo_get_jds_by_user_name,
                          get_jd_by_id as repo_get_jd_by_id,
                          delete_jd_by_id as repo_delete_jd_by_id,
                          update_jd_by_id as repo_update_jd_by_id,
-                         update_business_by_id as repo_update_business_by_id)
+                         update_business_by_id as repo_update_business_by_id,
+                         get_job_categories as repo_get_job_categories)
 from fastapi import Depends
 from typing import Annotated, List
-from .schemas import JD_create, jd_response, OCR_result, jd_CV
+from .schemas import JD_create, JobCategory, jd_response, OCR_result, jd_CV
 from Core.Auth.schemas import user
 from Core.Auth.dependencies import get_current_user
 from Core.OCR import compare
@@ -54,3 +55,6 @@ def update_jd_by_id(session: Session, jd_id: int, new_jd: dict) -> bool:
 
 def update_business_by_id(session: Session, business_id: int, new_business: dict) -> bool:
     return repo_update_business_by_id(session, business_id, new_business)
+
+def get_job_categories(session: Session) -> List[JobCategory]:
+    return repo_get_job_categories(session)

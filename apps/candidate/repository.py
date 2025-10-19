@@ -1,7 +1,7 @@
 # Truy vấn cơ sỏ dữ liệu
 from sqlmodel import Session, select
-from models import User_db, jd_db, candidate_CV_db, jd_CV_db, SavedJob
-from .schemas import candidate_CV, jd, jd_CV
+from models import JobCategory_db, User_db, jd_db, candidate_CV_db, jd_CV_db, SavedJob
+from .schemas import candidate_CV, jd, jd_CV, JobCategory
 from sqlalchemy import or_
 from typing import List, Optional
 from sqlalchemy import or_, and_
@@ -179,3 +179,8 @@ def save_jd(session: Session, candidate_id: int, job_id: int):
     session.refresh(saved_job)  # cập nhật lại instance với id mới sinh ra
 
     return saved_job
+
+def get_job_categories(session: Session):
+    statement = select(JobCategory_db)
+    results = session.exec(statement).all()
+    return [JobCategory.model_validate(job_category) for job_category in results]

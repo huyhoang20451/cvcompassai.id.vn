@@ -14,7 +14,8 @@ from .services import (search_jobs,
                        add_cv_into_jd,
                        add_cv_into_candidate,
                        get_top_10_jds_by_cv,
-                       save_jd as service_save_jd)
+                       save_jd as service_save_jd,
+                       get_job_categories)
 from db import get_session
 from Core.Auth.schemas import user
 from .schemas import JobResponse, JobSearchRequest, candidate_CV, jd
@@ -30,9 +31,12 @@ async def home(request: Request,
                user_info: user = Depends(authorize_role(["candidate"])), 
                session: Session = Depends(get_session)):
     job_descriptions = get_jds(session)
+    job_categories = get_job_categories(session)
     return templates.TemplateResponse("home_logged_in.html", {"request": request, 
                                                               "job_descriptions": job_descriptions, 
-                                                              "user_info": user_info})
+                                                              "user_info": user_info,
+                                                              "job_categories": job_categories},
+                                                              )
 
 @router.get("/aboutus-logged-in", response_class=HTMLResponse)
 async def about_us(request: Request,
@@ -78,9 +82,12 @@ async def jobs_search_endpoint(request: Request,
                            max_filter=max_filter,
                            keyword=keyword,
                            sort_by=sort_by)
+
         return templates.TemplateResponse("home_logged_in.html", {"request": request,
                                                                    "user_info": user_info,
                                                                    "job_descriptions": jobs})
+
+        
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Lỗi hệ thống: {str(e)}")
 

@@ -96,3 +96,9 @@ class SavedJob(SQLModel, table=True):
     candidate_id: int = Field(foreign_key="user.id", nullable=False)
     job_id: int = Field(foreign_key="jd.id", nullable=False)
     saved_at: datetime = Field(default_factory=datetime.utcnow)
+
+class JobCategory_db(SQLModel, table=True):
+    __tablename__ = "job_category"
+
+    id: int = Field(default=None, primary_key=True)  # Tự động tăng (autoincrement)
+    job_category: str = Field(nullable=False, max_length=100, unique=True)

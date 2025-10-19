@@ -54,3 +54,9 @@ class jd(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+class JobCategory(BaseModel):
+    id: int
+    job_category: str
+
+    model_config = ConfigDict(from_attributes=True)
