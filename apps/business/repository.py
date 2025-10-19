@@ -1,6 +1,6 @@
 from sqlmodel import Session, select
 from models import JobCategory_db, User_db, jd_db, jd_CV_db, candidate_CV_db
-from .schemas import JD_create, jd_response, jd_CV, candidate_CV
+from .schemas import JD_create, JobCategory, jd_response, jd_CV, candidate_CV
 from typing import List
 
 def get_jds_by_user_name(session: Session, username: str) -> List[jd_response]:
