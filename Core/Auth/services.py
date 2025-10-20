@@ -1,7 +1,8 @@
 from sqlmodel import Session
 from .repository import (get_user_by_username as repo_get_user_by_username,
                          save_user_to_db as repo_save_user_to_db,
-                         get_user_by_id as repo_get_user_by_id)
+                         get_user_by_id as repo_get_user_by_id,
+                         get_user_by_google_id as repo_get_user_by_google_id)
 from .schemas import userinDB, Login_form, Token
 from .hashing import verify_password
 from datetime import datetime, timedelta, timezone
@@ -72,7 +73,8 @@ def create_user(session: Session,
                 email: str,
                 role: str,
                 company_name: str,
-                full_name: str):
+                full_name: str,
+                google_id: str):
     user = get_user_by_username(session, username)
     if user:
         return False # Đã có username trong database
@@ -82,5 +84,9 @@ def create_user(session: Session,
                        email=email,
                        role=role, 
                        company_name=company_name,
-                       full_name=full_name)
+                       full_name=full_name,
+                       google_id=google_id)
     return repo_save_user_to_db(session, new_user)
+
+def get_user_by_google_id(session: Session, google_id: str) -> User_db:
+    return repo_get_user_by_google_id(session, google_id)

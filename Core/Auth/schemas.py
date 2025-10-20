@@ -35,14 +35,14 @@ class Token(BaseModel):
 
 class CandidateCreate(BaseModel):
     username: str | None = None
-    password: str
+    password: str | None = None
     email: str | None = None
     role: str = "candidate"
     full_name: str | None = None
 
 class BusinessCreate(BaseModel):
     username: str | None = None
-    password: str
+    password: str | None = None
     email: str | None = None
     role: str = "business"
     company_name: str | None = None

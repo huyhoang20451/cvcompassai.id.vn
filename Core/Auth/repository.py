@@ -14,3 +14,7 @@ def save_user_to_db(session: Session, user: User_db) -> User_db:
     session.commit()
     session.refresh(user)
     return user
+
+def get_user_by_google_id(session: Session, google_id: str) -> User_db:
+    statement = select(User_db).where(User_db.google_id == google_id)
+    return session.exec(statement).first()
