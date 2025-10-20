@@ -90,8 +90,8 @@
                 <div class="price">{{ package.price }} VNĐ/tháng</div>
                 <div class="card-body">
                     <ul>
-                        {% for feature in package.features %}
-                        <li>{{ feature }}</li>
+                        {% for description in package.description %}
+                        <li>{{ description }}</li>
                         {% endfor %}
                     </ul>
                     <button onclick="formAppear()" class="buy-btn" data-package-name="{{ package.name }}" data-package-price="{{ package.price }}">Mua ngay</button>
