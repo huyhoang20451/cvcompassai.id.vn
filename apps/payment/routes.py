@@ -69,7 +69,7 @@ async def payment(request: Request,
 
 
 # payOS gọi về đây
-@router.get("/webhook", response_class=JSONResponse)
+@router.post("/webhook", response_class=JSONResponse)
 async def payment_ipn(request: Request,
                       session: Session = Depends(get_session)):
     body = await request.json()
@@ -83,20 +83,7 @@ async def payment_ipn(request: Request,
     # Cập nhật DB dựa trên mã phản hồi
     order = update_db_by_ResponseCode(webhookData.description, webhookData.orderCode, webhookData.code, session)
 
-    # Tính xu nhận được
-    if order.package == "candidate_xu":
-        coins_received = order.amount*2
-    elif order.package == "candidate_premium":
-        coins_received = 5
-    else:
-        coins_received = None
-
     if order.status == OrderStatus.paid:
-        return templates.TemplateResponse("success-transaction.html", {"request": request, 
-                                                                       "amount": order.amount, # số gói
-                                                                       "order_id": order.id, 
-                                                                       "message": "Giao dịch thành công", 
-                                                                       "coins_received": coins_received})
+        return JSONResponse({"RspCode": "00", "Message": "Success"})
     else:
-        return templates.TemplateResponse("fail-transaction.html", {"request": request, 
-                                                                    "message": "Giao dịch không thành công",})
+        return JSONResponse({"RspCode": "01", "Message": "Giao dịch không thành công"})
