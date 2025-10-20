@@ -74,28 +74,21 @@
     </div> <!-- kết thúc phần tựa đề -->
 
     <div class="card-pricing-container">
+        {% for package in business_packages %}
         <div class="card-pricing premium"> <!--Bắt đầu các gói dịch vụ-->
-            <div class="card-header">Gói Premium</div>
-            <div class="price">500.000 VNĐ/tháng</div>
+            <div class="card-header">{{ package.name }}</div>
+            <div class="price">{{ package.price }} VNĐ/tháng</div>
             <div class="card-body">
                 <ul>
-                    <li>Tải lên thư mục CV thủ công (tính năng sắp ra mắt)</li>
-                    <li>Phân tích CV</li>
+                    {% for feature in package.features %}
+                    <li>{{ feature }}</li>
+                    {% endfor %}
                 </ul>
-                <button onclick="location.href='/business-payment-checkout?username={{ username }}&company={{ company }}&package=business-premium&price=500000&quantity=1'" class="buy-btn">Mua ngay</button>
+                <button onclick="location.href='/business-payment-checkout?username={{ username }}&company={{ company }}&package=business-premium&price={{ package.price }}&quantity=1'" class="buy-btn">Mua ngay</button>
             </div>
+        {% endfor %}
         </div>
 
-        <div class="card-pricing xu">
-            <div class="card-header">Gói cơ bản</div>
-            <div class="price">Free</div>
-            <div class="card-body">
-                <ul>
-                    <li>Tìm kiếm ứng viên theo từ khóa</li>
-                </ul>
-                <button onclick="location.href='/business-dashboard?username={{ username }}&role={{ role }}&company={{ company }}'" class="buy-btn">Sử dụng ngay</button>
-            </div>
-        </div>
     </div> <!--Kết thúc các gói dịch vụ-->
         <footer class="footer">
         <div class="footer-contact">
