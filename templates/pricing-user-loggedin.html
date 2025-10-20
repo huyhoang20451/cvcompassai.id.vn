@@ -80,35 +80,25 @@
     </div> <!-- kết thúc phần tựa đề -->
 
     <div class="card-pricing-container">
+        {% for package in candidate_packages %}
         <div class="card-pricing premium"> <!--Bắt đầu các gói dịch vụ-->
-            <div class="card-header">Gói Premium</div>
-            <div class="price">50.000 VNĐ/tháng</div>
+            <div class="card-header">{{ package.name }}</div>
+            <div class="price">{{ package.price }} VNĐ/tháng</div>
             <div class="card-body">
                 <ul>
-                    <li>Nhận 5 xu mỗi ngày (reset hằng ngày)</li>
-                    <li>Tự động cập nhật thông tin doanh nghiệp mỗi 2 ngày</li>
-                    <li>Giới hạn bài đăng</li>
+                    {% for feature in package.features %}
+                    <li>{{ feature }}</li>
+                    {% endfor %}
                 </ul>
                 <button onclick="formAppear()" class="buy-btn">Mua ngay</button>
             </div>
+        {% endfor %}
         </div>
 
-        <div class="card-pricing xu">
-            <div class="card-header">Gói theo xu</div>
-            <div class="price">10.000 VNĐ/2 xu</div>
-            <div class="card-body">
-                <ul>
-                    <li>Hiển thị top 10 doanh nghiệp (top 5 được làm mờ)</li>
-                    <li>Dùng xu để mở khóa top 5 doanh nghiệp</li>
-                    <li>Không tự động cập nhật thông tin doanh nghiệp</li>
-                </ul>
-                <button onclick="formAppear()" class="buy-btn">Mua ngay</button>
-            </div>
-        </div>
     <!--Chỗ này hiện box checkout-->
         <div class="checkout-box" id="checkout-box" style="display:none;">
             <form action="/payment" method="POST">
-                <div style="margin-bottom:8px;">{% if candidate_packages.name == 'premium' %}Gói Premium{% else %}Gói theo xu{% endif %} — Giá: {{ business_packages.price }} VNĐ</div>
+                <div style="margin-bottom:8px;">{% if candidate_packages.name == 'premium' %}Gói Premium{% else %}Gói theo xu{% endif %} — Giá: {{ candidate_packages.price }} VNĐ</div>
                 <!-- backend expects 'package' and 'amount_package' -->
                 <input type="hidden" name="package" value="{{ candidate_packages.name }}">
                 <input type="hidden" name="price" value="{{ candidate_packages.price }}">
