@@ -17,11 +17,11 @@
         </div>
         <div class="header-menu"> <!-- Menu lựa chọn -->
             <ul>
-                <li><a method="get" href="/home-logged-in?username={{username}}">Trang chủ</a></li>
-                <li><a method="get" href="/aboutus-logged-in?username={{username}}">Về chúng tôi</a></li>
-                <li><a method="get" href="/finding-jobs?username={{username}}">Tìm việc làm</a></li>
-                <li><a method="get" href="/ocr-scan-logged-in?username={{username}}">Quét CV bằng OCR</a></li>
-                <li><a method="get" href="/pricing-user-loggedin?username={{username}}">Gói dịch vụ</a></li>
+                <li><a method="get" href="/home-logged-in">Trang chủ</a></li>
+                <li><a method="get" href="/aboutus-logged-in">Về chúng tôi</a></li>
+                <li><a method="get" href="/finding-jobs">Tìm việc làm</a></li>
+                <li><a method="get" href="/ocr-scan-logged-in">Quét CV bằng OCR</a></li>
+                <li><a method="get" href="/pricing-user-logged-in">Gói dịch vụ</a></li>
             </ul>
         </div>
         <div class="header-actions">
@@ -46,9 +46,9 @@
                 box.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
                 box.style.padding = '10px';
                 box.innerHTML = `
-                    <p><a href="/edit-profile?username={{username}}" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
-                    <p><a href="/mycv-settings?username={{username}}" style="text-decoration:none;color:#222;">CV của tôi</a></p>
-                    <p><a href="/system-settings?username={{username}}" style="text-decoration:none;color:#222;">Cài đặt tài khoản</a></p>
+                    <p><a href="/edit-profile" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
+                    <p><a href="/mycv-settings" style="text-decoration:none;color:#222;">CV của tôi</a></p>
+                    <p><a href="/system-settings" style="text-decoration:none;color:#222;">Cài đặt tài khoản</a></p>
                     <p><a href="/home" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
                 `;
                 document.body.appendChild(box);
