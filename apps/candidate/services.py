@@ -123,3 +123,4 @@ def save_jd(session: Session, candidate_id: int, job_id: int):
 
 def get_job_categories(session: Session) -> List[JobCategory]:
     return repo_get_job_categories(session)
+

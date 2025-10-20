@@ -102,3 +102,10 @@ class JobCategory_db(SQLModel, table=True):
 
     id: int = Field(default=None, primary_key=True)  # Tự động tăng (autoincrement)
     job_category: str = Field(nullable=False, max_length=100, unique=True)
+
+class Package_db(SQLModel, table=True):
+    __tablename__ = "package"
+
+    id: int = Field(default=None, primary_key=True)
+    name_package: str = Field(nullable=False, max_length=100, unique=True)
+    price: float = Field(nullable=False)  # hoặc Decimal nếu muốn chính xác hơn

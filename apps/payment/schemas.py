@@ -7,10 +7,12 @@ class OrderStatus(str, enum.Enum):
     paid = "paid"
     failed = "failed"
 
-class pricemap(str, enum.Enum):
-    candidate_xu = 10000
-    candidate_premium = 50000
-    business_premium = 500000
+class packageInfo(BaseModel):
+    id: int
+    name: str
+    price: int
+
+    model_config = ConfigDict(from_attributes=True)
 
 class OrderSchema(BaseModel):
     id: str
