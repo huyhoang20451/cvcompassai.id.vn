@@ -39,8 +39,7 @@ async def home(request: Request,
     return templates.TemplateResponse("home_logged_in.html", {"request": request, 
                                                               "job_descriptions": job_descriptions, 
                                                               "user_info": user_info,
-                                                              "job_categories": job_categories},
-                                                              )
+                                                              "job_categories": job_categories})
 
 @router.get("/aboutus-logged-in", response_class=HTMLResponse)
 async def about_us(request: Request,
