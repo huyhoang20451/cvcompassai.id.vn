@@ -11,7 +11,7 @@ class User_db(SQLModel, table=True):
 
     id: int | None = Field(default=None, primary_key=True)
     username: str = Field(nullable=False, max_length=100, unique=True)
-    hashed_password: str = Field(nullable=False, max_length=255)
+    hashed_password: str = Field(default=None, max_length=255)
     email: Optional[str] = Field(default=None, max_length=100, unique=True)
     role: str = Field(nullable=False, max_length=50)  # "candidate" hoặc "business"
     avatar_path: Optional[str] = Field(default=None, max_length=255)
@@ -27,7 +27,8 @@ class User_db(SQLModel, table=True):
     website: Optional[str] = Field(default=None, max_length=255)
     phone_number: Optional[str] = Field(default=None, max_length=20)
     address: Optional[str] = Field(default=None, max_length=255)
-
+    google_id: Optional[str] = Field(default=None, max_length=255)
+    
 class jd_db(SQLModel, table=True):
     __tablename__ = "jd"  # Tên bảng trong database: lưu thông tin các job posting (tin tuyển dụng)
 
