@@ -80,33 +80,47 @@
     </div> <!-- kết thúc phần tựa đề -->
 
     <div class="card-pricing-container">
-        {% for package in candidate_packages %}
-        <div class="card-pricing premium"> <!--Bắt đầu các gói dịch vụ-->
-            <div class="card-header">{{ package.name }}</div>
-            <div class="price">{{ package.price }} VNĐ/tháng</div>
-            <div class="card-body">
-                <ul>
-                    {% for feature in package.features %}
-                    <li>{{ feature }}</li>
-                    {% endfor %}
-                </ul>
-                <button onclick="formAppear()" class="buy-btn">Mua ngay</button>
+        {# Normalize packages: prefer candidate_packages, then business_packages, else empty list #}
+        {% set packages = candidate_packages if (candidate_packages is defined and candidate_packages) else (business_packages if (business_packages is defined and business_packages) else []) %}
+
+        {% if packages and packages | length > 0 %}
+            {% for package in packages %}
+            <div class="card-pricing premium"> <!--Bắt đầu các gói dịch vụ-->
+                <div class="card-header">{{ package.name }}</div>
+                <div class="price">{{ package.price }} VNĐ/tháng</div>
+                <div class="card-body">
+                    <ul>
+                        {% for feature in package.features %}
+                        <li>{{ feature }}</li>
+                        {% endfor %}
+                    </ul>
+                    <button onclick="formAppear()" class="buy-btn" data-package-name="{{ package.name }}" data-package-price="{{ package.price }}">Mua ngay</button>
+                </div>
             </div>
-        {% endfor %}
-        </div>
+            {% endfor %}
+        {% else %}
+            <p>Hiện chưa có gói dịch vụ nào. Vui lòng quay lại sau.</p>
+        {% endif %}
 
     <!--Chỗ này hiện box checkout-->
+        {% if packages and packages | length > 0 %}
+        {% set default = packages[0] %}
         <div class="checkout-box" id="checkout-box" style="display:none;">
             <form action="/payment" method="POST">
-                <div style="margin-bottom:8px;">{% if candidate_packages.name == 'premium' %}Gói Premium{% else %}Gói theo xu{% endif %} — Giá: {{ candidate_packages.price }} VNĐ</div>
+                <div style="margin-bottom:8px;">{{ default.name }} — Giá: {{ default.price }} VNĐ</div>
                 <!-- backend expects 'package' and 'amount_package' -->
-                <input type="hidden" name="package" value="{{ candidate_packages.name }}">
-                <input type="hidden" name="price" value="{{ candidate_packages.price }}">
+                <input type="hidden" id="package_input" name="package" value="{{ default.name }}">
+                <input type="hidden" id="price_input" name="price" value="{{ default.price }}">
                 <label for="amount_package">Số lượng:</label>
                 <input id="amount_package" name="amount_package" type="number" min="1" value="1" required placeholder="Nhập số lượng muốn mua">
                 <div style="margin-top:12px;"><button type="submit" class="btn btn-primary">Xác nhận thanh toán</button></div>
             </form>
         </div>
+        {% else %}
+        <div class="checkout-box" id="checkout-box" style="display:none;">
+            <p>Không có gói để thanh toán.</p>
+        </div>
+        {% endif %}
         <script>
             function formAppear() {
                 var box = document.getElementById("checkout-box");
@@ -115,6 +129,23 @@
                 // scroll into view for better UX on mobile
                 box.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
+        </script>
+        <script>
+            // Attach click handlers after DOM ready to populate package inputs
+            document.addEventListener('DOMContentLoaded', function(){
+                document.querySelectorAll('.buy-btn').forEach(function(btn){
+                    btn.addEventListener('click', function(e){
+                        e.preventDefault();
+                        var packageName = btn.getAttribute('data-package-name');
+                        var packagePrice = btn.getAttribute('data-package-price');
+                        var pkgInput = document.getElementById('package_input');
+                        var priceInput = document.getElementById('price_input');
+                        if(pkgInput) pkgInput.value = packageName;
+                        if(priceInput) priceInput.value = packagePrice;
+                        formAppear();
+                    });
+                });
+            });
         </script>
     </div> <!--Kết thúc các gói dịch vụ-->
         <footer class="footer">
