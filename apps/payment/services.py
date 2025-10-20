@@ -3,7 +3,6 @@ from fastapi import APIRouter, Form, Request, Depends, HTTPException
 from starlette.responses import RedirectResponse
 from datetime import datetime, timedelta
 from Core.config import settings
-from .dependencies import vnpay
 from .schemas import OrderSchema, OrderStatus, packageInfo
 from .repository import (create_order as repo_create_order,
                          get_order as repo_get_order,
@@ -15,7 +14,8 @@ from .repository import (create_order as repo_create_order,
 from apps.candidate.repository import update_coin as repo_update_coin
 from Core.Auth.services import get_user_by_id
 from sqlmodel import Session
-from payos import PayOS, ItemData, PaymentData
+from payos import PayOS
+from payos.types import CreatePaymentLinkRequest, ItemData
 
 # Thêm hoặc cập nhật order trong DB
 def create_order_to_db(order: OrderSchema, session: Session) -> OrderSchema:
@@ -84,7 +84,7 @@ def create_paymentData(order_id: str,
                        return_url: str, 
                        cancel_url: str):
     item = ItemData(name=name, quantity=amount, price=price)
-    payment_data = PaymentData(
+    payment_data = CreatePaymentLinkRequest(
         orderCode= order_id,
         amount=total_money,
         description=description,
