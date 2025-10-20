@@ -7,6 +7,3 @@ api_key = settings.PAYOS_API_KEY
 checksum_key = settings.PAYOS_CHECKSUM_KEY
 
 payOS = PayOS(client_id=client_id, api_key=api_key, checksum_key=checksum_key)
-
-payOS.confirmWebhook("https://cvcompas.ngrok.app/payment_ipn")
-
