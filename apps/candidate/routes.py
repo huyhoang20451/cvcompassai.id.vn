@@ -24,6 +24,7 @@ from Core.Auth.schemas import user
 from .schemas import JobResponse, JobSearchRequest, candidate_CV, jd
 from Core.Auth.dependencies import templates, get_current_user, decode_token, authorize_role
 from Core.OCR import compare_qwen, run_vintern
+from ..payment.services import get_packages
 
 router = APIRouter(tags=["candidate"])
 
@@ -49,9 +50,13 @@ async def about_us(request: Request,
 
 @router.get("/pricing-user-logged-in", response_class=HTMLResponse)
 async def pricing(request: Request,
-                  user_info: user = Depends(authorize_role(["candidate"]))):
+                  user_info: user = Depends(authorize_role(["candidate"])),
+                  session: Session = Depends(get_session)):
+    packages = get_packages(session)
+    candidate_packages = [p for p in packages if p.name.startswith("candidate_")]
     return templates.TemplateResponse("pricing-user-logged-in.html", {"request": request, 
-                                                                      "user_info": user_info})
+                                                                      "user_info": user_info,
+                                                                      "candidate_packages": candidate_packages})
 
 @router.get("/ocr-scan-logged-in", response_class=HTMLResponse)
 async def ocr_scan(request: Request,

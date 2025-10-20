@@ -1,7 +1,7 @@
 # Truy vấn cơ sỏ dữ liệu
 from datetime import date
 from sqlmodel import Session, select
-from models import Order_db, User_db, Package_db
+from models import Order_db, User_db, Service_db
 from .schemas import OrderSchema, packageInfo
 from sqlalchemy import or_
 from typing import List, Optional
@@ -52,6 +52,11 @@ def update_order_status(id: str, new_status: str, session: Session) -> OrderSche
     return OrderSchema.model_validate(order)
 
 def get_package_info_by_name(package_name: str, session: Session):
-    statement = select(Package_db).where(Package_db.name_package == package_name)
+    statement = select(Service_db).where(Service_db.name == package_name)
     package = session.exec(statement).first()
     return packageInfo.model_validate(package)
+
+def get_packages(session: Session) -> List[packageInfo]:
+    statement = select(Service_db)
+    packages = session.exec(statement).all()
+    return [packageInfo.model_validate(pkg) for pkg in packages]

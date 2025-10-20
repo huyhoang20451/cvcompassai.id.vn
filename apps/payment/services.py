@@ -1,15 +1,17 @@
+from typing import List
 from fastapi import APIRouter, Form, Request, Depends, HTTPException
 from starlette.responses import RedirectResponse
 from datetime import datetime, timedelta
 from Core.config import settings
 from .dependencies import vnpay
-from .schemas import OrderSchema, OrderStatus, pricemap
+from .schemas import OrderSchema, OrderStatus, packageInfo
 from .repository import (create_order as repo_create_order,
                          get_order as repo_get_order,
                          update_user_role as repo_update_user_role,
                          update_order_status as repo_update_order_status,
                          update_user_expires_premium as repo_update_user_expires_premium,
-                         get_package_info_by_name as repo_get_package_info_by_name)
+                         get_package_info_by_name as repo_get_package_info_by_name,
+                         get_packages as repo_get_packages)
 from apps.candidate.repository import update_coin as repo_update_coin
 from Core.Auth.services import get_user_by_id
 from sqlmodel import Session
@@ -55,22 +57,24 @@ def update_db_by_ResponseCode(user_id, order_id, response_code, session: Session
 
     if order.status == OrderStatus.paid:
         if order.package == "candidate_xu":
-            xu = 2*(order.total_money // pricemap.candidate_xu.value)
+            xu = 2*order.amount
 
             update_user_coin(order.user_id, user.coin + xu)
         elif order.package == "candidate_premium":
             update_user_coin(order.user_id, user.coin + 5)
             update_user_role(order.user_id, "candidate_premium")
             repo_update_user_expires_premium(order.user_id, new_expires, session)
-            
+
         elif order.package == "business_premium":
             update_user_role(order.user_id, "business_premium")
             repo_update_user_expires_premium(order.user_id, new_expires, session)
     return order
 
-def get_package_info_by_name(package_name: str, session: Session):
+def get_package_info_by_name(package_name: str, session: Session) -> packageInfo:
     return repo_get_package_info_by_name(package_name, session)
 
+def get_packages(session: Session) -> List[packageInfo]:
+    return repo_get_packages(session)
 def create_paymentData(order_id: str, 
                        name: str, 
                        amount: int, 

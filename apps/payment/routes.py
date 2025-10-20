@@ -10,7 +10,7 @@ from .services import (update_db_by_ResponseCode,
                        create_paymentData)
 from db import get_session
 from Core.Auth.schemas import user
-from .schemas import OrderSchema, OrderStatus, pricemap
+from .schemas import OrderSchema, OrderStatus
 from Core.Auth.dependencies import templates, get_current_user, decode_token, authorize_role
 from Core.OCR import run_vintern
 from Core.config import settings
@@ -32,8 +32,6 @@ async def payment(request: Request,
     price = get_package_info_by_name(package, session).price
     total_money = amount_package * price
     order_desc = f"{user_info.id}"
-
-
 
     # Tạo OrderSchema từ dữ liệu form
     order = OrderSchema(

@@ -19,6 +19,8 @@ from .schemas import JD_create
 from datetime import datetime, timezone
 from typing import Optional
 from Core.OCR import compare
+from ..payment.services import get_packages
+
 router = APIRouter(tags=["business"])
 
 @router.get("/business-home", response_class=HTMLResponse)
@@ -43,11 +45,13 @@ async def business_profile(request: Request,
 
 @router.get("/pricing-business-logged-in", response_class=HTMLResponse)
 async def pricing_business_logged_in(request: Request, 
-                                     user_info: user = Depends(authorize_role(["business"]))):
-    # Fallback cho company_name nếu bị None
-    company_name = user_info.company_name or user_info.username or "Công ty chưa cập nhật"
+                                     user_info: user = Depends(authorize_role(["business"])),
+                                     session: Session = Depends(get_session)):
+    packages = get_packages(session)
+    business_packages = [p for p in packages if p.name.startswith("business_")]
     return templates.TemplateResponse("pricing_business_logged_in.html", {"request": request, 
-                                                                          "user_info": user_info})
+                                                                          "user_info": user_info,
+                                                                          "business_packages": business_packages})
 
 @router.get("/job-storage", response_class=HTMLResponse)
 async def job_storage(request: Request,
