@@ -26,12 +26,12 @@ def get_order(id: int, session: Session) -> OrderSchema:
     return repo_get_order(id, session)
 
 # Cập nhật role cho user
-def update_user_role(user_id: int, new_role: str):
-    return repo_update_user_role(user_id, new_role)
+def update_user_role(user_id: int, new_role: str, session: Session):
+    return repo_update_user_role(user_id, new_role, session)
 
 # Cập nhật coin cho user
-def update_user_coin(username: str, coin: int):
-    return repo_update_coin(username, coin)
+def update_user_coin(session: Session, user_id: int, new_coin: int):
+    return repo_update_coin(session, user_id, new_coin)
 
 # Cập nhật theo trạng thái trả về từ VNPAY
 # Candidate_xu: cập nhật coin, cập nhật trạng thái order, không đổi role
@@ -45,6 +45,9 @@ def update_order_status(order_id: str, new_status: str, session: Session) -> Ord
 
 def update_db_by_ResponseCode(user_id, order_id, response_code, session: Session):
     order = get_order(order_id, session)
+    if not order:
+        return None
+    print(user_id)
     user = get_user_by_id(session, user_id)
     # Cập nhật status đơn hàng dựa trên mã phản hồi
     if response_code == "00":
@@ -54,19 +57,19 @@ def update_db_by_ResponseCode(user_id, order_id, response_code, session: Session
 
     today = datetime.now().date()
     new_expires = today + timedelta(days=30)
-
+    print(order)
     if order.status == OrderStatus.paid:
         if order.package == "candidate_xu":
             xu = 2*order.amount
 
-            update_user_coin(order.user_id, user.coin + xu)
+            update_user_coin(session, order.user_id, user.coin + xu)
         elif order.package == "candidate_premium":
-            update_user_coin(order.user_id, user.coin + 5)
-            update_user_role(order.user_id, "candidate_premium")
+            update_user_coin(session, order.user_id, user.coin + 5)
+            update_user_role(order.user_id, "candidate_premium", session)
             repo_update_user_expires_premium(order.user_id, new_expires, session)
 
         elif order.package == "business_premium":
-            update_user_role(order.user_id, "business_premium")
+            update_user_role(order.user_id, "business_premium", session)
             repo_update_user_expires_premium(order.user_id, new_expires, session)
     return order
 

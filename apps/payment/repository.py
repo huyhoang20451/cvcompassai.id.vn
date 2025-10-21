@@ -19,6 +19,8 @@ def create_order(order: OrderSchema, session: Session) -> OrderSchema:
 def get_order(id: str, session: Session) -> OrderSchema:
     statement = select(Order_db).where(Order_db.id == id)
     order = session.exec(statement).first()
+    if not order:
+        return None
     return OrderSchema.model_validate(order)
 
 def update_user_role(id: int, new_role: str, session: Session):

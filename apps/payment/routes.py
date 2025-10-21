@@ -82,14 +82,17 @@ async def payment_ipn(request: Request,
     body = await request.json()
     if not body:
         return JSONResponse({"RspCode": "99", "Message": "Invalid request"})
-    
-    webhookData = payOS.verifyPaymentWebhookData(body)
-    if not webhookData:
-        return JSONResponse({"RspCode": "97", "Message": "Invalid signature"})
-    
-    # Cập nhật DB dựa trên mã phản hồi
-    order = update_db_by_ResponseCode(webhookData.description, webhookData.orderCode, webhookData.code, session)
+    webhookData = payOS.webhooks.verify(body)
 
+    description = webhookData.description
+    user_id = description.split()[-1]
+    orderCode = webhookData.order_code
+    code = webhookData.code
+    print("Webhook received:", webhookData)
+    # Cập nhật DB dựa trên mã phản hồi
+    order = update_db_by_ResponseCode(int(user_id), orderCode, code, session)
+    if not order:
+        return JSONResponse({"RspCode": "01", "Message": "Order not found"})
     if order.status == OrderStatus.paid:
         return JSONResponse({"RspCode": "00", "Message": "Success"})
     else:

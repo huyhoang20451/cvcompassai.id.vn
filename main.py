@@ -47,11 +47,11 @@ def pricing(request: Request):
 
 @app.get("/edit-profile", response_class=HTMLResponse)
 def edit_profile(request: Request,
-                 user_info: user = Depends(authorize_role(["candidate", "business"]))):
+                 user_info: user = Depends(authorize_role(["candidate", "business", "candidate_premium"]))):
 
     return templates.TemplateResponse("settings.html", {"request": request, "user_info": user_info})
 
 @app.get("/system-settings", response_class=HTMLResponse)
 def system_settings(request: Request,
-                    user_info: user = Depends(authorize_role(["candidate", "business"]))):
+                    user_info: user = Depends(authorize_role(["candidate", "business", "candidate_premium"]))):
     return templates.TemplateResponse("system-settings.html", {"request": request, "user_info": user_info})

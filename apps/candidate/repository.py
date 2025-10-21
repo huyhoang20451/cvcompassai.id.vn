@@ -115,10 +115,10 @@ def get_jd_by_id(session: Session, id: int) -> jd:
 
 # Cập nhật coin mới vào database
 def update_coin(session: Session, 
-                username: str, 
+                user_id: int, 
                 new_coin: int) -> Optional[int]:
 
-    statement = select(User_db).where(User_db.username == username)
+    statement = select(User_db).where(User_db.id == user_id)
     result = session.exec(statement).first()
 
     if result is None:

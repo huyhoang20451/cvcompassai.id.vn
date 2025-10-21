@@ -32,7 +32,7 @@ router = APIRouter(tags=["candidate"])
 # Home sau khi log in
 @router.get("/home-logged-in", response_class=HTMLResponse)
 async def home(request: Request, 
-               user_info: user = Depends(authorize_role(["candidate"])), 
+               user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])), 
                session: Session = Depends(get_session)):
     job_descriptions = get_jds(session)
     job_categories = get_job_categories(session)
@@ -43,13 +43,13 @@ async def home(request: Request,
 
 @router.get("/aboutus-logged-in", response_class=HTMLResponse)
 async def about_us(request: Request,
-                   user_info: user = Depends(authorize_role(["candidate"]))):
+                   user_info: user = Depends(authorize_role(["candidate", "candidate_premium"]))):
     return templates.TemplateResponse("aboutus-logged-in.html", {"request": request, 
                                                                  "user_info": user_info})
 
 @router.get("/pricing-user-logged-in", response_class=HTMLResponse)
 async def pricing(request: Request,
-                  user_info: user = Depends(authorize_role(["candidate"])),
+                  user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
                   session: Session = Depends(get_session)):
     packages = get_packages(session)
     candidate_packages = [p for p in packages if p.name.startswith("candidate_")]
@@ -60,13 +60,13 @@ async def pricing(request: Request,
 
 @router.get("/ocr-scan-logged-in", response_class=HTMLResponse)
 async def ocr_scan(request: Request,
-                   user_info: user = Depends(authorize_role(["candidate"]))):
+                   user_info: user = Depends(authorize_role(["candidate", "candidate_premium"]))):
     return templates.TemplateResponse("ocr-scan.html", {"request": request, 
                                                         "user_info": user_info})
 
 @router.get("/finding-jobs", response_class=HTMLResponse)
 async def finding_jobs(request: Request,
-                       user_info: user = Depends(authorize_role(["candidate"])),
+                       user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
                        session: Session = Depends(get_session)):
     job_descriptions = get_jds(session)
     return templates.TemplateResponse("finding-jobs.html", {"request": request,
@@ -81,7 +81,7 @@ async def jobs_search_endpoint(request: Request,
                                max_filter: int = None,  # mức lương tối đa
                                keyword: str = None,  # từ khóa
                                sort_by: Optional[str] = "newest",
-                               user_info: user = Depends(authorize_role(["candidate"])),
+                               user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
                                session: Session = Depends(get_session)):
     try:
         jobs = search_jobs(session, 
@@ -103,7 +103,7 @@ async def jobs_search_endpoint(request: Request,
 @router.get("/job-detail/{job_id}", response_class=HTMLResponse)
 def job_detail(request: Request,
                job_id: int,
-               user_info: user = Depends(authorize_role(["candidate"])),
+               user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
                session: Session = Depends(get_session)):
     jd = get_jd_by_id(session, job_id)
     if not jd:
@@ -115,7 +115,7 @@ def job_detail(request: Request,
 @router.get("/job-detail/{job_id}", response_class=HTMLResponse)
 def job_detail(request: Request,
                job_id: int,
-               user_info: user = Depends(authorize_role(["candidate"])),
+               user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
                session: Session = Depends(get_session)):
     jd = get_jd_by_id(session, job_id)
     if not jd:
@@ -126,13 +126,15 @@ def job_detail(request: Request,
 
 # Lấy tất cả CVs theo username lấy từ token
 @router.get("/get_cvs", response_model= List[candidate_CV])
-async def get_cvs_by_username(user_info: user = Depends(authorize_role(["candidate"])),
+async def get_cvs_by_username(user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
                               session: Session = Depends(get_session)):
     return service_get_cvs_by_username(user_info.username, session)
 
 # Trừ coin trong database
 @router.post("/deduct-coin")
-async def deduct_coin(amount: int, user_info: user = Depends(authorize_role(["candidate"])), session: Session = Depends(get_session)):
+async def deduct_coin(amount: int, 
+                      user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])), 
+                      session: Session = Depends(get_session)):
     '''
     True: đã trừ coin
     False: không đủ coin
@@ -146,25 +148,25 @@ async def deduct_coin(amount: int, user_info: user = Depends(authorize_role(["ca
 
 # Lấy số coin trong database
 @router.get("/get-coin")
-async def get_coin(user_info: user = Depends(authorize_role(["candidate"]))):
+async def get_coin(user_info: user = Depends(authorize_role(["candidate", "candidate_premium"]))):
     coin = user_info.coin
     return JSONResponse(content={"success": True, "coin": coin})
 
 @router.get("/create-free-cv", response_class=HTMLResponse)
 async def create_free_cv(request: Request, 
-                   user_info: user = Depends(authorize_role(["candidate"]))):
+                   user_info: user = Depends(authorize_role(["candidate", "candidate_premium"]))):
     return templates.TemplateResponse("create-free-cv.html", {"request": request, 
                                                               "user_info": user_info})
 
 @router.get("/mycv-settings", response_class=HTMLResponse)
 async def mycv_settings(request: Request,
-                  user_info: user = Depends(authorize_role(["candidate"]))):
+                  user_info: user = Depends(authorize_role(["candidate", "candidate_premium"]))):
     return templates.TemplateResponse("mycv-settings.html", {"request": request, 
                                                              "user_info": user_info})
 
 @router.get("/finding-jobs", response_class=HTMLResponse)
 async def finding_jobs(request: Request,
-                       user_info: user = Depends(authorize_role(["candidate"]))):
+                       user_info: user = Depends(authorize_role(["candidate", "candidate_premium"]))):
     return templates.TemplateResponse("finding-jobs.html", {"request": request, 
                                                             "user_info": user_info})
 # Nộp cv cho jd bằng cv có sẵn trong database
@@ -172,7 +174,7 @@ async def finding_jobs(request: Request,
 async def submit_cv(request: Request,
                     jd_id: int,
                     existing_cv_id: int,
-                    user_info: user = Depends(authorize_role(["candidate"])),
+                    user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
                     session: Session = Depends(get_session)):
     cv = get_candidate_cv_by_id(session, existing_cv_id) # Lấy cv trong bảng candidate_cv
     URL = cv.URL
@@ -186,7 +188,7 @@ async def submit_cv(request: Request,
 async def submit_cv(request: Request,
                     jd_id: int,
                     new_cv: Optional[UploadFile] = File(None),   # nếu upload CV mới
-                    user_info: user = Depends(authorize_role(["candidate"])),
+                    user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
                     session: Session = Depends(get_session)):
     if not new_cv:
         raise HTTPException(status_code=400, detail="Chưa upload file")
@@ -198,7 +200,7 @@ async def submit_cv(request: Request,
 
 @router.get("/pricing-user-loggedin", response_class=HTMLResponse)
 async def pricing_user_logged_in(request: Request,
-                                  user_info: user = Depends(authorize_role(["candidate"]))):
+                                  user_info: user = Depends(authorize_role(["candidate", "candidate_premium"]))):
     
     return templates.TemplateResponse("pricing-user-loggedin.html", {"request": request, 
                                                                      "user_info": user_info})
@@ -207,7 +209,7 @@ async def pricing_user_logged_in(request: Request,
 @router.post("/save-jd", response_class=HTMLResponse)
 async def save_jd(request: Request,
                   jd_id: int,
-                  user_info: user = Depends(authorize_role(["candidate"])),
+                  user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
                   session: Session = Depends(get_session)):
     jd = service_save_jd(session, user_info.id, jd_id)
     if jd is None:
@@ -244,7 +246,7 @@ def process_cv(cv_str: str):
 @router.post("/top10-best-jd", response_class=HTMLResponse)
 async def upload_cv(request: Request, 
                     file: UploadFile = File(...),
-                    user_info: user = Depends(authorize_role(["candidate"])),
+                    user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
                     session: Session = Depends(get_session)):
     file_path, cv = await service_upload_cv(file, user_info.id, session)
     if file.content_type == "application/pdf" or file.filename.lower().endswith(".pdf"):
