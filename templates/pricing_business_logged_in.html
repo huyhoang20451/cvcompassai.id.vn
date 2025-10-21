@@ -84,11 +84,27 @@
                     <li>{{ feature }}</li>
                     {% endfor %}
                 </ul>
-                <button onclick="location.href='/business-payment-checkout?username={{ username }}&company={{ company }}&package=business-premium&price={{ package.price }}&quantity=1'" class="buy-btn">Mua ngay</button>
+                <button class="buy-btn" data-package-name="{{ package.name }}" data-package-price="{{ package.price }}">Mua ngay</button>
             </div>
-        {% endfor %}
         </div>
+        {% endfor %}
 
+        <!-- Modal-style checkout box -->
+        {% if business_packages and business_packages | length > 0 %}
+        <div class="checkout-box" id="checkout-box" style="display:none; position:fixed; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.25); z-index:999; justify-content:center; align-items:center;">
+            <div style="background:#fff; padding:32px 24px; border-radius:12px; min-width:320px; max-width:90vw; margin:auto; position:relative;">
+                <button onclick="closeCheckout()" style="position:absolute; top:8px; right:12px; background:none; border:none; font-size:22px; cursor:pointer;">&times;</button>
+                <form action="/payment" method="POST">
+                    <div id="checkout-title" style="margin-bottom:8px; font-weight:bold; font-size:1.2em;">Chọn gói dịch vụ</div>
+                    <input type="hidden" id="package_input" name="package" value="">
+                    <input type="hidden" id="price_input" name="price" value="">
+                    <label for="amount_package">Số lượng:</label>
+                    <input id="amount_package" name="amount_package" type="number" min="1" value="1" required placeholder="Nhập số lượng muốn mua" style="margin-bottom:12px;">
+                    <div style="margin-top:12px;"><button type="submit" class="btn btn-primary">Xác nhận thanh toán</button></div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
     </div> <!--Kết thúc các gói dịch vụ-->
         <footer class="footer">
         <div class="footer-contact">
