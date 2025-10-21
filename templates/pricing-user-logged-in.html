@@ -100,13 +100,12 @@
 
     <!--Chỗ này hiện box checkout-->
         {% if packages and packages | length > 0 %}
-        {% set default = packages[0] %}
         <div class="checkout-box" id="checkout-box" style="display:none;">
             <form action="/payment" method="POST">
-                <div style="margin-bottom:8px;">{{ default.name }} — Giá: {{ default.price }} VNĐ</div>
+                <div id="checkout-title" style="margin-bottom:8px;">Chọn gói dịch vụ</div>
                 <!-- backend expects 'package' and 'amount_package' -->
-                <input type="hidden" id="package_input" name="package" value="{{ default.name }}">
-                <input type="hidden" id="price_input" name="price" value="{{ default.price }}">
+                <input type="hidden" id="package_input" name="package" value="">
+                <input type="hidden" id="price_input" name="price" value="">
                 <label for="amount_package">Số lượng:</label>
                 <input id="amount_package" name="amount_package" type="number" min="1" value="1" required placeholder="Nhập số lượng muốn mua">
                 <div style="margin-top:12px;"><button type="submit" class="btn btn-primary">Xác nhận thanh toán</button></div>
