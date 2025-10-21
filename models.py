@@ -66,7 +66,7 @@ class jd_CV_db(SQLModel, table=True):
 class Order_db(SQLModel, table=True):
     __tablename__ = "orders"
 
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True, index=True)
+    id: int = Field(default=None, primary_key=True, index=True)
     user_id: int = Field(foreign_key="user.id")
     package: str
     amount: int

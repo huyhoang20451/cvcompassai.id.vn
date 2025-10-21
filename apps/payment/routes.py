@@ -17,7 +17,6 @@ from Core.config import settings
 import uuid
 from .dependencies import payOS
 from Core.Auth.services import get_user_by_username
-from payos import ItemData, PaymentData
 
 router = APIRouter(tags=["payment"])
 
@@ -32,10 +31,11 @@ async def payment(request: Request,
     price = get_package_info_by_name(package, session).price
     total_money = amount_package * price
     order_desc = f"{user_info.id}"
+    order_code = int(datetime.now().timestamp())
 
     # Tạo OrderSchema từ dữ liệu form
     order = OrderSchema(
-        id=str(uuid.uuid4()),              # sinh id
+        id=order_code,              # sinh id
         user_id=user_info.id,
         package=package,
         amount=amount_package,
@@ -60,10 +60,19 @@ async def payment(request: Request,
         return_url=url,
         cancel_url=url
     )
+    result = payOS.payment_requests.create(payment_data=payment_data)
 
-    result = payOS.createPaymentLink(paymentData=payment_data)
+    if isinstance(result, dict):
+        checkout_url = result.get("checkoutUrl") or result.get("checkout_url")
+    else:
+        checkout_url = getattr(result, "checkoutUrl", None) or getattr(result, "checkout_url", None)
 
-    return RedirectResponse(url=result.checkoutUrl)
+    if not checkout_url:
+        # debug: in ra để kiểm tra cấu trúc trả về
+        print("payment create response fields:", dir(result) if not isinstance(result, dict) else result.keys())
+        raise HTTPException(status_code=500, detail="Failed to create payment link")
+
+    return RedirectResponse(url=checkout_url, status_code=303)
 
 
 # payOS gọi về đây

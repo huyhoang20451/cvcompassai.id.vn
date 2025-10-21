@@ -53,6 +53,7 @@ async def pricing(request: Request,
                   session: Session = Depends(get_session)):
     packages = get_packages(session)
     candidate_packages = [p for p in packages if p.name.startswith("candidate_")]
+    print(candidate_packages)
     return templates.TemplateResponse("pricing-user-logged-in.html", {"request": request, 
                                                                       "user_info": user_info,
                                                                       "candidate_packages": candidate_packages})

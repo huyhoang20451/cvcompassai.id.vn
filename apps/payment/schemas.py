@@ -15,7 +15,7 @@ class packageInfo(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class OrderSchema(BaseModel):
-    id: str
+    id: int
     user_id: int
     package: str
     amount: int
