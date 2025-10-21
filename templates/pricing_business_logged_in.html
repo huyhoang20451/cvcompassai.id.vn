@@ -74,14 +74,15 @@
     </div> <!-- kết thúc phần tựa đề -->
 
     <div class="card-pricing-container">
-        {% for package in business_packages %}
+        {% set packages = business_packages if (business_packages is defined and business_packages) else (candidate_packages if (candidate_packages is defined and candidate_packages) else []) %}
+        {% for package in packages %}
         <div class="card-pricing premium"> <!--Bắt đầu các gói dịch vụ-->
             <div class="card-header">{{ package.name }}</div>
             <div class="price">{{ package.price }} VNĐ/tháng</div>
             <div class="card-body">
                 <ul>
-                    {% for feature in package.features %}
-                    <li>{{ feature }}</li>
+                    {% for description in package.description %}
+                    <li>{{ description }}</li>
                     {% endfor %}
                 </ul>
                 <button class="buy-btn" data-package-name="{{ package.name }}" data-package-price="{{ package.price }}">Mua ngay</button>
@@ -93,7 +94,7 @@
         {% if business_packages and business_packages | length > 0 %}
         <div class="checkout-box" id="checkout-box" style="display:none; position:fixed; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.25); z-index:999; justify-content:center; align-items:center;">
             <div style="background:#fff; padding:32px 24px; border-radius:12px; min-width:320px; max-width:90vw; margin:auto; position:relative;">
-                <button onclick="appearForm()" style="position:absolute; top:8px; right:12px; background:none; border:none; font-size:22px; cursor:pointer;">&times;</button>
+                <button type="button" id="close-checkout" style="position:absolute; top:8px; right:12px; background:none; border:none; font-size:22px; cursor:pointer;">&times;</button>
                 <form action="/payment" method="POST">
                     <div id="checkout-title" style="margin-bottom:8px; font-weight:bold; font-size:1.2em;">Chọn gói dịch vụ</div>
                     <input type="hidden" id="package_input" name="package" value="">
@@ -107,10 +108,33 @@
         {% endif %}
     </div> <!--Kết thúc các gói dịch vụ-->
     <script>
-        async function appearForm() {
-            const box = document.getElementById('checkout-box');
-            box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
-        }
+        // Show checkout modal and fill info
+        document.addEventListener('DOMContentLoaded', function(){
+            document.querySelectorAll('.buy-btn').forEach(function(btn){
+                btn.addEventListener('click', function(e){
+                    e.preventDefault();
+                    var packageName = btn.getAttribute('data-package-name');
+                    var packagePrice = btn.getAttribute('data-package-price');
+                    var pkgInput = document.getElementById('package_input');
+                    var priceInput = document.getElementById('price_input');
+                    var title = document.getElementById('checkout-title');
+                    if (pkgInput) pkgInput.value = packageName || '';
+                    if (priceInput) priceInput.value = packagePrice || '';
+                    if (title) title.textContent = packageName + ' — Giá: ' + packagePrice + ' VNĐ';
+                    var box = document.getElementById("checkout-box");
+                    if (!box) return;
+                    box.style.display = "flex";
+                    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                });
+            });
+            var closeBtn = document.getElementById('close-checkout');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function(){
+                    var box = document.getElementById('checkout-box');
+                    if (box) box.style.display = 'none';
+                });
+            }
+        });
     </script>
         <footer class="footer">
         <div class="footer-contact">
