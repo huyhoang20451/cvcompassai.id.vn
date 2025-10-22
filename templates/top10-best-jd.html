@@ -75,36 +75,46 @@
 
     <div class="jd-top10-container">
         <h2 class="jd-title">Top 10 Job Description phù hợp nhất</h2>
-        <button onclick="unlockTop5JD()" class="unlock-top5-button">Mở khóa ngay Top 5 JD phù hợp<img style="width: 20px; height: 20px; margin-left: 5px;" src="/static/images/coin.png" alt="Coin">5</button>
-        <script>
-            function unlockTop5JD() {
-                // Lay tong so xu o trang top-10-best-jd-unblur
-                fetch(`/deduct-coin`)
-                  .then(res => res.json())
-                  .then(data => {
-                    if (data.success) {
-                      window.location.href = '/top10-best-jd-unblur&job_id=1';
-                    } else {
-                      alert(data.msg || "Bạn không đủ coin để mở khóa. Vui lòng nạp thêm coin.");
-                    }
-                  });
-                }
-        </script>
+                <button onclick="unlockTop5JD()" class="unlock-top5-button">Mở khóa ngay Top 5 JD phù hợp<img style="width: 20px; height: 20px; margin-left: 5px;" src="/static/images/coin.png" alt="Coin">5</button>
+                <script>
+                        function unlockTop5JD() {
+                                fetch(`/deduct-coin`)
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            // Bỏ mờ 5 JD đầu tiên
+                                            document.querySelectorAll('.jd-blur').forEach(function(item){
+                                            item.classList.remove('jd-blur');
+                                            var desc = item.querySelector('.jd-desc');
+                                            if(desc) desc.textContent = '';
+                                                // Add click handler to unlocked JD
+                                                var jdId = item.getAttribute('data-jd-id');
+                                                item.style.cursor = 'pointer';
+                                                item.onclick = function(){
+                                                window.location.href = '/job-detail/' + jdId;
+                                            };
+                                        });
+                                        } else {
+                                            alert(data.msg || "Bạn không đủ coin để mở khóa. Vui lòng nạp thêm coin.");
+                                        }
+                                    });
+                        }
+                </script>
         <div class="jd-list">
             <!--Top 5 JD bị che mờ-->
             {% for jd in job_descriptions[:5] %}
-            <div class="jd-item jd-blur">
+            <div class="jd-item jd-blur" data-jd-id="{{ jd.id }}">
                 <div class="jd-rank">#{{ loop.index }}</div>
                 <div class="jd-info">
                     <div class="jd-name">{{ jd.title }}</div>
                     <div class="jd-company">{{ jd.location }}</div>
-                    <div class="jd-desc">Bạn cần mở khóa để xem chi tiết JD này.</div>
+                    <div class="jd-desc">{%if jd.is_unlocked %}{{ jd.description }}{%else%}Bạn cần mở khóa để xem chi tiết JD này.{%endif%}</div>
                 </div>
             </div>
             {%endfor%}
             <!--Top 6-10 JD hiển thị bình thường-->
             {% for job in job_descriptions[5:10] %}
-            <div onclick="location.href='/top10-best-jd-detail'" class="jd-item">
+            <div onclick="location.href='/job-detail/{{ job.id }}'" class="jd-item">
                 <div class="jd-rank">#{{ job.id }}</div>
                 <div class="jd-info">
                     <div class="jd-name">{{ job.title }}</div>
