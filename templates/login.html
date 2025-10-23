@@ -64,8 +64,16 @@
         <div class="divider">Hoặc</div>
         <button type="button" class="google-btn">
           <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google logo">
-          Đăng nhập bằng Google
+          <span id="google-btn-text">Đăng nhập bằng Google</span>
         </button>
+        <div style="margin-bottom:12px; margin-top:8px;">
+          <label for="google-role" style="font-size:13px; color:#444; margin-right:8px;">Vai trò:</label>
+          <select id="google-role" style="padding:6px 8px; border-radius:6px; border:1px solid #ccc;">
+            <option value="candidate">Ứng viên</option>
+            <option value="business">Nhà tuyển dụng</option>
+          </select>
+        </div>
+        <div id="g_id_signin" style="display:none;"></div>
         <div class="actions">
           <button onclick="location.href='/signup'" type="button" class="btn-register">Đăng ký</button>
           <button method='post' type="submit" class="btn-login">Đăng nhập</button>
@@ -81,25 +89,57 @@
 </div>
 {% endif %}
 
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script>
-    function signin_success(event) {
-      if (event) event.preventDefault();
+    (function(){
+      const googleBtn = document.querySelector('.google-btn');
+      const roleSelect = document.getElementById('google-role');
+      // server should provide google_client_id variable; if not, disable GSI
+      const clientId = {{ google_client_id | tojson | safe }};
 
-      // Lấy thông tin đăng nhập
-      const username = document.querySelector('.input-group input[type="text"]').value;
-      const password = document.querySelector('.input-group input[type="password"]').value;
-
-      // Kiểm tra thông tin đăng nhập
-      if (username === "admin" && password === "123456") {
-        alert("Đăng nhập thành công!");
-        location.href = 'home_logged_in.html';
-
-        // Ghi vào trang home_logged_in.html ở phần Chào mừng, [user] tên username
-        localStorage.setItem('username', username);
-      } else {
-        alert("Tên đăng nhập hoặc mật khẩu không đúng.");
+      if (!clientId) {
+        googleBtn.addEventListener('click', function(){
+          alert('Google Sign-In chưa được cấu hình trên server.');
+        });
+        return;
       }
-    }
+
+      function handleCredentialResponse(response) {
+        const id_token = response.credential;
+        const role = (roleSelect && roleSelect.value) ? roleSelect.value : 'candidate';
+
+        fetch('/google-login', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id_token: id_token, role: role })
+        }).then(async (res) => {
+          // If server redirected, follow the redirect in the browser
+          if (res.redirected) {
+            window.location.href = res.url;
+            return;
+          }
+          // fallback: if OK, try to read JSON/text or reload
+          if (res.ok) {
+            window.location.reload();
+            return;
+          }
+          const t = await res.text();
+          alert('Đăng nhập Google thất bại');
+        }).catch(e => {
+          console.error(e);
+          alert('Lỗi mạng khi đăng nhập bằng Google');
+        });
+      }
+
+      window.addEventListener('load', function(){
+        google.accounts.id.initialize({ client_id: clientId, callback: handleCredentialResponse });
+        google.accounts.id.renderButton(document.getElementById('g_id_signin'), { theme: 'outline', size: 'large' });
+        googleBtn.addEventListener('click', function(){
+          google.accounts.id.prompt();
+        });
+      });
+    })();
   </script>
 </body>
 </html>
