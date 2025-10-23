@@ -73,7 +73,7 @@
             <option value="business">Nhà tuyển dụng</option>
           </select>
         </div>
-        <div id="g_id_signin" style="display:none;"></div>
+  <div id="g_id_signin"></div>
         <div class="actions">
           <button onclick="location.href='/signup'" type="button" class="btn-register">Đăng ký</button>
           <button method='post' type="submit" class="btn-login">Đăng nhập</button>
@@ -94,17 +94,25 @@
     (function(){
       const googleBtn = document.querySelector('.google-btn');
       const roleSelect = document.getElementById('google-role');
-      // server should provide google_client_id variable; if not, disable GSI
-      const clientId = "1003268141163-fthbmge9o5aotba1t7jb8neuttu72f01.apps.googleusercontent.com";
+      // Use server-provided GOOGLE_CLIENT_ID when available. If it's not passed to the template
+      // this will render as null and we will disable the Google flow gracefully.
+      const clientId = {{ google_client_id | default(None) | tojson }};
 
-      if (!clientId) {
-        googleBtn.addEventListener('click', function(){
-          alert('Google Sign-In chưa được cấu hình trên server.');
-        });
-        return;
+      function disableGoogle(reason){
+        console.warn('Google Sign-In disabled:', reason);
+        if (googleBtn){
+          googleBtn.addEventListener('click', function(){
+            alert('Google Sign-In không khả dụng: ' + reason);
+          });
+          googleBtn.classList.add('disabled');
+          googleBtn.style.opacity = '0.6';
+        }
+        const gdiv = document.getElementById('g_id_signin');
+        if (gdiv) gdiv.style.display = 'none';
       }
 
       function handleCredentialResponse(response) {
+        console.log('GSI credential response', response);
         const id_token = response.credential;
         const role = (roleSelect && roleSelect.value) ? roleSelect.value : 'candidate';
 
@@ -114,16 +122,8 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id_token: id_token, role: role })
         }).then(async (res) => {
-          // If server redirected, follow the redirect in the browser
-          if (res.redirected) {
-            window.location.href = res.url;
-            return;
-          }
-          // fallback: if OK, try to read JSON/text or reload
-          if (res.ok) {
-            window.location.reload();
-            return;
-          }
+          if (res.redirected) { window.location.href = res.url; return; }
+          if (res.ok) { window.location.reload(); return; }
           const t = await res.text();
           alert('Đăng nhập Google thất bại');
         }).catch(e => {
@@ -132,13 +132,40 @@
         });
       }
 
-      window.addEventListener('load', function(){
-        google.accounts.id.initialize({ client_id: clientId, callback: handleCredentialResponse });
-        google.accounts.id.renderButton(document.getElementById('g_id_signin'), { theme: 'outline', size: 'large' });
-        googleBtn.addEventListener('click', function(){
-          google.accounts.id.prompt();
-        });
-      });
+      // If server didn't provide clientId, disable the Google button with a message
+      if (!clientId) {
+        disableGoogle('Client ID không được cấu hình');
+        return;
+      }
+
+      // Initialize when GSI client is ready. Retry for a short period if not yet loaded.
+      function initWhenReady(attemptsLeft=50){
+        if (window.google && google.accounts && google.accounts.id) {
+          try {
+            console.log('Initializing Google Identity, clientId=', clientId);
+            google.accounts.id.initialize({ client_id: clientId, callback: handleCredentialResponse });
+            const renderTarget = document.getElementById('g_id_signin');
+            if (renderTarget) {
+              google.accounts.id.renderButton(renderTarget, { theme: 'outline', size: 'large' });
+            }
+            if (googleBtn) {
+              googleBtn.addEventListener('click', function(){ google.accounts.id.prompt(); });
+            }
+          } catch (err){
+            console.error('Error initializing Google Identity', err);
+            disableGoogle('Lỗi khi khởi tạo GSI');
+          }
+        } else {
+          if (attemptsLeft <= 0) {
+            console.warn('GSI client not available after waiting');
+            disableGoogle('GSI client không load được');
+            return;
+          }
+          setTimeout(function(){ initWhenReady(attemptsLeft-1); }, 100);
+        }
+      }
+
+      window.addEventListener('load', function(){ initWhenReady(); });
     })();
   </script>
 </body>
