@@ -95,7 +95,7 @@
       const googleBtn = document.querySelector('.google-btn');
       const roleSelect = document.getElementById('google-role');
       // server should provide google_client_id variable; if not, disable GSI
-      const clientId = {{ google_client_id | tojson | safe }};
+      const clientId = "1003268141163-fthbmge9o5aotba1t7jb8neuttu72f01.apps.googleusercontent.com";
 
       if (!clientId) {
         googleBtn.addEventListener('click', function(){
