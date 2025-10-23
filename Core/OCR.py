@@ -6,6 +6,7 @@
 # pip install einops timm
 # pip install flash-attn --no-build-isolation
 # pip install pillow
+import io
 import re
 import torch
 import torchvision.transforms as T
@@ -210,9 +211,9 @@ def compare_OCR(image, JD):
         print(f"- {r}")
     return result
 
-def scan_pdf(file: UploadFile):
-    file_bytes = BytesIO(file.file.read())
-    reader = PdfReader(file_bytes)
+async def scan_pdf(file: UploadFile):
+    contents = await file.read()
+    reader = PdfReader(io.BytesIO(contents))
     text = ""
     for page in reader.pages:
         text += page.extract_text() or ""

@@ -9,9 +9,9 @@ class Settings(BaseSettings):
     PAYOS_API_KEY: str
     PAYOS_CHECKSUM_KEY: str
 
-    GOOGLE_CLIENT_ID: str
-    GOOGLE_CLIENT_SECRET: str
-    GOOGLE_REDIRECT_URI: str
+    #GOOGLE_CLIENT_ID: str
+    #GOOGLE_CLIENT_SECRET: str
+    #GOOGLE_REDIRECT_URI: str
 
     class Config:
         env_file = ".env"  # chỉ định file .env

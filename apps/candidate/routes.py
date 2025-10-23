@@ -192,7 +192,7 @@ async def submit_cv(request: Request,
                     session: Session = Depends(get_session)):
     if not new_cv:
         raise HTTPException(status_code=400, detail="Chưa upload file")
-    file_path, cv_file = await upload_cv(new_cv, user_info.id, session) # Lưu cv về server và database bảng candidate_cv
+    file_path, cv_file = await service_upload_cv(new_cv, user_info.id, session) # Lưu cv về server và database bảng candidate_cv
     cv = add_cv_into_jd(session, file_path, jd_id) # Add cv vào bảng jd_CV
 
     return templates.TemplateResponse("finding-jobs.html",{"request": request, 
@@ -244,14 +244,14 @@ def process_cv(cv_str: str):
 
 # --- Route upload CV ---
 @router.post("/top10-best-jd", response_class=HTMLResponse)
-async def upload_cv(request: Request, 
+async def top10_best_jd(request: Request, 
                     file: UploadFile = File(...),
                     user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
                     session: Session = Depends(get_session)):
     file_path, cv = await service_upload_cv(file, user_info.id, session)
     if file.content_type == "application/pdf" or file.filename.lower().endswith(".pdf"):
         from Core.OCR import scan_pdf  # hàm đọc PDF
-        cv_str = scan_pdf(file_path)
+        cv_str = scan_pdf(file.file)
     elif file.content_type.startswith("image/") or file.filename.lower().endswith((".jpg", ".jpeg", ".png")):
         from Core.OCR import run_vintern  # hàm OCR
         cv_str = run_vintern(file_path)
@@ -300,8 +300,20 @@ async def get_progress():
 
 # --- Route kết quả ---
 @router.get("/result", response_class=HTMLResponse)
-async def result_page():
+async def result_page(request: Request, 
+                      user_info: user = Depends(authorize_role(["candidate", "candidate_premium"]))):
     result_store.sort(key=lambda x: x["Ratio"], reverse=True)
     top_10 = result_store[:10]
     return templates.TemplateResponse("top10-best-jd.html", {"request": request, 
-                                                             "job_descriptions": [jd['jd'] for jd in top_10]})
+                                                             "job_descriptions": [jd['jd'] for jd in top_10],
+                                                             "user_info": user_info})
+
+@router.post("/top10-best-jd-unblur", response_class=HTMLResponse)
+async def top10_best_jd_unblur(request: Request, 
+                               user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
+                               session: Session = Depends(get_session)):
+    form = await request.form()
+    print(form)
+    return templates.TemplateResponse("top10-best-jd.html", {"request": request, 
+                                                             #"job_descriptions": [jd['jd'] for jd in top_10],
+                                                             "user_info": user_info})

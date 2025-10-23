@@ -74,7 +74,7 @@ def create_user(session: Session,
                 role: str,
                 company_name: str,
                 full_name: str,
-                google_id: str):
+                google_id: str | None = None):
     user = get_user_by_username(session, username)
     if user:
         return False # Đã có username trong database

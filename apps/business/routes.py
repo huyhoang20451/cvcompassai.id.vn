@@ -29,7 +29,7 @@ async def business_home(request: Request):
 
 @router.get("/business-dashboard", response_class=HTMLResponse)
 async def business_dashboard(request: Request,
-                             user_info: user = Depends(authorize_role(["business"])),
+                             user_info: user = Depends(authorize_role(["business", "business_premium"])),
                              session: Session = Depends(get_session)):
     job_descriptions = get_jds_by_user_name(session, user_info.username)
     return templates.TemplateResponse("business_dashboard.html", {"request": request,
@@ -39,13 +39,13 @@ async def business_dashboard(request: Request,
 # Direct tới business profile page
 @router.get("/business-profile", response_class=HTMLResponse)
 async def business_profile(request: Request,
-                           user_info: user = Depends(authorize_role(["business"]))):
+                           user_info: user = Depends(authorize_role(["business", "business_premium"]))):
     return templates.TemplateResponse("business_profile.html", {"request": request,
                                                                 "user_info": user_info})
 
 @router.get("/pricing-business-logged-in", response_class=HTMLResponse)
 async def pricing_business_logged_in(request: Request, 
-                                     user_info: user = Depends(authorize_role(["business"])),
+                                     user_info: user = Depends(authorize_role(["business", "business_premium"])),
                                      session: Session = Depends(get_session)):
     packages = get_packages(session)
     business_packages = [p for p in packages if p.name.startswith("business_")]
@@ -56,7 +56,7 @@ async def pricing_business_logged_in(request: Request,
 @router.get("/job-storage", response_class=HTMLResponse)
 async def job_storage(request: Request,
                       jd_id: Optional[int] = None,
-                      user_info: user = Depends(authorize_role(["business"])),
+                      user_info: user = Depends(authorize_role(["business", "business_premium"])),
                       session : Session = Depends(get_session)):
     job_descriptions = get_jds_by_user_name(session, user_info.username)
     job = next((jd for jd in job_descriptions if jd.id == jd_id), None)
@@ -69,7 +69,7 @@ async def job_storage(request: Request,
 
 @router.post("/submit-job", response_class=HTMLResponse)
 async def submit_job(request: Request, 
-                     user_info: user = Depends(authorize_role(["business"])),
+                     user_info: user = Depends(authorize_role(["business", "business_premium"])),
                      session: Session = Depends(get_session)):
     form = await request.form()
     jd_form = dict(form)
@@ -92,7 +92,7 @@ async def submit_job(request: Request,
 
 @router.get("/dang-tuyen-ngay", response_class=HTMLResponse)
 def dang_tuyen_ngay(request: Request, 
-                    user_info: user = Depends(authorize_role(["business"])),
+                    user_info: user = Depends(authorize_role(["business", "business_premium"])),
                     session: Session = Depends(get_session)):
     job_categories = get_job_categories(session)
 
@@ -102,14 +102,14 @@ def dang_tuyen_ngay(request: Request,
 
 @router.get("/cv-detail-business", response_class=HTMLResponse)
 def cv_detail_business(request: Request, 
-                       user_info: user = Depends(authorize_role(["business"]))):
+                       user_info: user = Depends(authorize_role(["business", "business_premium"]))):
     return templates.TemplateResponse("cv-detail-business.html", {"request": request, 
                                                                   "user_info": user_info})
 
 @router.get("/compare_cv_vs_jd", response_class=HTMLResponse)
 def compare_cv_vs_jd(request: Request,
                      jd_id: int, 
-                     user_info: user = Depends(authorize_role(["business"])),
+                     user_info: user = Depends(authorize_role(["business", "business_premium"])),
                      session: Session = Depends(get_session)):
     cvs = get_cvs_by_jd_id(session, jd_id)
     jd = get_jd_by_id(session, jd_id)
@@ -129,7 +129,7 @@ def compare_cv_vs_jd(request: Request,
 @router.post("/update-jd/{jd_id}", response_class=HTMLResponse)
 async def update_jd(request: Request,
                     jd_id: Optional[int] = None,
-                    user_info: user = Depends(authorize_role(["business"])),
+                    user_info: user = Depends(authorize_role(["business", "business_premium"])),
                     session: Session = Depends(get_session)):
     form = await request.form()
     jd_form = dict(form)
@@ -163,7 +163,7 @@ async def update_jd(request: Request,
 def delete_jd_by_id(request: Request,
                     jd_id: int,
                     session: Session = Depends(get_session),
-                    user_info: user = Depends(authorize_role(["business"]))):
+                    user_info: user = Depends(authorize_role(["business", "business_premium"]))):
     result = service_delete_jd_by_id(session, jd_id, user_info.id)
     if result is False:
         raise HTTPException(status_code=404, detail="Job description not found or not authorized to delete")
@@ -173,7 +173,7 @@ def delete_jd_by_id(request: Request,
 @router.post("/update-business-profile", response_class=HTMLResponse)
 async def update_business_info(request: Request,
                                session: Session = Depends(get_session),
-                               user_info: user = Depends(authorize_role(["business"]))):
+                               user_info: user = Depends(authorize_role(["business", "business_premium"]))):
     form = await request.form()
     business_info = dict(form)
     print(business_info)

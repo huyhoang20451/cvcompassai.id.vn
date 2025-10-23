@@ -79,7 +79,7 @@
         <script>
             function unlockTop5JD() {
                 // Lay tong so xu o trang top-10-best-jd-unblur
-                fetch(`/api/deduct-coin&amount=5`)
+                fetch(`/deduct-coin&amount=5`)
                   .then(res => res.json())
                   .then(data => {
                     if (data.success) {
