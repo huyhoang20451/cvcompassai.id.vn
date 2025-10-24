@@ -19,6 +19,8 @@
         display: flex;
         padding: 20px;
         gap: 20px;
+        /* align items to left so left-panel appears on the left */
+        justify-content: flex-start;
     }
     .left-panel {
         width: 25%;
@@ -50,17 +52,8 @@
         font-size: 12px;
         color: #777;
     }
-    .cv-detail {
-        flex-grow: 1;
-        background: #fff;
-        padding: 15px;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        height: 600px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+    /* center preview removed; hide original cv-detail */
+    .cv-detail { display: none; }
     .cv-detail img {
         max-width: 100%;
         max-height: 100%;
@@ -83,11 +76,14 @@
     .nav-buttons button:hover {
         background-color: #0056b3;
     }
+    /* right-panel fills remaining space */
     .right-panel {
-        width: 25%;
+        flex: 1;
+        max-width: 65%;
         display: flex;
-        flex-direction: column;
-        gap: 20px;
+        gap: 24px;
+        align-items: flex-start;
+        justify-content: center;
     }
     .card {
         background: #fff;
@@ -180,42 +176,11 @@
                         <p><a href="{{ r.cv_url }}" target="_blank">{{ r.cv_url }}</a></p>
                         <p class="cv-status">Met: {{ r.met|length }} | Not met: {{ r.not_met|length }}</p>
                     </div>
-                    <span>#{% if loop.index0 is defined %}{{ loop.index }}{% else %}{{ loop.index }}{% endif %}</span>
+                    <span>#{{ loop.index }}</span>
                 </div>
                 {% endfor %}
             {% else %}
                 <p>Không có kết quả.</p>
-            {% endif %}
-        </div>
-
-        <div class="cv-detail" id="cv-detail-panel">
-            {% if results and results[0] %}
-                <div id="detail-0">
-                    <h3>Chi tiết CV: <a href="{{ results[0].cv_url }}" target="_blank">Mở CV</a></h3>
-
-                    <!-- Preview area: try to show as image; if PDF or other, use embed/iframe; fallback to link -->
-                    <div id="cv-preview" style="width:100%; display:flex; justify-content:center; margin-bottom:16px;">
-                        <img id="cv-image" src="{{ results[0].cv_url }}" alt="CV preview" style="max-width:100%; max-height:520px; display:none; border-radius:8px;" />
-                        <iframe id="cv-iframe" src="{{ results[0].cv_url }}" style="width:100%; height:520px; border: none; display:none;" title="CV preview iframe"></iframe>
-                    </div>
-
-                    <p id="cv-fallback" style="text-align:center; display:none;">Không thể hiển thị bản xem trước. <a href="{{ results[0].cv_url }}" target="_blank">Mở CV ở tab mới</a></p>
-
-                    <h4>Đã đạt (Met)</h4>
-                    <ul>
-                        {% for item in results[0].met %}
-                            <li>{{ item }}</li>
-                        {% endfor %}
-                    </ul>
-                    <h4>Chưa đạt (Not met)</h4>
-                    <ul>
-                        {% for item in results[0].not_met %}
-                            <li>{{ item }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            {% else %}
-                <p>Không có kết quả để hiển thị.</p>
             {% endif %}
         </div>
 
@@ -227,6 +192,8 @@
                         {% for item in results[0].met %}
                             <li>{{ item }}</li>
                         {% endfor %}
+                    {% else %}
+                        <li>Không có dữ liệu.</li>
                     {% endif %}
                 </ul>
             </div>
@@ -237,6 +204,8 @@
                         {% for item in results[0].not_met %}
                             <li>{{ item }}</li>
                         {% endfor %}
+                    {% else %}
+                        <li>Không có dữ liệu.</li>
                     {% endif %}
                 </ul>
             </div>
