@@ -285,11 +285,216 @@ body {
         </div>
         <div class="job-actions">
           <a href="/job-detail/{{ job.id }}" class="cv-detail">Xem chi tiết >></a><br>
-          <button class="btn-orange">Quan tâm</button>
-          <button class="btn-blue">Ứng tuyển ngay</button>
+          <button onclick="location.href='/save-jd/{{ job.id }}'" class="btn-orange">Quan tâm</button>
+          <button onclick="openUpdateFormModal()" class="btn-blue">Ứng tuyển ngay</button>
         </div>
       </div>
       {%endfor%}
+
+      <div id="update-modal-overlay" style="display:none; position:fixed; z-index:1000; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5);"></div>
+    <div id="update-form-modal" role="dialog" aria-modal="true" aria-labelledby="update-form-title" style="display:none; position:fixed; z-index:1001; left:50%; top:50%; transform:translate(-50%,-50%); min-width:420px; max-width:96vw; background:#fff; border-radius:10px; box-shadow:0 4px 24px #0005; padding:18px 16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <strong style="font-size:16px;">Gửi CV ứng tuyển</strong>
+                <button type="button" onclick="document.getElementById('update-modal-overlay').style.display='none'; document.getElementById('update-form-modal').style.display='none';" style="background:transparent;border:none;font-size:20px;cursor:pointer;">&times;</button>
+            </div>
+                <div style="display:flex; gap:8px; margin-bottom:12px;">
+                <button type="button" id="tab-upload" class="tab-btn" style="flex:1;padding:8px;border-radius:6px;border:1px solid #ccc;background:#eef;cursor:pointer;">Upload từ máy</button>
+                <button type="button" id="tab-existing" class="tab-btn" style="flex:1;padding:8px;border-radius:6px;border:1px solid #ccc;background:#fff;cursor:pointer;">Chọn từ kho CV</button>
+            </div>
+
+            <!-- Upload form -->
+            <form id="upload-form" action="/submit-upload-cv?jd_id={{ job.id }}" method="POST" enctype="multipart/form-data" style="display:block;">
+                <div style="margin-bottom:10px;">
+                    <label for="cv-file">Chọn file CV (pdf, doc, image):</label><br>
+                    <!-- name must match the parameter name in the endpoint (new_cv) -->
+                    <input id="cv-file" name="new_cv" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" required>
+                    <div id="cv-filename" style="margin-top:6px;font-size:13px;color:#333"></div>
+                </div>
+                <div style="text-align:right;">
+                    <button type="submit" style="background:#007bff;color:#fff;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;">Gửi</button>
+                </div>
+            </form>
+
+            <!-- Existing CV form (single form with select) -->
+            <form id="existing-form" action="/submit-existing-cv?jd_id={{ job.id }}" method="POST" style="display:none;">
+                <div style="margin-bottom:10px;">
+                    <label for="existing-cv">Chọn CV từ kho của bạn:</label>
+                    <select id="existing-cv" name="existing_cv_id" style="width:100%;padding:8px;border-radius:6px;border:1px solid #ccc;">
+                        <option value="">-- Chọn CV --</option>
+                        {% if user_cvs %}
+                            {% for cv in user_cvs %}
+                                <option value="{{ cv.id }}">{{ cv.filename if cv.filename else ('CV #' ~ cv.id) }}</option>
+                            {% endfor %}
+                        {% else %}
+                            <!-- Will attempt to fetch via AJAX when modal opens -->
+                        {% endif %}
+                    </select>
+                </div>
+                <div style="text-align:right;">
+                    <button type="submit" style="background:#007bff;color:#fff;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;">Gửi</button>
+                </div>
+            </form>
+            <script>
+                (function(){
+                    const tabUpload = document.getElementById('tab-upload');
+                    const tabExisting = document.getElementById('tab-existing');
+                    const uploadForm = document.getElementById('upload-form');
+                    const existingForm = document.getElementById('existing-form');
+                    const overlay = document.getElementById('update-modal-overlay');
+                    const modal = document.getElementById('update-form-modal');
+                    const cvFileInput = document.getElementById('cv-file');
+                    const cvFilename = document.getElementById('cv-filename');
+                    const existingSelect = document.getElementById('existing-cv');
+
+                    function activateUpload(){
+                        tabUpload.style.background = '#eef';
+                        tabExisting.style.background = '#fff';
+                        uploadForm.style.display = 'block';
+                        existingForm.style.display = 'none';
+                    }
+                    function activateExisting(){
+                        tabUpload.style.background = '#fff';
+                        tabExisting.style.background = '#eef';
+                        uploadForm.style.display = 'none';
+                        existingForm.style.display = 'block';
+                        // If no options present (only placeholder), try fetching via AJAX
+                        if (existingSelect && existingSelect.options.length <= 1) {
+                            fetchExistingCVs();
+                        }
+                        // focus the select for keyboard users
+                        if (existingSelect) existingSelect.focus();
+                    }
+
+                    tabUpload.addEventListener('click', activateUpload);
+                    tabExisting.addEventListener('click', activateExisting);
+                    // default
+                    activateUpload();
+
+                    // Close helpers
+                    window.openUpdateFormModal = function() {
+                        if (overlay) overlay.style.display = 'block';
+                        if (modal) modal.style.display = 'block';
+                        // reset filename preview
+                        if (cvFilename) cvFilename.textContent = '';
+                        // focus first interactive element
+                        if (cvFileInput) cvFileInput.focus();
+                        // debug: log form actions
+                        try{ console.log('upload-form action:', uploadForm.action, 'existing-form action:', existingForm.action); }catch(e){}
+                    }
+
+                    window.closeUpdateFormModal = function() {
+                        if (overlay) overlay.style.display = 'none';
+                        if (modal) modal.style.display = 'none';
+                    }
+
+                    // ESC to close
+                    document.addEventListener('keydown', function(e){
+                        if (e.key === 'Escape') {
+                            closeUpdateFormModal();
+                        }
+                    });
+
+                    // Allow clicking overlay to close
+                    if (overlay) overlay.addEventListener('click', closeUpdateFormModal);
+
+                    // filename preview
+                    if (cvFileInput) {
+                        cvFileInput.addEventListener('change', function(){
+                            if (cvFileInput.files && cvFileInput.files.length > 0) {
+                                cvFilename.textContent = 'Đã chọn: ' + cvFileInput.files[0].name;
+                            } else {
+                                cvFilename.textContent = '';
+                            }
+                        });
+                    }
+
+                    // helper: log form data for debugging (prints to console)
+                    function logFormData(form){
+                        try{
+                            const fd = new FormData(form);
+                            console.group('FormData - ' + (form.id || form.action));
+                            for (const pair of fd.entries()){
+                                console.log(pair[0], pair[1]);
+                            }
+                            console.groupEnd();
+                        }catch(err){
+                            console.warn('Could not log form data', err);
+                        }
+                    }
+
+                    // Prevent submitting existing form when no CV selected or invalid id
+                    existingForm.addEventListener('submit', function(e){
+                        logFormData(existingForm);
+                        if (!existingSelect || !existingSelect.value) {
+                            e.preventDefault();
+                            alert('Vui lòng chọn một CV từ kho trước khi gửi.');
+                            return;
+                        }
+                        // ensure numeric id (FastAPI expects int); if not numeric, block and log
+                        const num = Number(existingSelect.value);
+                        if (!Number.isFinite(num) || String(num) === 'NaN'){
+                            e.preventDefault();
+                            console.warn('existing_cv_id is not numeric:', existingSelect.value);
+                            alert('Giá trị CV không hợp lệ. Vui lòng thử lại.');
+                            return;
+                        }
+                        // Append the selected id to the action URL as a query param to avoid empty-string parsing issues
+                        try{
+                            const base = existingForm.action.split('?')[0];
+                            existingForm.action = base + '?jd_id={{ job.id }}&existing_cv_id=' + encodeURIComponent(existingSelect.value);
+                            console.log('Submitting existing-form to:', existingForm.action);
+                        }catch(err){
+                            console.warn('Could not append existing_cv_id to action', err);
+                        }
+                    });
+
+                    // Prevent submitting upload form without file (extra guard) and log data
+                    uploadForm.addEventListener('submit', function(e){
+                        logFormData(uploadForm);
+                        if (!cvFileInput || !cvFileInput.files || cvFileInput.files.length === 0) {
+                            e.preventDefault();
+                            alert('Vui lòng chọn file CV để upload.');
+                        }
+                    });
+
+                    // Fetch user's CVs via API and populate select (no backend change required)
+                    function fetchExistingCVs(){
+                        fetch('/get_cvs')
+                            .then(function(resp){
+                                if (!resp.ok) throw new Error('Network response was not ok');
+                                return resp.json();
+                            })
+                            .then(function(data){
+                                // data is expected to be a list of objects with id and URL/filename
+                                if (!existingSelect) return;
+                                // remove non-placeholder options
+                                for (let i = existingSelect.options.length - 1; i >= 0; i--) {
+                                    if (existingSelect.options[i].value) existingSelect.remove(i);
+                                }
+                                if (Array.isArray(data) && data.length > 0) {
+                                    data.forEach(function(cv){
+                                        const opt = document.createElement('option');
+                                        // ensure value is a string (and preferably numeric string)
+                                        const rawId = cv.id || cv.cv_id || cv.CV_id || '';
+                                        opt.value = rawId !== undefined && rawId !== null ? String(rawId) : '';
+                                        // try common filename keys
+                                        opt.textContent = cv.filename || cv.URL || ('CV #' + (rawId || ''));
+                                        existingSelect.appendChild(opt);
+                                    });
+                                } else {
+                                    const opt = document.createElement('option');
+                                    opt.value = '';
+                                    opt.textContent = '(Bạn chưa có CV trong kho)';
+                                    existingSelect.appendChild(opt);
+                                }
+                            })
+                            .catch(function(err){
+                                console.warn('Không thể tải kho CV:', err);
+                            });
+                    }
+
+                })();
+            </script>
 
       <!-- phân trang -->
       <div class="pagination">
