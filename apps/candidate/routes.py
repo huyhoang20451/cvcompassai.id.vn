@@ -160,15 +160,21 @@ async def create_free_cv(request: Request,
 
 @router.get("/mycv-settings", response_class=HTMLResponse)
 async def mycv_settings(request: Request,
-                  user_info: user = Depends(authorize_role(["candidate", "candidate_premium"]))):
+                        user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
+                        session: Session = Depends(get_session)):
+    cvs = service_get_cvs_by_username(user_info.username, session)
     return templates.TemplateResponse("mycv-settings.html", {"request": request, 
-                                                             "user_info": user_info})
+                                                             "user_info": user_info,
+                                                             "cvs": cvs})
 
 @router.get("/finding-jobs", response_class=HTMLResponse)
 async def finding_jobs(request: Request,
-                       user_info: user = Depends(authorize_role(["candidate", "candidate_premium"]))):
-    return templates.TemplateResponse("finding-jobs.html", {"request": request, 
-                                                            "user_info": user_info})
+                       user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
+                       session: Session = Depends(get_session)):
+    jds = get_jds(session)
+    return templates.TemplateResponse("finding-jobs.html", {"request": request,
+                                                            "user_info": user_info,
+                                                            "jds": jds})
 # Nộp cv cho jd bằng cv có sẵn trong database
 @router.post("/submit-existing-cv", response_class=HTMLResponse)
 async def submit_cv(request: Request,

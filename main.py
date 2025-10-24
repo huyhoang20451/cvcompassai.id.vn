@@ -10,11 +10,15 @@ from apps.payment.routes import router as payment_router
 from Core.Auth.routes import router as auth_router
 from Core.Auth.dependencies import authorize_role, templates
 from Core.Auth.schemas import user
+from Core.OCR import load_vintern_model
 from db import init_db, get_session
 from sqlmodel import Session
 
 app = FastAPI()
+
 app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+app.mount("/cv", StaticFiles(directory="cv"), name="cv")
 
 # Đăng ký router của từng module
 app.include_router(auth_router)
@@ -27,6 +31,7 @@ app.include_router(payment_router)
 @app.on_event("startup")
 def on_startup():
     init_db()
+    load_vintern_model()  # ✅ model chỉ load 1 lần ở đây
 
 @app.get("/items/", response_model=None)
 async def read_items(user = Depends(authorize_role(["admin"]))):

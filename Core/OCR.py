@@ -79,16 +79,62 @@ def load_image(image_file, input_size=448, max_num=12):
 # ===============================
 # MODEL 1: VINTERN
 # ===============================
-def run_vintern(image_path):
+
+vintern_model = None
+vintern_tokenizer = None
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+# ======================
+# 2️⃣ Hàm load model — chỉ gọi 1 lần ở startup
+# ======================
+def load_vintern_model():
+    """
+    Load mô hình Vintern lên GPU hoặc CPU tùy tài nguyên.
+    Gọi một lần khi khởi động server.
+    """
+    global vintern_model, vintern_tokenizer, device
+
+    if vintern_model is not None:
+        print("✅ Vintern model already loaded.")
+        return vintern_model, vintern_tokenizer
+
     model_name = "5CD-AI/Vintern-1B-v3_5"
-    model = AutoModel.from_pretrained(
+    print(f"🔹 Loading model {model_name}...")
+
+    try:
+        vintern_model = AutoModel.from_pretrained(
+            model_name,
+            torch_dtype=torch.bfloat16,
+            low_cpu_mem_usage=True,
+            trust_remote_code=True,
+            use_flash_attn=False,
+        ).eval().to(device)
+    except RuntimeError as e:
+        # fallback sang CPU nếu GPU hết RAM
+        print("⚠️ GPU memory error, switching to CPU.")
+        torch.cuda.empty_cache()
+        vintern_model = AutoModel.from_pretrained(
+            model_name,
+            torch_dtype=torch.float32,
+            low_cpu_mem_usage=True,
+            trust_remote_code=True,
+            use_flash_attn=False,
+        ).eval().to("cpu")
+        device = torch.device("cpu")
+
+    vintern_tokenizer = AutoTokenizer.from_pretrained(
         model_name,
-        torch_dtype=torch.bfloat16,
-        low_cpu_mem_usage=True,
         trust_remote_code=True,
-        use_flash_attn=False,
-    ).eval().cuda()
-    tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True, use_fast=False)
+        use_fast=False,
+    )
+
+    print(f"✅ Vintern model loaded successfully on {device}.")
+    return vintern_model, vintern_tokenizer
+
+def run_vintern(image_path):
+    if vintern_model is None or vintern_tokenizer is None:
+        raise RuntimeError("❌ Model chưa được load. Gọi load_vintern_model() trước!")
 
     pixel_values = load_image(image_path, max_num=6).to(torch.bfloat16).cuda()
     generation_config = dict(max_new_tokens=2000, do_sample=False, num_beams=3, repetition_penalty=2.5)
@@ -99,7 +145,7 @@ def run_vintern(image_path):
     Return the result in Markdown format. 
     Respond in English only.
     """
-    response, _ = model.chat(tokenizer, pixel_values, question, generation_config, history=None, return_history=True)
+    response, _ = vintern_model.chat(vintern_tokenizer, pixel_values, question, generation_config, history=None, return_history=True)
     return response  # Đây chính là CR
 
 # ===============================
