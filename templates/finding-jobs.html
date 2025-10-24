@@ -290,9 +290,7 @@ body {
         </div>
       </div>
     </main>
-    {%endfor%}
-
-      <div id="update-modal-overlay" style="display:none; position:fixed; z-index:1000; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5);"></div>
+     <div id="update-modal-overlay" style="display:none; position:fixed; z-index:1000; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5);"></div>
     <div id="update-form-modal" role="dialog" aria-modal="true" aria-labelledby="update-form-title" style="display:none; position:fixed; z-index:1001; left:50%; top:50%; transform:translate(-50%,-50%); min-width:420px; max-width:96vw; background:#fff; border-radius:10px; box-shadow:0 4px 24px #0005; padding:18px 16px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                 <strong style="font-size:16px;">Gửi CV ứng tuyển</strong>
@@ -335,6 +333,8 @@ body {
                     <button type="submit" style="background:#007bff;color:#fff;padding:8px 14px;border:none;border-radius:6px;cursor:pointer;">Gửi</button>
                 </div>
             </form>
+    {%endfor%}
+
             <script>
                 (function(){
                     const tabUpload = document.getElementById('tab-upload');
