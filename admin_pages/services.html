@@ -78,16 +78,20 @@
         <table>
             <thead>
                 <tr>
+                    <th>Id</th>
                     <th>Service Name</th>
-                    <th>Status</th>
+                    <th>Price</th>
+                    <th>Description</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for service in services %}
                 <tr>
-                    <td>{{ service.name_service }}</td>
-                    <td><span class="badge {{ 'green' if service.status == 'active' else 'red' }}">{{ service.status.capitalize() }}</span></td>
+                    <td>{{ service.id }}</td>
+                    <td>{{ service.name }}</td>
+                    <td>{{ service.price }}</td>
+                    <td>{{ service.description }}</td>
                     <td><span class="badge blue"><i class="fas fa-edit"></i> Edit</span></td>
                 </tr>
                 {% endfor %}
