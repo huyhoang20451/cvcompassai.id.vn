@@ -76,7 +76,7 @@
         <tr>
           <td>{{ order.id }}</td>
           <td>{{ order.username }}</td>
-          <td>₫ {{ order.amount }}</td>
+          <td>₫ {{ order.total_money }}</td>
           <td>{{ order.paid_at }}</td>
           <td><span class="badge {{ 'green' if order.status == 'paid' else 'yellow' }}">{{ 'Đã thanh toán' if order.status == 'paid' else 'Chưa thanh toán' }}</span></td>
         </tr>
