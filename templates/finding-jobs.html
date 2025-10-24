@@ -271,7 +271,7 @@ body {
     </aside>
 
     <!-- Danh sách việc -->
-  {% for job in job_descriptions %}
+  {% for job in jds %}
     <main class="job-list">
       <div class="job-item">
         <img style="width: 40px; height: 40px;" src="{{ job.company_logo_url or '/static/images/business_avatar.png' }}" alt="logo" class="company-logo">
