@@ -439,14 +439,19 @@ body {
                             alert('Giá trị CV không hợp lệ. Vui lòng thử lại.');
                             return;
                         }
-                        // Append the selected id to the action URL as a query param to avoid empty-string parsing issues
-                        try{
-                            const base = existingForm.action.split('?')[0];
-                            existingForm.action = base + '?jd_id={{ job.id }}&existing_cv_id=' + encodeURIComponent(existingSelect.value);
-                            console.log('Submitting existing-form to:', existingForm.action);
-                        }catch(err){
-                            console.warn('Could not append existing_cv_id to action', err);
-                        }
+            // Append the selected id to the action URL as a query param.
+            // Do not use server-side `{{ job.id }}` here because this JS runs outside the Jinja loop.
+            try{
+              const currentAction = existingForm.getAttribute('action') || '';
+              const base = currentAction.split('?')[0];
+              // try to extract jd_id from the existing action (it was set per-modal in the template)
+              const params = new URLSearchParams(currentAction.split('?')[1] || '');
+              const jdId = params.get('jd_id') || '';
+              existingForm.action = base + '?jd_id=' + encodeURIComponent(jdId) + '&existing_cv_id=' + encodeURIComponent(existingSelect.value);
+              console.log('Submitting existing-form to:', existingForm.action);
+            }catch(err){
+              console.warn('Could not append existing_cv_id to action', err);
+            }
                     });
 
                     // Prevent submitting upload form without file (extra guard) and log data
