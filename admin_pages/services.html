@@ -78,21 +78,103 @@
         <table>
             <thead>
                 <tr>
+                    <th>Id</th>
                     <th>Service Name</th>
-                    <th>Status</th>
+                    <th>Price</th>
+                    <th>Description</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for service in services %}
                 <tr>
-                    <td>{{ service.name_service }}</td>
-                    <td><span class="badge {{ 'green' if service.status == 'active' else 'red' }}">{{ service.status.capitalize() }}</span></td>
-                    <td><span class="badge blue"><i class="fas fa-edit"></i> Edit</span></td>
+                    <td>{{ service.id }}</td>
+                    <td>{{ service.name }}</td>
+                    <td>{{ service.price }}</td>
+                    <td>{{ service.description }}</td>
+                    <td>
+                        <button type="button" class="badge blue edit-btn"
+                            data-id="{{ service.id }}"
+                            data-name="{{ service.name | e }}"
+                            data-price="{{ service.price }}"
+                            data-description="{{ service.description | e }}">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+        <!-- Modal for editing a service -->
+        <div id="editModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <span class="close" title="Đóng">&times;</span>
+                <form method="POST" action="/update-service" id="editForm">
+                    <h2>Cập nhật dịch vụ</h2>
+                    <input type="hidden" id="service_id" name="id">
+                    <label for="service_name">Service Name:</label>
+                    <input type="text" id="service_name" name="name" required>
+                    <label for="service_price">Price:</label>
+                    <input type="text" id="service_price" name="price" required>
+                    <label for="service_description">Description:</label>
+                    <textarea id="service_description" name="description" required></textarea>
+                    <div style="margin-top:12px; display:flex; gap:8px;">
+                        <button type="submit">Cập nhật</button>
+                        <button type="button" id="cancelBtn">Hủy</button>
+                    </div>
+                </form>
+            </div>
+        </div>
         <a href="/admin-dashboard"><-- Quay lại trang admin</a>
     </div>
+    
+    <style>
+        /* Modal styles */
+        .modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 20px; border-radius: 8px; width: 480px; max-width: 90%; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+        .modal-content h2 { margin-top: 0; }
+        .modal-content label { display:block; margin-top: 8px; font-weight:600; }
+        .modal-content input[type="text"], .modal-content textarea { width:100%; padding:8px; margin-top:6px; border:1px solid #ddd; border-radius:6px; }
+        .modal-content textarea { min-height: 100px; resize: vertical; }
+        .close { float: right; font-size: 22px; cursor: pointer; }
+        .edit-btn { border:none; background:transparent; padding:8px 12px; cursor:pointer; border-radius:6px; }
+        .edit-btn i { margin-right:6px; }
+    </style>
+
+    <script>
+        (function(){
+            const modal = document.getElementById('editModal');
+            const closeBtn = modal && modal.querySelector('.close');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const form = document.getElementById('editForm');
+
+            function openModal(data){
+                document.getElementById('service_id').value = data.id || '';
+                document.getElementById('service_name').value = data.name || '';
+                document.getElementById('service_price').value = data.price || '';
+                document.getElementById('service_description').value = data.description || '';
+                modal.style.display = 'flex';
+            }
+
+            function closeModal(){
+                modal.style.display = 'none';
+            }
+
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', function(){
+                    const data = {
+                        id: this.getAttribute('data-id'),
+                        name: this.getAttribute('data-name'),
+                        price: this.getAttribute('data-price'),
+                        description: this.getAttribute('data-description')
+                    };
+                    openModal(data);
+                });
+            });
+
+            if (closeBtn) closeBtn.addEventListener('click', closeModal);
+            if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+            window.addEventListener('click', function(e){ if (e.target === modal) closeModal(); });
+        })();
+    </script>
 </html>
