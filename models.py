@@ -11,7 +11,7 @@ class User_db(SQLModel, table=True):
 
     id: int | None = Field(default=None, primary_key=True)
     username: str = Field(nullable=False, max_length=100, unique=True)
-    hashed_password: str = Field(default=None, max_length=255)
+    hashed_password: Optional[str] = Field(default=None, max_length=255, nullable=True)
     email: Optional[str] = Field(default=None, max_length=100, unique=True)
     role: str = Field(nullable=False, max_length=50)  # "candidate" hoặc "business"
     avatar_path: Optional[str] = Field(default=None, max_length=255)

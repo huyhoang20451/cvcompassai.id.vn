@@ -9,10 +9,11 @@ from .repository import (get_paid_orders as repo_get_paid_orders,
                          update_user_by_username as repo_update_user_by_username,
                          delete_user_by_username as repo_delete_user_by_username,
                          get_services as repo_get_services,
-                         get_orders as repo_get_orders)
+                         get_orders as repo_get_orders,
+                         update_service_by_id as repo_update_service_by_id)
 from fastapi import Depends
 from typing import Annotated, List
-from .schemas import OrderSchema, Service, user
+from .schemas import OrderSchema, Service, user, OrderSchemaResponse
 from Core.Auth.dependencies import get_current_user
 from Core.OCR import compare
 from Core.Auth.hashing import get_password_hash
@@ -70,5 +71,16 @@ def delete_user_by_username(session: Session, username: str) -> bool:
 def get_services(session: Session) -> List[Service]:
     return repo_get_services(session)
 
-def get_orders(session: Session) -> List[OrderSchema]:
+def get_orders(session: Session) -> List[OrderSchemaResponse]:
     return repo_get_orders(session)
+
+def update_service_by_id(session: Session,
+                         service_id: int,
+                         name: str | None = None,
+                         description: str | None = None,
+                         price: int | None = None) -> Service:
+    return repo_update_service_by_id(session,
+                                     service_id,
+                                     name,
+                                     description,
+                                     price)

@@ -12,7 +12,8 @@ from .services import (get_orders,
                        failed_percentage,
                        get_users as service_get_users,
                        update_user as service_update_user,
-                       delete_user_by_username)
+                       delete_user_by_username,
+                       update_service_by_id)
 from db import get_session
 from Core.Auth.dependencies import templates, authorize_role
 from Core.Auth.schemas import user
@@ -80,10 +81,18 @@ async def delete_user(username: str,
     result = delete_user_by_username(session, username)
     return RedirectResponse(url="/users", status_code=303)
 
+# Lấy danh sách dịch vụ
 @router.get("/services", response_class=HTMLResponse)
 def services(request: Request, 
              session: Session = Depends(get_session)):
     service_list = get_services(session)
+    return templates.TemplateResponse("services.html", {"request": request, "services": service_list})
+
+# Cập nhật dịch vụ
+@router.patch("/services", response_class=HTMLResponse)
+def update_service(request: Request,
+                   session: Session = Depends(get_session)):
+    service_list = update_service_by_id(session)
     return templates.TemplateResponse("services.html", {"request": request, "services": service_list})
 
 @router.get("/quality-cv-checker", response_class=HTMLResponse)

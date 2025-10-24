@@ -78,7 +78,10 @@ def create_user(session: Session,
     user = get_user_by_username(session, username)
     if user:
         return False # Đã có username trong database
-    hashed_password = get_password_hash(password)
+    if password:
+        hashed_password = get_password_hash(password)
+    else:
+        hashed_password = None
     new_user = User_db(username=username, 
                        hashed_password=hashed_password,
                        email=email,

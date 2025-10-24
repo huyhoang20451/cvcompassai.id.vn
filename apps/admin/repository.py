@@ -1,6 +1,6 @@
 from sqlmodel import Session, func, select
 from models import Order_db, User_db, Service_db
-from .schemas import OrderSchema, user, Service
+from .schemas import OrderSchema, user, Service, OrderSchemaResponse
 from typing import List
 
 # Lấy tất cả các đơn đã thanh toán
@@ -10,10 +10,23 @@ def get_paid_orders(session: Session) -> List[OrderSchema]:
     orders = [OrderSchema.model_validate(order_in_db) for order_in_db in results]
     return orders
 
-def get_orders(session: Session) -> List[OrderSchema]:
-    statement = select(Order_db)
+def get_orders(session: Session) -> List[OrderSchemaResponse]:
+    statement = (
+        select(
+            Order_db.id,
+            Order_db.user_id,
+            User_db.username,
+            Order_db.package,
+            Order_db.amount,
+            Order_db.total_money,
+            Order_db.description,
+            Order_db.status,
+            Order_db.created_at,
+        )
+        .join(User_db, User_db.id == Order_db.user_id)
+    )    
     results = session.exec(statement).all()
-    orders = [OrderSchema.model_validate(order_in_db) for order_in_db in results]
+    orders = [OrderSchemaResponse.model_validate(order_in_db) for order_in_db in results]
     return orders
 
 # Đếm tổng số đơn hàng
@@ -104,3 +117,34 @@ def delete_user_by_username(session: Session, username: str) -> bool:
 def get_services(session: Session) -> List[Service]:
     results = session.exec(select(Service_db)).all()
     return [Service.model_validate(service_in_db) for service_in_db in results]
+
+def update_service_by_id(session: Session,
+                         service_id: int,
+                         name: str | None = None,
+                         description: str | None = None,
+                         price: int | None = None):
+    service = session.exec(select(Service_db).where(Service_db.id == service_id)).first()
+    if not service:
+        return None
+    service.name = name or service.name
+    service.description = description or service.description
+    service.price = price or service.price
+
+    session.add(service)
+    session.commit()
+    session.refresh(service)
+    return service
+
+def create_service(session: Session,
+                   name: str,
+                   description: str | None = None,
+                   price: int = 0):
+    new_service = Service_db(
+        name=name,
+        description=description,
+        price=price
+    )
+    session.add(new_service)
+    session.commit()
+    session.refresh(new_service)
+    return new_service

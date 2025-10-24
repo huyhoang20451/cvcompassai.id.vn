@@ -16,6 +16,12 @@ class OrderSchema(BaseModel):
     total_money: int
     description: str
     status: OrderStatus
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+class OrderSchemaResponse(OrderSchema):
+    username: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
 

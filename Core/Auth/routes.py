@@ -23,7 +23,8 @@ router = APIRouter(tags=["auth"])
 # Trang đăng nhập
 @router.get("/login", response_class=HTMLResponse)
 async def register_page(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
+    return templates.TemplateResponse("login.html", {"request": request,
+                                                     "google_client_id": settings.GOOGLE_CLIENT_ID})
 
 # Đăng nhập
 @router.post("/login", response_class=HTMLResponse)
@@ -57,6 +58,7 @@ async def register_page(request: Request, session: Session = Depends(get_session
 async def google_login(request: Request, 
                        session: Session = Depends(get_session)):
     data = await request.json()
+    print(data)
     id_token_str = data.get("id_token")
 
     if not id_token_str:
@@ -71,22 +73,29 @@ async def google_login(request: Request,
         email = idinfo["email"]
         name = idinfo.get("name", "")
         google_id = idinfo["sub"]  # ID duy nhất của người dùng trong Google
+        print(f"Google ID: {google_id}, Email: {email}, Name: {name}")
     except ValueError:
         raise HTTPException(status_code=401, detail="Token Google không hợp lệ")
     
     role = data.get("role")
     company_name = data.get("company_name", None)
     user = get_user_by_google_id(session, google_id)
-
+    if not user:
+        if not role:
+            return templates.TemplateResponse(
+                "register.html",
+                {"request": request, "error_message": "⚠️ Vai trò (role) không được để trống!"}
+            )
     # Đăng ký
     if not user:
         try:
             if role == "candidate":
-                user_in = CandidateCreate(username=email, email=email, role=role, full_name=name)
+                user_in = CandidateCreate(username=name, email=email, role=role, full_name=name)
             elif role == "business":
-                user_in = BusinessCreate(username=email, email=email, role=role, company_name=name)
+                user_in = BusinessCreate(username=name, email=email, role=role, company_name=company_name)
             else:
                 raise ValueError("Vai trò không hợp lệ")
+            print(f"Registering new user: {user_in}")
             new_user = create_user(session,
                                 username=user_in.username,
                                 password=user_in.password,
@@ -95,18 +104,21 @@ async def google_login(request: Request,
                                 company_name=getattr(user_in, "company_name", None),
                                 full_name=getattr(user_in, "full_name", None),
                                 google_id=google_id)
+            print(f"New user created: {new_user}")
         except Exception as e:
-            return templates.TemplateResponse(
-                "register.html", {"request": request, 
-                                "error": f"Dữ liệu không hợp lệ: {e}"})
-    
-
-    # 4️⃣ Tạo JWT riêng của bạn
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(data={"sub" : user.username, "role": user.role, "company_name": user.company_name},
-                                       expires_delta=access_token_expires)    
+            return JSONResponse(status_code=400, content={"detail": f"Lỗi đăng ký: {e}"})
+        # 4️⃣ Tạo JWT riêng của bạn
+        access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(data={"sub" : user_in.username, "role": user_in.role, "company_name": getattr(user_in, "company_name", None)},
+                                            expires_delta=access_token_expires)
+    else:
+        # 4️⃣ Tạo JWT riêng của bạn
+        access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(data={"sub" : user.username, "role": user.role, "company_name": user.company_name},
+                                            expires_delta=access_token_expires)
+    print("Access Token:", access_token)
     username, role, company_name = decode_token(access_token)
-
+    print(username, role, company_name)
     # 5️⃣ Điều hướng theo role
     if role in ["business", "business_premium"]:
         url = "/business-dashboard"
@@ -124,7 +136,6 @@ async def google_login(request: Request,
         max_age=3600
     )
     return response
-
 
     
 # Trang đăng ký:
