@@ -287,21 +287,15 @@ body {
             <h1>Cài đặt</h1>
             <h3>CV của tôi</h3>
 
+            {% for cv in cvs %}
             <div class="cv-item">
                 <div class="cv-file">
-                    <h4>CV #1</h4>
-                    <p>Filename: cv_john_doe.pdf</p>
+                    <h4>{{ cv.title }}</h4>
+                    <p>Filename: {{ cv.filename }}</p>
                     <a href="#" class="cv-detail">Xem chi tiết</a>
                 </div>
             </div>
-
-            <div class="cv-item">
-                <div class="cv-file">
-                    <h4>CV #2</h4>
-                    <p>Filename: cv_john_doe_updated.pdf</p>
-                    <a href="#" class="cv-detail">Xem chi tiết</a>
-                </div>
-            </div>
+            {% endfor %}
         </main>
     </div>
             <footer class="footer">
