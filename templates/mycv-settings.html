@@ -290,9 +290,9 @@ body {
             {% for cv in cvs %}
             <div class="cv-item">
                 <div class="cv-file">
-                    <h4>{{ cv.title }}</h4>
-                    <p>Filename: {{ cv.filename }}</p>
-                    <a href="#" class="cv-detail">Xem chi tiết</a>
+                    <h4>CV #{{ cv.id }}</h4>
+                    <p>Filename: {{ cv.URL }}</p>
+                    <a href="{{ cv.URL }}" class="cv-detail">Xem chi tiết</a>
                 </div>
             </div>
             {% endfor %}
