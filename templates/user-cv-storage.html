@@ -276,8 +276,8 @@ body {
             <h2>Cài đặt</h2>
             <ul class="menu">
                 <li><a style="text-decoration: none;" href="/edit-profile">Thông tin cá nhân</a></li>
-                <li class="active"><a style="text-decoration: none;" href="/mycv-settings">CV của tôi</a></li>
-                <li><a style="text-decoration: none;" href="/saved-jobs">Công việc/Đã lưu</a></li>
+                <li><a style="text-decoration: none;" href="/mycv-settings">CV của tôi</a></li>
+                <li class="active"><a style="text-decoration: none;" href="/saved-jobs">Công việc/Đã lưu</a></li>
                 <li>Lịch sử ứng tuyển</li>
                 <li><a style="text-decoration: none;" href="/system-settings">Cài đặt hệ thống</a></li>
             </ul>
@@ -290,10 +290,10 @@ body {
             {% for job in job_descriptions %}
             <div class="job-item">
                 <div class="job-details">
-                    <h4>Job #{{ job.id }}</h4>
-                    <p>Title: {{ job.title }}</p>
-                    <p>Location: {{ job.location }}</p>
-                    <p>Position: {{ job.position }}</p>
+                    <h4>Công việc #{{ job.id }}</h4>
+                    <p>Tên công việc: {{ job.title }}</p>
+                    <p>Nơi làm việc: {{ job.location }}</p>
+                    <p>Chức danh: {{ job.position }}</p>
                     <a href="/job-detail/{{ job.id }}" class="job-detail">Xem chi tiết</a>
                 </div>
             </div>
