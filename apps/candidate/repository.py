@@ -184,3 +184,27 @@ def get_job_categories(session: Session):
     statement = select(JobCategory_db)
     results = session.exec(statement).all()
     return [JobCategory.model_validate(job_category) for job_category in results]
+
+def get_saved_jobs_by_user(session: Session, user_id: int) -> List[jd]:
+    """
+    Lấy danh sách các công việc mà người dùng đã lưu,
+    bao gồm thông tin chi tiết của job.
+    """
+    statement = (
+        select(
+            jd_db.title,
+            jd_db.location,
+            jd_db.min_salary,
+            jd_db.max_salary,
+            jd_db.position,
+            jd_db.job_description,
+            jd_db.requirements,
+            jd_db.benefits,
+            jd_db.working_time,
+            jd_db.application_method,
+        )
+        .join(SavedJob, jd_db.id == SavedJob.job_id)
+        .where(SavedJob.user_id == user_id)
+    )
+    results = session.exec(statement).all()
+    return [jd.model_validate(result) for result in results]

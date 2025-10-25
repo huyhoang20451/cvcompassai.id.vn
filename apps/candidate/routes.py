@@ -18,7 +18,8 @@ from .services import (jd_to_str, search_jobs,
                        add_cv_into_candidate,
                        get_top_10_jds_by_cv,
                        save_jd as service_save_jd,
-                       get_job_categories)
+                       get_job_categories,
+                       get_saved_jobs_by_user)
 from db import get_session, engine
 from Core.Auth.schemas import user
 from .schemas import JobResponse, JobSearchRequest, candidate_CV, jd
@@ -212,7 +213,7 @@ async def pricing_user_logged_in(request: Request,
                                                                      "user_info": user_info})
 
 # Lưu công việc vào danh sách yêu thích
-@router.post("/save-jd", response_class=HTMLResponse)
+@router.post("/save-jd/{jd_id}", response_class=HTMLResponse)
 async def save_jd(request: Request,
                   jd_id: int,
                   user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
@@ -323,3 +324,12 @@ async def top10_best_jd_unblur(request: Request,
     return templates.TemplateResponse("top10-best-jd.html", {"request": request, 
                                                              #"job_descriptions": [jd['jd'] for jd in top_10],
                                                              "user_info": user_info})
+
+@router.get("/saved-jobs", response_class=HTMLResponse)
+async def saved_jobs(request: Request,
+                     user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
+                     session: Session = Depends(get_session)):
+    saved_jds = get_saved_jobs_by_user(session, user_info.id)
+    return templates.TemplateResponse("user-cv-storage.html", {"request": request,
+                                                               "user_info": user_info,
+                                                               "job_descriptions": saved_jds})

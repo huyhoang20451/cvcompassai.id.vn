@@ -10,7 +10,8 @@ from .repository import (search_jobs as repo_search_jobs,
                          add_cv_into_candidate as repo_add_cv_into_candidate,
                          get_cvs_by_id as repo_get_cvs_by_id,
                          save_jd as repo_save_jd,
-                         get_job_categories as repo_get_job_categories)
+                         get_job_categories as repo_get_job_categories,
+                         get_saved_jobs_by_user as repo_get_saved_jobs_by_user)
 from fastapi import Depends, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 from typing import Annotated, List, Optional
@@ -124,3 +125,5 @@ def save_jd(session: Session, candidate_id: int, job_id: int):
 def get_job_categories(session: Session) -> List[JobCategory]:
     return repo_get_job_categories(session)
 
+def get_saved_jobs_by_user(session: Session, user_id: int) -> List[jd]:
+    return repo_get_saved_jobs_by_user(session, user_id)
