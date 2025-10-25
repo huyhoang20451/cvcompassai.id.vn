@@ -8,7 +8,7 @@
   <script src="/static/js/theme.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=upload" />
-    <title>Cài đặt tài khoản</title>
+    <title>Cài đặt tài khoản - CV của tôi</title>
 </head>
 <style>
     /* Reset cơ bản */
@@ -157,6 +157,52 @@ body {
   display: block;
   margin: 0 auto;
 }
+/* CV item */
+.cv-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  background: #fff;
+  padding: 15px 20px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.cv-item .company-logo {
+  width: 40px;
+  height: 40px;
+  margin-right: 15px;
+}
+
+.cv-info {
+  flex: 1;
+}
+
+.cv-info h4 {
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
+
+.cv-info p {
+  font-size: 14px;
+  margin-bottom: 4px;
+  color: #444;
+}
+
+.cv-detail {
+  color: #004aad;
+  font-weight: bold;
+  text-decoration: none;
+  align-self: center;
+  margin-left: 15px;
+}
+.cv-detail:hover {
+  text-decoration: underline;
+}
+
 </style>
 <body style="background-color: #F6FCFF">
     <!--Bắt đầu phần header-->
@@ -170,14 +216,13 @@ body {
                 <li><a method="get" href="/aboutus-logged-in">Về chúng tôi</a></li>
                 <li><a method="get" href="/finding-jobs">Tìm việc làm</a></li>
                 <li><a method="get" href="/ocr-scan-logged-in">Quét CV bằng OCR</a></li>
-                <li><a method="get" href="/pricing-user-loggedin">Gói dịch vụ</a></li>
+                <li><a method="get" href="/pricing-user-logged-in">Gói dịch vụ</a></li>
             </ul>
         </div>
         <div class="header-actions">
             <!--Chào mừng khi đăng nhập thành công-->
             <p id="welcome-user">Chào mừng, {{user_info.full_name}}!</p>
             <p style="display: flex; align-items: center; background-color: #D1E9F6; padding: 5px 10px; border-radius: 5px;"><img style="width: 20px; height: 20px;" src="/static/images/coin.png" alt="Coin"><strong>{{user_info.coin}}</strong></p>
-            
         </div>
         <div class="user-avatar">
             <img onclick="boxAppear()" style="width: 40px; height: 40px; border-radius: 50%;" src="/static/images/user_avatar.png" alt="User Avatar">
@@ -230,8 +275,8 @@ body {
             <button class="back-btn">← Quay lại</button>
             <h2>Cài đặt</h2>
             <ul class="menu">
-                <li class="active"><a style="text-decoration: none;" href="/edit-profile">Thông tin cá nhân</a></li>
-                <li><a style="text-decoration: none;" href="/mycv-settings">CV của tôi</a></li>
+                <li><a style="text-decoration: none;" href="/edit-profile">Thông tin cá nhân</a></li>
+                <li class="active"><a style="text-decoration: none;" href="/mycv-settings">CV của tôi</a></li>
                 <li><a style="text-decoration: none;" href="/saved-jobs">Công việc/Đã lưu</a></li>
                 <li>Lịch sử ứng tuyển</li>
                 <li><a style="text-decoration: none;" href="/system-settings">Cài đặt hệ thống</a></li>
@@ -240,29 +285,18 @@ body {
         <!--Main content-->
         <main class="main">
             <h1>Cài đặt</h1>
-            <h3>Thông tin cá nhân</h3>
+            <h3>Công việc / Đã lưu</h3>
 
-            <div class="profile">
-                <div class="avatar">
-                    <img src="/static/images/user_avatar.png" alt="User Avatar">
-                    <button class="upload-btn">Tải ảnh đại diện</button>
+            {% for job in job_descriptions %}
+            <div class="job-item">
+                <div class="job-details">
+                    <h4>Job #{{ job.id }}</h4>
+                    <p>Title: {{ job.title }}</p>
+                    <p>Company: {{ job.company }}</p>
+                    <a href="{{ /job-detail/{{ job.id }} }}" class="job-detail">Xem chi tiết</a>
                 </div>
             </div>
-
-            <p class="note">(*) Các thông tin bắt buộc</p>
-
-            <form class="form">
-                <label for="fullname">Họ và tên <span>*</span></label>
-                <input type="text" id="fullname" value="{{ user_info.full_name }}" required>
-
-                <label for="email">Email <span>*</span></label>
-                <input type="email" id="email" value="" required>
-
-                <label for="phone">Số điện thoại <span>*</span></label>
-                <input type="tel" id="phone" value="" required>
-
-                <button type="submit" class="save-btn">Lưu</button>
-            </form>
+            {% endfor %}
         </main>
     </div>
             <footer class="footer">
