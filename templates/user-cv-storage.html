@@ -290,9 +290,10 @@ body {
             {% for job in job_descriptions %}
             <div class="job-item">
                 <div class="job-details">
-                    <h4>Job #{{ job.id }}</h4>
+                    <h4>Job #{{ loop.index }}</h4>
                     <p>Title: {{ job.title }}</p>
-                    <p>Company: {{ job.company }}</p>
+                    <p>Location: {{ job.location }}</p>
+                    <p>Position: {{ job.position }}</p>
                     <a href="/job-detail/{{ job.id }}" class="job-detail">Xem chi tiết</a>
                 </div>
             </div>
