@@ -287,11 +287,16 @@ body {
           <form action="/job-detail/{{ job.id }}" method="get">
             <button type="submit" class="cv-detail">Xem chi tiết >></button>
           </form>
-          <form action="/save-jd" method="post">
+          <!-- Preserve a non-JS fallback form (submit shown only when JS is disabled) -->
+          <form action="/save-jd" method="post" class="save-jd-fallback" style="display:inline-block;">
             <input type="hidden" name="username" value="{{ username }}">
             <input type="hidden" name="jd_id" value="{{ job.id }}">
-            <button type="submit" class="btn-orange">Quan tâm</button>
+            <noscript>
+              <button type="submit" class="btn-orange">Quan tâm</button>
+            </noscript>
           </form>
+          <!-- AJAX-enabled save button: visible when JS is enabled -->
+          <button type="button" class="btn-orange save-jd-btn" data-jd-id="{{ job.id }}">Quan tâm</button>
         </div>
         
       </div>
@@ -411,6 +416,79 @@ body {
 
   document.getElementById('globalSearchBtn').addEventListener('click', applyFilters);
   document.getElementById('resetFilters').addEventListener('click', function(){ document.getElementById('searchForm').reset(); });
+
+  // --- Save JD (AJAX) ---
+  // Use event delegation so the button works for dynamically injected job lists too.
+  document.addEventListener('click', async function (ev) {
+    const btn = ev.target.closest && ev.target.closest('.save-jd-btn');
+    if (!btn) return;
+    ev.preventDefault();
+
+    const jdId = btn.dataset.jdId;
+    if (!jdId) return alert('Không xác định được job id');
+
+    btn.disabled = true;
+    const originalText = btn.innerText;
+    btn.innerText = 'Đang lưu...';
+
+    try {
+      const resp = await fetch('/save-jd', {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({ jd_id: jdId })
+      });
+
+      if (!resp.ok) {
+        throw new Error('HTTP ' + resp.status);
+      }
+      const data = await resp.json();
+      showToast(data.msg || (data.success ? 'Thành công' : 'Không thành công'), !!data.success);
+      // Optionally update UI if saved (e.g., change button text or style)
+      if (data.success) {
+        btn.innerText = 'Đã lưu';
+        btn.classList.add('saved');
+      } else {
+        btn.innerText = originalText;
+      }
+    } catch (err) {
+      console.error('Lưu công việc thất bại', err);
+      showToast('Lỗi khi lưu công việc. Vui lòng thử lại.', false);
+      btn.innerText = originalText;
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  // Small toast helper
+  function showToast(message, success=true) {
+    const id = 'cvcompass-toast';
+    let container = document.getElementById(id);
+    if (!container) {
+      container = document.createElement('div');
+      container.id = id;
+      container.style.position = 'fixed';
+      container.style.right = '20px';
+      container.style.bottom = '20px';
+      container.style.zIndex = 9999;
+      document.body.appendChild(container);
+    }
+    const el = document.createElement('div');
+    el.innerText = message;
+    el.style.marginTop = '8px';
+    el.style.padding = '10px 14px';
+    el.style.borderRadius = '6px';
+    el.style.color = '#fff';
+    el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+    el.style.background = success ? '#2f9e44' : '#e03131';
+    el.style.opacity = '1';
+    el.style.transition = 'opacity 0.5s ease';
+    container.appendChild(el);
+    setTimeout(() => { el.style.opacity = '0'; }, 2600);
+    setTimeout(() => { el.remove(); }, 3100);
+  }
 </script>
 
 </body>
