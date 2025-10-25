@@ -271,7 +271,7 @@ body {
     </aside>
 
     <!-- Danh sách việc -->
-  {% for job in job_descriptions %}
+  {% for job in jds %}
     <main class="job-list">
       <div class="job-item">
         <img style="width: 40px; height: 40px;" src="{{ job.company_logo_url or '/static/images/business_avatar.png' }}" alt="logo" class="company-logo">
@@ -284,15 +284,19 @@ body {
           <p><b>Hạn nộp:</b> {{ job.deadline }}</p>
         </div>
         <div class="job-actions">
-          <a href="/job-detail/{{ job.id }}" class="cv-detail">Xem chi tiết >></a><br>
-          <form method="post" action="/save-jd">
-            <input type="hidden" name="job_id" value="{{ job.id }}">
+          <form action="/job-detail/{{ job.id }}" method="get">
+            <button type="submit" class="cv-detail">Xem chi tiết >></button>
+          </form>
+          <form action="/save-jd" method="post">
+            <input type="hidden" name="username" value="{{ username }}">
+            <input type="hidden" name="jd_id" value="{{ job.id }}">
             <button type="submit" class="btn-orange">Quan tâm</button>
           </form>
-          <button class="btn-blue">Ứng tuyển ngay</button>
-        </div>
+        
       </div>
-      {% endfor %}
+    </div>
+  {%endfor%}
+
 
       <!-- phân trang -->
       <div class="pagination">
