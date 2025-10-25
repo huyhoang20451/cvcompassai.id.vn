@@ -432,7 +432,7 @@ body {
     btn.innerText = 'Đang lưu...';
 
     try {
-      const resp = await fetch('/save-jd', {
+      const resp = await fetch(`/save-jd/${jdId}`, {
         method: 'POST',
         headers: {
           'X-Requested-With': 'XMLHttpRequest',
