@@ -287,7 +287,7 @@ body {
           <form action="/job-detail/{{ job.id }}" method="get">
             <button type="submit" class="cv-detail">Xem chi tiết >></button>
           </form>
-          <form action="/save-jd/{{ job.id }}" method="post">
+          <form action="/save-jd" method="post">
             <input type="hidden" name="username" value="{{ username }}">
             <input type="hidden" name="jd_id" value="{{ job.id }}">
             <button type="submit" class="btn-orange">Quan tâm</button>
