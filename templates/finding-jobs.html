@@ -288,7 +288,7 @@ body {
             <button type="submit" class="cv-detail">Xem chi tiết >></button>
           </form>
           <!-- Preserve a non-JS fallback form (submit shown only when JS is disabled) -->
-          <form action="/save-jd" method="post" class="save-jd-fallback" style="display:inline-block;">
+          <form action="/save-jd/{{ job.id }}" method="post" class="save-jd-fallback" style="display:inline-block;">
             <input type="hidden" name="username" value="{{ username }}">
             <input type="hidden" name="jd_id" value="{{ job.id }}">
             <noscript>
