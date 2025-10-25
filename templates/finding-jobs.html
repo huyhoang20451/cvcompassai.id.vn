@@ -271,8 +271,8 @@ body {
     </aside>
 
     <!-- Danh sách việc -->
-  {% for job in job_descriptions %}
     <main class="job-list">
+      {% for job in job_descriptions %}
       <div class="job-item">
         <img style="width: 40px; height: 40px;" src="{{ job.company_logo_url or '/static/images/business_avatar.png' }}" alt="logo" class="company-logo">
         <div class="job-info">
@@ -298,11 +298,9 @@ body {
           <!-- AJAX-enabled save button: visible when JS is enabled -->
           <button type="button" class="btn-orange save-jd-btn" data-jd-id="{{ job.id }}">Quan tâm</button>
         </div>
-        
       </div>
+      {% endfor %}
     </main>
-    </div>
-  {%endfor%}
 
 
       <!-- phân trang -->
@@ -313,8 +311,7 @@ body {
         <span>…</span>
         <span>>></span>
       </div>
-    </main>
-  </div>
+    </div>
     
             <footer class="footer">
         <div class="footer-contact">
