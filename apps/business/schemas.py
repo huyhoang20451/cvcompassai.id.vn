@@ -26,6 +26,7 @@ class JD_create(BaseModel):
 class jd_response(JD_create):
     company_name: Optional[str] = None
     avatar_path: Optional[str] = None
+    cv_count: Optional[int] = 0
 
     model_config = ConfigDict(from_attributes=True)
     

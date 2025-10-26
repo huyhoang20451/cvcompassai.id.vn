@@ -4,15 +4,31 @@ from .schemas import JD_create, JobCategory, jd_response, jd_CV, candidate_CV
 from typing import List
 
 def get_jds_by_user_name(session: Session, username: str) -> List[jd_response]:
+    # 1️⃣ Lấy danh sách JD của user
     statement = (
-        select(jd_db, User_db.username, User_db.company_name)
+        select(jd_db, User_db.company_name, User_db.avatar_path)
         .join(User_db, jd_db.business_id == User_db.id)
         .where(User_db.username == username)
     )
-    results = session.exec(statement).all()
+    jd_results = session.exec(statement).all()
+
+    # 2️⃣ Lấy số lượng CV theo JD (trả về dạng dict: {jd_id: cv_count})
+    cv_statement = (
+        select(jd_CV_db.jd_id, func.count(jd_CV_db.id))
+        .group_by(jd_CV_db.jd_id)
+    )
+    cv_results = session.exec(cv_statement).all()
+    cv_count_map = {jd_id: count for jd_id, count in cv_results}
+
+    # 3️⃣ Gộp hai kết quả lại
     return [
-        jd_response.model_validate({**jd.model_dump(), "username": u, "company_name": c})
-        for jd, u, c in results
+        jd_response.model_validate({
+            **jd.model_dump(),
+            "company_name": company_name,
+            "avatar_path": avatar_path,
+            "cv_count": cv_count_map.get(jd.id, 0)
+        })
+        for jd, company_name, avatar_path in jd_results
     ]
 
 def get_user_by_jd_id(session: Session, jd_id: int) -> User_db:
@@ -99,22 +115,6 @@ def get_job_categories(session: Session):
     results = session.exec(statement).all()
     return [JobCategory.model_validate(job_category) for job_category in results]
 
-# Thống kê số lượng CV ứng tuyển cho mỗi JD
-def get_cv_count_by_jd(session: Session):
-    statement = (
-        select(
-            getattr(jd_CV_db, "jd_id"),
-            func.count(getattr(jd_CV_db, "jd_id")).label("so_luong_cv")
-        )
-        .group_by(getattr(jd_CV_db, "jd_id"))
-    )
-    results = session.exec(statement).all()
-
-    # Trả về dạng list[dict] cho dễ dùng
-    return [
-        {"jd_id": jd_id, "so_luong_cv": so_luong_cv}
-        for jd_id, so_luong_cv in results
-    ]
 
 def get_total_cv_by_business_id(session: Session, business_id: int):
     """

@@ -12,7 +12,6 @@ from .services import (get_jds_by_user_name,
                        update_jd_by_id as service_update_jd_by_id,
                        update_business_by_id as service_update_business_info,
                        get_job_categories,
-                       get_cv_count_by_jd,
                        get_total_cv_by_business_id,
                        get_total_jd_by_business_id)
 from db import get_session
@@ -67,13 +66,11 @@ async def job_storage(request: Request,
                       session : Session = Depends(get_session)):
     job_descriptions = get_jds_by_user_name(session, user_info.username)
     job = next((jd for jd in job_descriptions if jd.id == jd_id), None)
-    cv_counts = get_cv_count_by_jd(session)
     return templates.TemplateResponse("job-storage.html", 
                                       {"request": request,
                                        "job_position": job_descriptions,
                                        "job": job,
-                                       "user_info": user_info,
-                                       "cv_counts": cv_counts})
+                                       "user_info": user_info})
 
 @router.post("/submit-job", response_class=HTMLResponse)
 async def submit_job(request: Request, 
