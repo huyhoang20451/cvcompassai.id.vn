@@ -282,7 +282,9 @@ body {
     <div class="job-highlight">
       <div class="score">
         <p>Số lượng CV</p>
-        <h1>{{ cv_counts }}</h1>
+        {% if jd_id == job.id %}
+        <h1>{{ cv_counts[jd_id].so_luong_cv }}</h1>
+        {% endif%}
         <button>Đề Cử Top 20 CV</button>
       </div>
       <div class="company">
