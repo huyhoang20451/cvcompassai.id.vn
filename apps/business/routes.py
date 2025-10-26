@@ -13,7 +13,8 @@ from .services import (get_jds_by_user_name,
                        update_business_by_id as service_update_business_info,
                        get_job_categories,
                        get_total_cv_by_business_id,
-                       get_total_jd_by_business_id)
+                       get_total_jd_by_business_id,
+                       approve_cv as service_approve_cv)
 from .dependency import send_email
 from db import get_session
 from Core.Auth.dependencies import templates, authorize_role
@@ -127,7 +128,7 @@ def compare_cv_vs_jd(request: Request,
         results.append({"cv_url": cv.URL,
                         "met": comparison.get("Met", []),
                         "not_met": comparison.get("Not_Met", []),
-                        "candidate_id": cv.candidate_id})
+                        "id": cv.id})
     print(results)
     return templates.TemplateResponse("cv-detail-business.html", {"request": request,
                                                                   "user_info": user_info,
@@ -190,29 +191,17 @@ async def update_business_info(request: Request,
         raise HTTPException(status_code=404, detail="Business information not found")
     return RedirectResponse(url=f"/business-profile", status_code=303)
 
-@router.post("/send-email", response_class=HTMLResponse)
-async def send_email_endpoint(request: Request,
-                              session: Session = Depends(get_session),
-                              user_info: user = Depends(authorize_role(["business", "business_premium"]))):
-    form = await request.form()
-    email_data = dict(form)
-    print(email_data)
+@router.post("/approve-cv", response_class=HTMLResponse)
+async def approve_cv(request: Request,
+                     id: int = Form(...),
+                     approval: bool = Form(...),
+                     session: Session = Depends(get_session),
+                     user_info: user = Depends(authorize_role(["business", "business_premium"]))):
 
-    # Lấy thông tin email từ form
-    candidate_id = email_data.get("candidate_id")
-    candidate = get_user_by_id(session, candidate_id)
-    to = candidate.email
-    if not to:
-        raise HTTPException(status_code=400, detail="Ứng viên không có email")
-    subject = email_data.get("subject")
-    content = email_data.get("content")
-
-    # Kiểm tra dữ liệu hợp lệ
-    if not all([to, subject, content]):
-        raise HTTPException(status_code=400, detail="Thiếu thông tin email")
-
-    # Gửi email (có thể dùng BackgroundTasks hoặc async)
-    await send_email(to, subject, content)
-
-    # Sau khi gửi xong thì chuyển hướng
-    return RedirectResponse(url="/business-profile", status_code=303)
+    result = service_approve_cv(session, id, approval)
+    if result is False:
+        raise HTTPException(status_code=404, detail="CV not found or not authorized to approve")
+    if approval:
+        return JSONResponse(content={"message": "CV approved successfully"})
+    else:
+        return JSONResponse(content={"message": "CV rejected successfully"})

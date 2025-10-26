@@ -63,6 +63,7 @@ class jd_CV_db(SQLModel, table=True):
     jd_id: int = Field(foreign_key="jd.id")   # liên kết với bảng job
     URL: str = Field(max_length=255)
     candidate_id: int = Field(foreign_key="user.id")  # liên kết với bảng users
+    approved: bool = Field(default=False)
     
 class Order_db(SQLModel, table=True):
     __tablename__ = "orders"

@@ -138,3 +138,15 @@ def get_total_jd_by_business_id(session: Session, business_id: int):
     )
     result = session.exec(statement).first()
     return result or 0
+
+def approve_cv(session: Session, id: int, approval: bool) -> bool:
+    jd_cv = session.exec(
+        select(jd_CV_db).where(jd_CV_db.id == id)
+    ).first()
+    if not jd_cv:
+        return False
+    jd_cv.approved = approval
+    session.add(jd_cv)
+    session.commit()
+    session.refresh(jd_cv)
+    return True
