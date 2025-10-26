@@ -399,10 +399,10 @@
         if(cvIds.length === 0){ alert('Không tìm thấy ID hợp lệ cho CV được chọn.'); return; }
         try{
             // send delete requests in parallel
-            const promises = cvIds.map(id => fetch('/delete-cv-from-jd', {
+            const promises = cvIds.map(id => fetch('/approve-cv', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ cv_id: id, jd_id: currentJdId })
+                body: new URLSearchParams({ id: id, approval: 'false' })
             }));
             const responses = await Promise.all(promises);
             // check results
