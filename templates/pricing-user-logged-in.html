@@ -10,6 +10,108 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=upload" />
     <title>Giá dịch vụ cho người dùng</title>
 </head>
+<style>
+    .pricing-section {
+  text-align: center;
+  padding: 60px 20px;
+  background: #f6fcff;
+}
+
+.pricing-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 40px;
+  color: #1e3a8a;
+}
+
+.pricing-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+.pricing-card {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  padding: 30px 25px;
+  width: 280px;
+  transition: all 0.3s ease;
+  border-top: 6px solid #60a5fa;
+}
+
+.pricing-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.pricing-plan {
+  font-size: 20px;
+  font-weight: bold;
+  color: #2563eb;
+}
+
+.pricing-price {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 10px 0;
+  color: #111827;
+}
+
+.pricing-desc {
+  font-size: 15px;
+  color: #4b5563;
+  margin-bottom: 15px;
+}
+
+.pricing-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px 0;
+  text-align: left;
+}
+
+.pricing-features li {
+  margin: 6px 0;
+  font-size: 14px;
+  color: #374151;
+}
+
+.pricing-btn {
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+.pricing-btn:hover {
+  background: linear-gradient(90deg, #2563eb, #1d4ed8);
+}
+
+.premium {
+  border-top-color: #f59e0b;
+}
+
+.premium .pricing-plan {
+  color: #b45309;
+}
+
+.checkout-box {
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+  margin: 30px auto;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+</style>
 <body style="background-color: #F6FCFF;">
     <!--Bắt đầu phần header-->
     <div class="header">
@@ -79,70 +181,71 @@
         </div>
     </div> <!-- kết thúc phần tựa đề -->
 
-    <div class="card-pricing-container">
-        {# Normalize packages: prefer candidate_packages, then business_packages, else empty list #}
-        {% set packages = candidate_packages if (candidate_packages is defined and candidate_packages) else (business_packages if (business_packages is defined and business_packages) else []) %}
+    <section class="pricing-section">
+  <h2 class="pricing-title">Chọn gói dịch vụ phù hợp với bạn</h2>
 
-        {% if packages and packages | length > 0 %}
-            {% for package in packages %}
-            <div class="card-pricing {{ 'premium' if package.name.startswith('candidate_') else 'business' }}"> <!--Bắt đầu các gói dịch vụ-->
-                <div class="card-header">{{ package.name }}</div>
-                <div class="price">{{ package.price }} VNĐ/tháng</div>
-                <div class="card-body">
-                    <div>{{ package.description | join(', ') }}</div>
-                    <button onclick="formAppear()" class="buy-btn" data-package-name="{{ package.name }}" data-package-price="{{ package.price }}">Mua ngay</button>
-                </div>
-            </div>
-            {% endfor %}
-        {% else %}
-            <p>Hiện chưa có gói dịch vụ nào. Vui lòng quay lại sau.</p>
-        {% endif %}
+  <div class="pricing-container">
+    {% for package in candidate_packages %}
+      <div class="pricing-card {% if 'premium' in package.name.lower() %}premium{% endif %}">
+        <h3 class="pricing-plan">
+          {% if package.name == 'candidate_xu' %}Candidate Xu{% else %}Candidate Premium{% endif %}
+        </h3>
+        <p class="pricing-price">{{ package.price | int | format(",") }} VNĐ / tháng</p>
+        <p class="pricing-desc">
+          {% if package.name == 'candidate_xu' %}
+            Phù hợp với người dùng cơ bản muốn quét CV và tìm kiếm công việc nhanh chóng.
+          {% else %}
+            Dành cho người dùng chuyên nghiệp muốn khai thác toàn bộ tính năng của CV Compass.
+          {% endif %}
+        </p>
 
-    <!--Chỗ này hiện box checkout-->
-        {% if packages and packages | length > 0 %}
-        <div class="checkout-box" id="checkout-box" style="display:none;">
-            <form action="/payment" method="POST">
-                <div id="checkout-title" style="margin-bottom:8px;">Chọn gói dịch vụ</div>
-                <!-- backend expects 'package' and 'amount_package' -->
-                <input type="hidden" id="package_input" name="package" value="">
-                <input type="hidden" id="price_input" name="price" value="">
-                <label for="amount_package">Số lượng:</label>
-                <input id="amount_package" name="amount_package" type="number" min="1" value="1" required placeholder="Nhập số lượng muốn mua">
-                <div style="margin-top:12px;"><button type="submit" class="btn btn-primary">Xác nhận thanh toán</button></div>
-            </form>
-        </div>
-        {% else %}
-        <div class="checkout-box" id="checkout-box" style="display:none;">
-            <p>Không có gói để thanh toán.</p>
-        </div>
-        {% endif %}
-        <script>
-            function formAppear() {
-                var box = document.getElementById("checkout-box");
-                if (!box) return;
-                box.style.display = "block";
-                // scroll into view for better UX on mobile
-                box.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        </script>
-        <script>
-            // Attach click handlers after DOM ready to populate package inputs
-            document.addEventListener('DOMContentLoaded', function(){
-                document.querySelectorAll('.buy-btn').forEach(function(btn){
-                    btn.addEventListener('click', function(e){
-                        e.preventDefault();
-                        var packageName = btn.getAttribute('data-package-name');
-                        var packagePrice = btn.getAttribute('data-package-price');
-                        var pkgInput = document.getElementById('package_input');
-                        var priceInput = document.getElementById('price_input');
-                        if(pkgInput) pkgInput.value = packageName;
-                        if(priceInput) priceInput.value = packagePrice;
-                        formAppear();
-                    });
-                });
-            });
-        </script>
-    </div> <!--Kết thúc các gói dịch vụ-->
+        <ul class="pricing-features">
+          {% if package.name == 'candidate_xu' %}
+            <li>✓ Truy cập tính năng OCR cơ bản</li>
+            <li>✓ Gợi ý 10 JD phù hợp</li>
+            <li>✗ Không có quyền mở khóa JD nâng cao</li>
+          {% else %}
+            <li>✓ Toàn bộ tính năng cơ bản</li>
+            <li>✓ Mở khóa tất cả JD phù hợp</li>
+            <li>✓ Ưu tiên hỗ trợ và cập nhật</li>
+          {% endif %}
+        </ul>
+
+        <button class="pricing-btn" data-package-name="{{ package.name }}" data-package-price="{{ package.price }}">
+          Mua ngay
+        </button>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Form thanh toán ẩn -->
+<div class="checkout-box" id="checkout-box" style="display:none;">
+  <form action="/payment" method="POST">
+    <h3 style="margin-bottom: 10px;">Xác nhận thanh toán</h3>
+    <input type="hidden" id="package_input" name="package">
+    <input type="hidden" id="price_input" name="price">
+    <label for="amount_package">Số lượng:</label>
+    <input id="amount_package" name="amount_package" type="number" min="1" value="1" required>
+    <br>
+    <button type="submit" class="pricing-btn" style="margin-top: 10px;">Xác nhận</button>
+  </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('.pricing-btn').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      var box = document.getElementById('checkout-box');
+      document.getElementById('package_input').value = btn.getAttribute('data-package-name');
+      document.getElementById('price_input').value = btn.getAttribute('data-package-price');
+      box.style.display = 'block';
+      box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  });
+});
+</script>
         <footer class="footer">
         <div class="footer-contact">
             <div class="footer-contact-item">
