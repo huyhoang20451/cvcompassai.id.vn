@@ -74,8 +74,8 @@ def get_candidate_cv_by_id(session: Session, cv_id: int) -> candidate_CV:
     cv = repo_get_candidate_cv_by_id(session, cv_id)
     return cv
 
-def add_cv_into_jd(session: Session, URL: str, jd_id: int) -> jd_CV:
-    cv = repo_add_cv_into_jd(session, URL, jd_id)
+def add_cv_into_jd(session: Session, URL: str, jd_id: int, candidate_id: int) -> jd_CV:
+    cv = repo_add_cv_into_jd(session, URL, jd_id, candidate_id)
     return cv
 
 def jd_to_str(jd: jd) -> str:
