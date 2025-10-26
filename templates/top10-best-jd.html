@@ -87,8 +87,8 @@
 
                             const response = await fetch('/deduct-coin', {
                                 method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ amount: amountToDeduct })
+                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                body: new URLSearchParams({ amount: amountToDeduct })
                 });
 
                             const data = await response.json();
