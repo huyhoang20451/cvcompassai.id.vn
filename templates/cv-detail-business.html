@@ -236,6 +236,8 @@
                 <textarea id="email-content" name="content" required></textarea>
                 <!-- hidden subject field that backend expects -->
                 <input type="hidden" id="email-subject" name="subject" value="Mời phỏng vấn">
+                <!-- hidden candidate id so backend receives candidate_id along with subject and content -->
+                <input type="hidden" id="candidate-id-field" name="candidate_id" value="">
                 <button type="submit">Gửi</button>
             </form>
         </div>
@@ -361,6 +363,12 @@
             selectedEl.classList.add('selected');
             currentSelectedIdx = idx;
             currentCvId = selectedEl.dataset.cvId || '';
+            // populate hidden candidate_id field in the interview form
+            const candField = document.getElementById('candidate-id-field');
+            if(candField) candField.value = currentCvId;
+            // also prefill candidate email if available in dataset (best-effort)
+            const candEmailField = document.getElementById('candidate-email');
+            if(candEmailField && selectedEl.dataset.candidateEmail) candEmailField.value = selectedEl.dataset.candidateEmail;
         }
 
         const adv = document.getElementById('advantages-list');
