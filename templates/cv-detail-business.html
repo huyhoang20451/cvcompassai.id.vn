@@ -42,6 +42,10 @@
     .cv-items.selected {
         background: #eef7ff;
     }
+    .cv-items.approved {
+        opacity: 0.6;
+        pointer-events: none;
+    }
     .cv-items img {
         width: 40px;
         height: 40px;
@@ -220,61 +224,17 @@
         <button onclick="approveCV()" style="background-color: green; color: white;" class="btn-approve">Duyệt</button>
     </div>
 
-    <!-- Modal gửi email mời phỏng vấn -->
-    <div class="modal" id="interview-modal" style="display:none;">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('interview-modal')">&times;</span>
-            <h2>Gửi email mời phỏng vấn</h2>
-            <!-- Submit to backend /send-email which expects form fields: to, subject, content -->
-            <form id="interview-form" action="/send-email" method="POST" onsubmit="prepareInterviewForm()">
-                <label for="candidate-email">Email ứng viên:</label>
-                <input type="email" id="candidate-email" name="to" required>
-                <label for="interview-date">Ngày phỏng vấn:</label>
-                <input type="date" id="interview-date" name="interview-date" required>
-                <label for="interview-time">Thời gian phỏng vấn:</label>
-                <input type="time" id="interview-time" name="interview-time" required>
-                <label for="email-content">Nội dung email:</label>
-                <textarea id="email-content" name="content" required></textarea>
-                <!-- hidden subject field that backend expects -->
-                <input type="hidden" id="email-subject" name="subject" value="Mời phỏng vấn">
-                <!-- hidden candidate id so backend receives candidate_id along with subject and content -->
-                <input type="hidden" id="candidate-id-field" name="candidate_id" value="">
-                <button type="submit">Gửi</button>
-            </form>
-        </div>
     </div>
     <script>
-        // track currently selected CV and JD id (if jd_id present in query params)
-        var currentSelectedIdx = null;
-        var currentCvId = '';
-        var currentJdId = "{{ request.query_params.get('jd_id','') }}";
+    // track currently selected CV and JD id (if jd_id present in query params)
+    var currentSelectedIdx = null;
+    var currentCvId = '';
+    var currentJdId = "{{ request.query_params.get('jd_id','') }}";
 
         function approveCV() {
-            // Hiển thị modal gửi email mời phỏng vấn
-            document.getElementById('interview-modal').style.display = 'block';
-            // if selected CV has email/cv-url, prefill the email input
-            if(currentSelectedIdx !== null){
-                const el = document.querySelector('.cv-items[data-idx="'+currentSelectedIdx+'"]');
-                if(el && el.dataset.cvUrl){
-                    // prefilling candidate email field is best-effort; leave blank if unknown
-                }
-            }
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        function prepareInterviewForm(){
-            // Called onsubmit to ensure subject is set from date/time
-            const date = document.getElementById('interview-date').value;
-            const time = document.getElementById('interview-time').value;
-            const subjectEl = document.getElementById('email-subject');
-            if(date || time){
-                subjectEl.value = 'Mời phỏng vấn - ' + (date ? date : '') + (time ? (' ' + time) : '');
-            }
-            // allow normal form submit so backend can return RedirectResponse
-            return true;
+            // Approve action will be handled by approveCV() below which calls /approve-cv
+            // This placeholder remains for compatibility if other code calls approveCV before refactor.
+            return;
         }
 
         // helper: call /approve-cv endpoint for single id and approval boolean
@@ -301,15 +261,13 @@
     function onCheckboxChange(event, idx){
         // if user checks a box, also mark it as selected visually and load detail
         const checkbox = event.target;
-        if(checkbox.checked){
+            if(checkbox.checked){
             // mark the item selected
             const el = document.querySelector('.cv-items[data-idx="'+idx+'"]');
             if(el) el.classList.add('selected');
             // set currentSelectedIdx to this idx for convenience
             currentSelectedIdx = idx;
             currentCvId = checkbox.dataset.cvId || '';
-            const candField = document.getElementById('candidate-id-field');
-            if(candField) candField.value = currentCvId;
             // show detail for convenience
             showDetail(idx);
         } else {
@@ -334,19 +292,21 @@
         const cvEl = checked[0];
         const cvId = cvEl.dataset.cvId;
         if(!cvId){ alert('CV không có id hợp lệ.'); return; }
-        try{
-            const data = await sendApprovalRequest(cvId, true);
-            alert(data.message || 'CV approved successfully');
-            // update selection state
-            currentCvId = cvId;
-            currentSelectedIdx = cvEl.dataset.cvIdx || currentSelectedIdx;
-            const candField = document.getElementById('candidate-id-field'); if(candField) candField.value = cvId;
-            // open interview modal so user can send invitation email
-            document.getElementById('interview-modal').style.display = 'block';
-        }catch(err){
-            console.error(err);
-            alert('Lỗi khi gọi approve: ' + err.message);
-        }
+            try{
+                const data = await sendApprovalRequest(cvId, true);
+                alert(data.message || 'CV approved successfully');
+                // update selection state and mark item as approved
+                currentCvId = cvId;
+                currentSelectedIdx = cvEl.dataset.cvIdx || currentSelectedIdx;
+                const item = document.querySelector('.cv-items[data-idx="'+currentSelectedIdx+'"]');
+                if(item){
+                    item.classList.add('approved');
+                    const cb = item.querySelector('.cv-select'); if(cb) cb.disabled = true;
+                }
+            }catch(err){
+                console.error(err);
+                alert('Lỗi khi gọi approve: ' + err.message);
+            }
     }
 
     async function rejectCV(){
@@ -412,28 +372,11 @@
     </div>
     <div class="footer-links-group">
       <div class="footer-links-title">Follow us</div>
-      <a href="#"><i class="fa fa-facebook"></i> CVCompass</a>
-      <a href="#"><i class="fa fa-tiktok"></i> CVCompass</a>
-    </div>
-  </div>
-</footer> 
-</body>
-</html>
-<script>
-    // Client-side copy of server results for quick UI updates
-    var RESULTS = [];
-    try{ RESULTS = {{ results|tojson }}; } catch(e){ RESULTS = []; }
-
-    function showDetail(idx){
-        // mark selected item in left panel
-        document.querySelectorAll('.cv-items').forEach(el=>el.classList.remove('selected'));
-        const selectedEl = document.querySelector('.cv-items[data-idx="'+idx+'"]');
-        if(selectedEl){
-            selectedEl.classList.add('selected');
-            currentSelectedIdx = idx;
-            currentCvId = selectedEl.dataset.cvId || '';
-            // populate hidden candidate_id field in the interview form
-            const candField = document.getElementById('candidate-id-field');
+      <div><a href="#">Facebook</a></div>
+    </footer>
+    <script>
+        function showDetail(idx){
+            <!-- Interview/email form removed per request -->
             if(candField) candField.value = currentCvId;
             // also prefill candidate email if available in dataset (best-effort)
             const candEmailField = document.getElementById('candidate-email');
