@@ -173,7 +173,7 @@
             <h2>Top CV</h2>
             {% if results %}
                 {% for r in results %}
-                <div class="cv-items" data-idx="{{ loop.index0 }}" data-cv-id="{{ r.candidate_id if r.candidate_id is defined else '' }}" data-cv-url="{{ r.cv_url }}" onclick="showDetail({{ loop.index0 }})" style="cursor:pointer;">
+                <div class="cv-items" data-idx="{{ r.candidate_id }}" data-cv-id="{{ r.candidate_id if r.candidate_id is defined else '' }}" data-cv-url="{{ r.cv_url }}" onclick="showDetail({{ loop.index0 }})" style="cursor:pointer;">
                     <input type="checkbox" class="cv-select" data-cv-id="{{ r.candidate_id if r.candidate_id is defined else '' }}" data-cv-idx="{{ loop.index0 }}" onclick="event.stopPropagation(); onCheckboxChange(event, {{ loop.index0 }})">
                     <img src="https://via.placeholder.com/40" alt="cv">
                     <div class="cv-info">
