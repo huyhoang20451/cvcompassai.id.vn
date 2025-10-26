@@ -345,7 +345,9 @@ body {
                 </div>
             </form>
         </div>
-        <button class="delete">Xóa</button>
+        <form action="/delete-jd/{{ job.id }}" method="POST" style="display:inline;">
+            <button type="submit" class="delete">Xóa</button>
+        </form>
       </div>
       <script>
         function appear_form() {
