@@ -344,7 +344,7 @@
     }
 
     // Update approve/reject to use checkboxes
-    function approveCV(){
+    async function approveCV(){
         const checked = getCheckedCvElements();
         if(checked.length === 0){
             alert('Vui lòng chọn 1 CV để duyệt.');
@@ -354,11 +354,34 @@
             alert('Vui lòng chỉ chọn 1 CV để duyệt (chỉ hỗ trợ 1 ứng viên cho gửi email mời phỏng vấn).');
             return;
         }
-        const cvId = checked[0].dataset.cvId;
-        currentCvId = cvId;
-        currentSelectedIdx = checked[0].dataset.cvIdx || currentSelectedIdx;
-        const candField = document.getElementById('candidate-id-field'); if(candField) candField.value = cvId;
-        document.getElementById('interview-modal').style.display = 'block';
+        const cvEl = checked[0];
+        const cvId = cvEl.dataset.cvId;
+        if(!cvId){ alert('CV không có id hợp lệ.'); return; }
+        // call backend approve-cv endpoint to mark approval
+        try{
+            const resp = await fetch('/approve-cv', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ id: cvId, approval: 'true' })
+            });
+            if(!resp.ok){
+                const text = await resp.text();
+                alert('Approve failed: ' + text);
+                return;
+            }
+            let data = {};
+            try{ data = await resp.json(); } catch(e){}
+            alert(data.message || 'CV approved successfully');
+            // update selection state
+            currentCvId = cvId;
+            currentSelectedIdx = cvEl.dataset.cvIdx || currentSelectedIdx;
+            const candField = document.getElementById('candidate-id-field'); if(candField) candField.value = cvId;
+            // open interview modal so user can send invitation email
+            document.getElementById('interview-modal').style.display = 'block';
+        }catch(err){
+            console.error(err);
+            alert('Lỗi khi gọi approve: ' + err.message);
+        }
     }
 
     async function rejectCV(){
