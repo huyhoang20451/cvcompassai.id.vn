@@ -11,7 +11,10 @@ from .services import (get_jds_by_user_name,
                        delete_jd_by_id as service_delete_jd_by_id,
                        update_jd_by_id as service_update_jd_by_id,
                        update_business_by_id as service_update_business_info,
-                       get_job_categories)
+                       get_job_categories,
+                       get_cv_count_by_jd,
+                       get_total_cv_by_business_id,
+                       get_total_jd_by_business_id)
 from db import get_session
 from Core.Auth.dependencies import templates, authorize_role
 from Core.Auth.schemas import user
@@ -32,9 +35,13 @@ async def business_dashboard(request: Request,
                              user_info: user = Depends(authorize_role(["business", "business_premium"])),
                              session: Session = Depends(get_session)):
     job_descriptions = get_jds_by_user_name(session, user_info.username)
+    total_cv = get_total_cv_by_business_id(session, user_info.id)
+    total_jd = get_total_jd_by_business_id(session, user_info.id)
     return templates.TemplateResponse("business_dashboard.html", {"request": request,
                                                                   "job_descriptions": job_descriptions,
-                                                                  "user_info": user_info})
+                                                                  "user_info": user_info,
+                                                                  "total_cv": total_cv,
+                                                                  "total_jd": total_jd})
 
 # Direct tới business profile page
 @router.get("/business-profile", response_class=HTMLResponse)
@@ -60,12 +67,13 @@ async def job_storage(request: Request,
                       session : Session = Depends(get_session)):
     job_descriptions = get_jds_by_user_name(session, user_info.username)
     job = next((jd for jd in job_descriptions if jd.id == jd_id), None)
-
+    cv_counts = get_cv_count_by_jd(session)
     return templates.TemplateResponse("job-storage.html", 
                                       {"request": request,
                                        "job_position": job_descriptions,
                                        "job": job,
-                                       "user_info": user_info})
+                                       "user_info": user_info,
+                                       "cv_counts": cv_counts})
 
 @router.post("/submit-job", response_class=HTMLResponse)
 async def submit_job(request: Request, 

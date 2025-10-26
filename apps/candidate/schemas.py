@@ -51,7 +51,7 @@ class jd(BaseModel):
     company_logo_url: Optional[str] = None
 
     business_id: Optional[int] = None
-    created_at: datetime
+    created_at: datetime = None
 
     model_config = ConfigDict(from_attributes=True)
 

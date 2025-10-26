@@ -192,6 +192,7 @@ def get_saved_jobs_by_user(session: Session, user_id: int) -> List[jd]:
     """
     statement = (
         select(
+            jd_db.id,
             jd_db.title,
             jd_db.location,
             jd_db.min_salary,
@@ -202,9 +203,10 @@ def get_saved_jobs_by_user(session: Session, user_id: int) -> List[jd]:
             jd_db.benefits,
             jd_db.working_time,
             jd_db.application_method,
+            jd_db.created_at
         )
         .join(SavedJob, jd_db.id == SavedJob.job_id)
-        .where(SavedJob.user_id == user_id)
+        .where(SavedJob.candidate_id == user_id)
     )
     results = session.exec(statement).all()
     return [jd.model_validate(result) for result in results]

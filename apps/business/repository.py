@@ -1,4 +1,4 @@
-from sqlmodel import Session, select
+from sqlmodel import Session, func, select
 from models import JobCategory_db, User_db, jd_db, jd_CV_db, candidate_CV_db
 from .schemas import JD_create, JobCategory, jd_response, jd_CV, candidate_CV
 from typing import List
@@ -98,3 +98,43 @@ def get_job_categories(session: Session):
     statement = select(JobCategory_db)
     results = session.exec(statement).all()
     return [JobCategory.model_validate(job_category) for job_category in results]
+
+# Thống kê số lượng CV ứng tuyển cho mỗi JD
+def get_cv_count_by_jd(session: Session):
+    statement = (
+        select(
+            getattr(jd_CV_db, "jd_id"),
+            func.count(getattr(jd_CV_db, "jd_id")).label("so_luong_cv")
+        )
+        .group_by(getattr(jd_CV_db, "jd_id"))
+    )
+    results = session.exec(statement).all()
+
+    # Trả về dạng list[dict] cho dễ dùng
+    return [
+        {"jd_id": jd_id, "so_luong_cv": so_luong_cv}
+        for jd_id, so_luong_cv in results
+    ]
+
+def get_total_cv_by_business_id(session: Session, business_id: int):
+    """
+    Lấy tổng số CV của tất cả các job thuộc business_id cụ thể.
+    """
+    statement = (
+        select(func.count(jd_CV_db.id).label("num_of_cv"))
+        .join(jd_db, jd_db.id == jd_CV_db.jd_id)
+        .where(jd_db.business_id == business_id)
+    )
+    result = session.exec(statement).first()
+    return result or 0
+
+def get_total_jd_by_business_id(session: Session, business_id: int):
+    """
+    Lấy tổng số JD (tin tuyển dụng) thuộc về business_id cụ thể.
+    """
+    statement = (
+        select(func.count(jd_db.id).label("num_of_jd"))
+        .where(jd_db.business_id == business_id)
+    )
+    result = session.exec(statement).first()
+    return result or 0
