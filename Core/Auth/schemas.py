@@ -10,7 +10,8 @@ class user(BaseModel):
     coin: int | None = None
     avatar_path: str | None = None
     premium_expires: Optional[date] = None
-
+    email: Optional[str] = None
+    
     # Các trường chỉ dành cho candidate
     full_name: Optional[str] = None
 

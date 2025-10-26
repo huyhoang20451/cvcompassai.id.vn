@@ -2,7 +2,7 @@
 from fastapi import APIRouter, BackgroundTasks, Depends, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from sqlmodel import Session
-from .services import (delete_cv_from_jd, get_jds_by_user_name, 
+from .services import (get_jds_by_user_name, 
                        add_jd, 
                        OCR, 
                        get_cvs_by_jd_id, 
@@ -18,6 +18,7 @@ from .dependency import send_email
 from db import get_session
 from Core.Auth.dependencies import templates, authorize_role
 from Core.Auth.schemas import user
+from Core.Auth.services import get_user_by_id
 from .schemas import EmailRequest, JD_create
 from datetime import datetime, timezone
 from typing import Optional
@@ -125,7 +126,8 @@ def compare_cv_vs_jd(request: Request,
         comparison = compare(cv.URL, jd, file_type)
         results.append({"cv_url": cv.URL,
                         "met": comparison.get("Met", []),
-                        "not_met": comparison.get("Not_Met", [])})
+                        "not_met": comparison.get("Not_Met", []),
+                        "candidate_id": cv.candidate_id})
     print(results)
     return templates.TemplateResponse("cv-detail-business.html", {"request": request,
                                                                   "user_info": user_info,
@@ -164,8 +166,8 @@ async def update_jd(request: Request,
     if result is False:
         raise HTTPException(status_code=404, detail="Job description not found")
     return RedirectResponse(url=f"/job-storage?company={user_info.company_name}&username={user_info.username}&jd_id={jd_id}", status_code=303)
-    
-@router.post("/delete-jd", response_class=HTMLResponse)
+
+@router.post("/delete-jd/{jd_id}", response_class=HTMLResponse)
 def delete_jd_by_id(request: Request,
                     jd_id: int,
                     session: Session = Depends(get_session),
@@ -197,7 +199,11 @@ async def send_email_endpoint(request: Request,
     print(email_data)
 
     # Lấy thông tin email từ form
-    to = email_data.get("to")
+    candidate_id = email_data.get("candidate_id")
+    candidate = get_user_by_id(session, candidate_id)
+    to = candidate.email
+    if not to:
+        raise HTTPException(status_code=400, detail="Ứng viên không có email")
     subject = email_data.get("subject")
     content = email_data.get("content")
 
@@ -210,23 +216,3 @@ async def send_email_endpoint(request: Request,
 
     # Sau khi gửi xong thì chuyển hướng
     return RedirectResponse(url="/business-profile", status_code=303)
-
-@router.post("/delete-cv-from-jd", response_class=HTMLResponse)
-async def delete_cv_from_jd_endpoint(request: Request,
-                                     cv_id: int = Form(...),
-                                     jd_id: int = Form(...),
-                                     session: Session = Depends(get_session),
-                                     user_info: user = Depends(authorize_role(["business", "business_premium"]))):
-
-    jd_id = jd_id
-    cv_id = cv_id
-
-    if not jd_id or not cv_id:
-        raise HTTPException(status_code=400, detail="Thiếu JD ID hoặc CV ID")
-    result = delete_cv_from_jd(jd_id, cv_id)
-
-    if not result:
-        raise HTTPException(status_code=404, detail="Không tìm thấy JD hoặc CV")
-
-    # Có thể redirect về trang JD details hoặc profile
-    return JSONResponse(content={"message": "Xóa CV khỏi JD thành công"})

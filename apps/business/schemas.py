@@ -50,7 +50,8 @@ class jd_CV(BaseModel):
     id: int
     jd_id: int
     URL: str
-
+    candidate_id: int
+    
     model_config = ConfigDict(from_attributes=True)
 
 class JobCategory(BaseModel):

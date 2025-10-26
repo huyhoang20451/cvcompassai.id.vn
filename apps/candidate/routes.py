@@ -185,7 +185,7 @@ async def submit_cv(request: Request,
                     session: Session = Depends(get_session)):
     cv = get_candidate_cv_by_id(session, existing_cv_id) # Lấy cv trong bảng candidate_cv
     URL = cv.URL
-    cv = add_cv_into_jd(session, URL, jd_id) # Add cv vào bảng jd_CV
+    cv = add_cv_into_jd(session, URL, jd_id, user_info.id) # Add cv vào bảng jd_CV
 
     return templates.TemplateResponse("finding-jobs.html",{"request": request, 
                                                            "user_info": user_info})
@@ -200,7 +200,7 @@ async def submit_cv(request: Request,
     if not new_cv:
         raise HTTPException(status_code=400, detail="Chưa upload file")
     file_path, cv_file = await service_upload_cv(new_cv, user_info.id, session) # Lưu cv về server và database bảng candidate_cv
-    cv = add_cv_into_jd(session, file_path, jd_id) # Add cv vào bảng jd_CV
+    cv = add_cv_into_jd(session, file_path, jd_id, user_info.id) # Add cv vào bảng jd_CV
 
     return templates.TemplateResponse("finding-jobs.html",{"request": request, 
                                                            "user_info": user_info})
