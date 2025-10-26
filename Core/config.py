@@ -13,6 +13,12 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_SECRET: str
     GOOGLE_REDIRECT_URI: str
 
+    EMAIL_HOST: str
+    EMAIL_PORT: int
+    EMAIL_USER: str
+    EMAIL_PASS: str
+    EMAIL_FROM: str
+
     class Config:
         env_file = ".env"  # chỉ định file .env
 

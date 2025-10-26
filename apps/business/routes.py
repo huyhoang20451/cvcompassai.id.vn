@@ -1,8 +1,8 @@
 # Chứa API
-from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi import APIRouter, BackgroundTasks, Depends, Form, HTTPException, Request
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from sqlmodel import Session
-from .services import (get_jds_by_user_name, 
+from .services import (delete_cv_from_jd, get_jds_by_user_name, 
                        add_jd, 
                        OCR, 
                        get_cvs_by_jd_id, 
@@ -14,10 +14,11 @@ from .services import (get_jds_by_user_name,
                        get_job_categories,
                        get_total_cv_by_business_id,
                        get_total_jd_by_business_id)
+from .dependency import send_email
 from db import get_session
 from Core.Auth.dependencies import templates, authorize_role
 from Core.Auth.schemas import user
-from .schemas import JD_create
+from .schemas import EmailRequest, JD_create
 from datetime import datetime, timezone
 from typing import Optional
 from Core.OCR import compare
@@ -186,3 +187,46 @@ async def update_business_info(request: Request,
     if result is False:
         raise HTTPException(status_code=404, detail="Business information not found")
     return RedirectResponse(url=f"/business-profile", status_code=303)
+
+@router.post("/send-email", response_class=HTMLResponse)
+async def send_email_endpoint(request: Request,
+                              session: Session = Depends(get_session),
+                              user_info: user = Depends(authorize_role(["business", "business_premium"]))):
+    form = await request.form()
+    email_data = dict(form)
+    print(email_data)
+
+    # Lấy thông tin email từ form
+    to = email_data.get("to")
+    subject = email_data.get("subject")
+    content = email_data.get("content")
+
+    # Kiểm tra dữ liệu hợp lệ
+    if not all([to, subject, content]):
+        raise HTTPException(status_code=400, detail="Thiếu thông tin email")
+
+    # Gửi email (có thể dùng BackgroundTasks hoặc async)
+    await send_email(to, subject, content)
+
+    # Sau khi gửi xong thì chuyển hướng
+    return RedirectResponse(url="/business-profile", status_code=303)
+
+@router.post("/delete-cv-from-jd", response_class=HTMLResponse)
+async def delete_cv_from_jd_endpoint(request: Request,
+                                     cv_id: int = Form(...),
+                                     jd_id: int = Form(...),
+                                     session: Session = Depends(get_session),
+                                     user_info: user = Depends(authorize_role(["business", "business_premium"]))):
+
+    jd_id = jd_id
+    cv_id = cv_id
+
+    if not jd_id or not cv_id:
+        raise HTTPException(status_code=400, detail="Thiếu JD ID hoặc CV ID")
+    result = delete_cv_from_jd(jd_id, cv_id)
+
+    if not result:
+        raise HTTPException(status_code=404, detail="Không tìm thấy JD hoặc CV")
+
+    # Có thể redirect về trang JD details hoặc profile
+    return JSONResponse(content={"message": "Xóa CV khỏi JD thành công"})

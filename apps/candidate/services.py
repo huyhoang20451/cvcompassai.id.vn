@@ -43,9 +43,9 @@ def get_jds(session: Session) -> List[jd]:
     return repo_get_jds(session)
 
 def update_coin (session: Session,
-                 username: str,
+                 id: int,
                  coin: int) -> int:
-    return repo_update_coin(session, username, coin)
+    return repo_update_coin(session, id, coin)
 
 def get_jd_by_id(session: Session, id: int) -> jd:
     return repo_get_jd_by_id(session, id)

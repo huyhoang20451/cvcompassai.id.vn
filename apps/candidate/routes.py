@@ -133,7 +133,7 @@ async def get_cvs_by_username(user_info: user = Depends(authorize_role(["candida
 
 # Trừ coin trong database
 @router.post("/deduct-coin")
-async def deduct_coin(amount: int, 
+async def deduct_coin(amount: int = Form(...), 
                       user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])), 
                       session: Session = Depends(get_session)):
     '''
@@ -144,7 +144,7 @@ async def deduct_coin(amount: int,
     if coin < amount:
         return JSONResponse(content={"success": False, "msg": "Bạn không đủ coin."})
     new_coin = coin - amount
-    update_coin(session, user_info.username, new_coin)
+    update_coin(session, user_info.id, new_coin)
     return JSONResponse(content={"success": True, "coin": new_coin})
 
 # Lấy số coin trong database

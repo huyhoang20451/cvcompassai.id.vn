@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from pydantic import BaseModel, HttpUrl, ConfigDict
+from pydantic import BaseModel, HttpUrl, ConfigDict, EmailStr
 from typing import List, Optional
 
 # Thông tin jd lúc tạo
@@ -58,3 +58,8 @@ class JobCategory(BaseModel):
     job_category: str
 
     model_config = ConfigDict(from_attributes=True)
+
+class EmailRequest(BaseModel):
+    to: EmailStr
+    subject: str
+    content: str

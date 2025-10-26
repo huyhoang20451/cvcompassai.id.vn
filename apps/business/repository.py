@@ -138,3 +138,13 @@ def get_total_jd_by_business_id(session: Session, business_id: int):
     )
     result = session.exec(statement).first()
     return result or 0
+
+def delete_cv_from_jd(session: Session, jd_id: int, cv_id: int) -> bool:
+    jd_cv = session.exec(
+        select(jd_CV_db).where(jd_CV_db.jd_id == jd_id, jd_CV_db.id == cv_id)
+    ).first()
+    if not jd_cv:
+        return False
+    session.delete(jd_cv)
+    session.commit()
+    return True

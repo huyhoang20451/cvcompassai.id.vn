@@ -8,7 +8,8 @@ from .repository import (get_jds_by_user_name as repo_get_jds_by_user_name,
                          update_business_by_id as repo_update_business_by_id,
                          get_job_categories as repo_get_job_categories,
                          get_total_cv_by_business_id as repo_get_total_cv_by_business_id,
-                         get_total_jd_by_business_id as repo_get_total_jd_by_business_id)
+                         get_total_jd_by_business_id as repo_get_total_jd_by_business_id,
+                         delete_cv_from_jd as repo_delete_cv_from_jd)
 from fastapi import Depends
 from typing import Annotated, List
 from .schemas import JD_create, JobCategory, jd_response, OCR_result, jd_CV
@@ -66,3 +67,6 @@ def get_total_cv_by_business_id(session: Session, business_id: int) -> int:
 
 def get_total_jd_by_business_id(session: Session, business_id: int) -> int:
     return repo_get_total_jd_by_business_id(session, business_id)
+
+def delete_cv_from_jd(jd_id: int, cv_id: int) -> bool:
+    return repo_delete_cv_from_jd(jd_id, cv_id)
