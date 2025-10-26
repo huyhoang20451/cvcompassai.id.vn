@@ -234,7 +234,8 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function(){
-  document.querySelectorAll('.pricing-btn').forEach(function(btn){
+  // Only attach the click handler to package purchase buttons which have data-package-name
+  document.querySelectorAll('.pricing-btn[data-package-name]').forEach(function(btn){
     btn.addEventListener('click', function(e){
       e.preventDefault();
       var box = document.getElementById('checkout-box');
@@ -279,4 +280,5 @@ document.addEventListener('DOMContentLoaded', function(){
     </div>
   </div>
 </footer>
-</body>
+  </body>
+</html>
