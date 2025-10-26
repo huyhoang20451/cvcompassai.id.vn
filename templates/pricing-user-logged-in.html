@@ -191,7 +191,17 @@
                 <div class="card-header">{{ package.name }}</div>
                 <div class="price">{{ package.price }} {{ 'VNĐ/2 xu' if package.name == 'candidate_xu' else 'VNĐ/tháng' }}</div>
                 <div class="card-body">
-                    <div>{{ package.description | join(', ') }}</div>
+                    <ul class='pricing-features'>
+                        {% if package.name == 'candidate_xu'%}
+                            <li>Hiển thị top 10 doanh nghiệp (top 5 được làm mờ)</li>
+                            <li>Dùng xu để mở khóa top 5 doanh nghiệp</li>
+                            <li>Không tự động cập nhật thông tin doanh nghiệp</li>
+                        {% elif package.name == 'candidate_premium'%}
+                            <li>Nhận 5 xu mỗi ngày (reset hằng ngày)</li>
+                            <li>Tự động cập nhật thông tin doanh nghiệp mỗi 2 ngày</li>
+                            <li>Giới hạn bài đăng</li>
+                        {% endif %}
+                    </ul>
                     <button onclick="formAppear()" class="buy-btn" data-package-name="{{ package.name }}" data-package-price="{{ package.price }}">Mua ngay</button>
                 </div>
             </div>
