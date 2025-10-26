@@ -174,6 +174,7 @@
             {% if results %}
                 {% for r in results %}
                 <div class="cv-items" data-idx="{{ loop.index0 }}" data-cv-id="{{ r.id if r.id is defined else '' }}" data-cv-url="{{ r.cv_url }}" onclick="showDetail({{ loop.index0 }})" style="cursor:pointer;">
+                    <input type="checkbox" class="cv-select" data-cv-id="{{ r.id if r.id is defined else '' }}" data-cv-idx="{{ loop.index0 }}" onclick="event.stopPropagation(); onCheckboxChange(event, {{ loop.index0 }})">
                     <img src="https://via.placeholder.com/40" alt="cv">
                     <div class="cv-info">
                         <p><a href="{{ r.cv_url }}" target="_blank">{{ r.cv_url }}</a></p>
@@ -314,6 +315,99 @@
             }
         }
     </script>
+<script>
+    // checkbox helpers: get selected cv ids and corresponding elements
+    function getCheckedCvElements(){
+        return Array.from(document.querySelectorAll('.cv-select:checked'));
+    }
+
+    function onCheckboxChange(event, idx){
+        // if user checks a box, also mark it as selected visually and load detail
+        const checkbox = event.target;
+        if(checkbox.checked){
+            // mark the item selected
+            const el = document.querySelector('.cv-items[data-idx="'+idx+'"]');
+            if(el) el.classList.add('selected');
+            // set currentSelectedIdx to this idx for convenience
+            currentSelectedIdx = idx;
+            currentCvId = checkbox.dataset.cvId || '';
+            const candField = document.getElementById('candidate-id-field');
+            if(candField) candField.value = currentCvId;
+            // show detail for convenience
+            showDetail(idx);
+        } else {
+            const el = document.querySelector('.cv-items[data-idx="'+idx+'"]');
+            if(el) el.classList.remove('selected');
+            // clear current if it was this one
+            if(currentSelectedIdx === idx){ currentSelectedIdx = null; currentCvId = ''; const candField = document.getElementById('candidate-id-field'); if(candField) candField.value = ''; }
+        }
+    }
+
+    // Update approve/reject to use checkboxes
+    function approveCV(){
+        const checked = getCheckedCvElements();
+        if(checked.length === 0){
+            alert('Vui lòng chọn 1 CV để duyệt.');
+            return;
+        }
+        if(checked.length > 1){
+            alert('Vui lòng chỉ chọn 1 CV để duyệt (chỉ hỗ trợ 1 ứng viên cho gửi email mời phỏng vấn).');
+            return;
+        }
+        const cvId = checked[0].dataset.cvId;
+        currentCvId = cvId;
+        currentSelectedIdx = checked[0].dataset.cvIdx || currentSelectedIdx;
+        const candField = document.getElementById('candidate-id-field'); if(candField) candField.value = cvId;
+        document.getElementById('interview-modal').style.display = 'block';
+    }
+
+    async function rejectCV(){
+        const checked = getCheckedCvElements();
+        if(checked.length === 0){
+            alert('Vui lòng chọn ít nhất 1 CV để loại.');
+            return;
+        }
+        if(!currentJdId){
+            alert('Không xác định JD ID. Vui lòng mở trang với tham số jd_id để thực hiện thao tác này.');
+            return;
+        }
+        if(!confirm('Bạn chắc chắn muốn loại CV đã chọn khỏi JD?')) return;
+        const cvIds = checked.map(el=>el.dataset.cvId).filter(Boolean);
+        if(cvIds.length === 0){ alert('Không tìm thấy ID hợp lệ cho CV được chọn.'); return; }
+        try{
+            // send delete requests in parallel
+            const promises = cvIds.map(id => fetch('/delete-cv-from-jd', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ cv_id: id, jd_id: currentJdId })
+            }));
+            const responses = await Promise.all(promises);
+            // check results
+            for(let i=0;i<responses.length;i++){
+                const resp = responses[i];
+                if(!resp.ok){
+                    const text = await resp.text();
+                    alert('Xóa CV thất bại: ' + text);
+                    return;
+                }
+            }
+            // all succeeded: remove elements from DOM
+            checked.forEach(el=>{
+                const idx = el.dataset.cvIdx;
+                const item = document.querySelector('.cv-items[data-idx="'+idx+'"]');
+                if(item) item.remove();
+            });
+            // clear right lists
+            document.getElementById('advantages-list').innerHTML = '<li>Không có dữ liệu.</li>';
+            document.getElementById('disadvantages-list').innerHTML = '<li>Không có dữ liệu.</li>';
+            currentSelectedIdx = null; currentCvId = '';
+            alert('Đã xóa CV đã chọn khỏi JD.');
+        } catch(err){
+            console.error(err);
+            alert('Có lỗi xảy ra khi xóa CV: ' + err.message);
+        }
+    }
+</script>
 
         <footer class="footer">
         <div class="footer-contact">
