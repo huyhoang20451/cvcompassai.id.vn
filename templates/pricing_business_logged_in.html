@@ -77,13 +77,14 @@
         {% set packages = business_packages if (business_packages is defined and business_packages) else (candidate_packages if (candidate_packages is defined and candidate_packages) else []) %}
         {% for package in packages %}
         <div class="card-pricing premium"> <!--Bắt đầu các gói dịch vụ-->
-            <div class="card-header">{{ package.name }}</div>
+            <div class="card-header">{{ 'Gói Premium Doanh Nghiệp' if package.name == 'business_premium' }}</div>
             <div class="price">{{ package.price }} VNĐ/tháng</div>
             <div class="card-body">
-                <ul>
-                    {% for description in package.description %}
-                    <li>{{ description }}</li>
-                    {% endfor %}
+                <ul class='pricing-features'>
+                    {% if package.name == 'business_premium' %}
+                        <li>Tải lên thư mục CV thủ công (tính năng sắp ra mắt)</li>
+                        <li>Phân tích CV</li>
+                    {% endif %}
                 </ul>
                 <button class="buy-btn" data-package-name="{{ package.name }}" data-package-price="{{ package.price }}">Mua ngay</button>
             </div>
@@ -106,6 +107,14 @@
             </div>
         </div>
         {% endif %}
+        <div class='card-pricing premium'>
+            <div class="card-header">Gói cơ bản</div>
+            <div class="price">Free (0 VNĐ)</div>
+            <div class="card-body">
+                <li>Tìm kiếm ứng viên theo từ khóa</li>
+            </div>
+            <button onclick="location.href='/business-dashboard'" class="buy-btn">Dùng ngay</button>
+        </div>
     </div> <!--Kết thúc các gói dịch vụ-->
     <script>
         // Show checkout modal and fill info
