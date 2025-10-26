@@ -282,9 +282,13 @@ body {
     <div class="job-highlight">
       <div class="score">
         <p>Số lượng CV</p>
-        {% if jd_id == job.id %}
-        <h1>{{ cv_counts[jd_id].so_luong_cv }}</h1>
-        {% endif%}
+        {%set so_luong_cv = 0 %}
+        {% for c in cv_counts %}
+        {% if c.jd_id == job.id %}
+        {% set so_luong_cv = c.so_luong_cv %}
+        {% endif %}
+        {% endfor %}
+        <h1>{{ so_luong_cv }}</h1>
         <button>Đề Cử Top 20 CV</button>
       </div>
       <div class="company">
