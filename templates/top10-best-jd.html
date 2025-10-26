@@ -77,47 +77,53 @@
         <h2 class="jd-title">Top 10 Job Description phù hợp nhất</h2>
                 <button onclick="unlockTop5JD()" class="unlock-top5-button">Mở khóa ngay Top 5 JD phù hợp<img style="width: 20px; height: 20px; margin-left: 5px;" src="/static/images/coin.png" alt="Coin">5</button>
                 <script>
-                        function unlockTop5JD() {
-                                // Cost to unlock top 5: 5 coins
-                                const amountToDeduct = 5;
-                                fetch('/deduct-coin', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/x-www-form-urlencoded',
-                                    },
-                                    body: new URLSearchParams({ amount: String(amountToDeduct) })
-                                })
-                                .then(res => res.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        // Update displayed coin count if backend returned it
-                                        try {
-                                            if (data.coin !== undefined && document.getElementById('user-coin')) {
-                                                document.getElementById('user-coin').innerText = data.coin;
-                                            }
-                                        } catch (e) { console.debug('Could not update coin UI', e); }
+                    async function unlockTop5JD() {
+                        const button = document.querySelector('.unlock-top5-button');
+                        button.disabled = true; // chặn spam
+                        button.textContent = 'Đang xử lý...';
 
-                                        // Bỏ mờ 5 JD đầu tiên
-                                        document.querySelectorAll('.jd-blur').forEach(function(item){
-                                            item.classList.remove('jd-blur');
-                                            var desc = item.querySelector('.jd-desc');
-                                            if(desc) desc.textContent = '';
-                                            // Add click handler to unlocked JD
-                                            var jdId = item.getAttribute('data-jd-id');
-                                            item.style.cursor = 'pointer';
-                                            item.onclick = function(){
-                                                window.location.href = '/job-detail/' + jdId;
-                                            };
-                                        });
-                                    } else {
-                                        alert(data.msg || "Bạn không đủ coin để mở khóa. Vui lòng nạp thêm coin.");
-                                    }
-                                }).catch(err => {
-                                    console.error('Error deducting coin', err);
-                                    alert('Lỗi khi trừ coin. Vui lòng thử lại sau.');
-                                });
-                        }
-                </script>
+                        try {
+                            const amountToDeduct = 5;
+
+                            const response = await fetch('/deduct-coin', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ amount: amountToDeduct })
+                });
+
+                            const data = await response.json();
+
+                            if (data.success) {
+                            // Cập nhật số coin
+                                const coinEl = document.getElementById('user-coin');
+                                if (coinEl && data.coin !== undefined) {
+                                    coinEl.innerText = data.coin;
+                }
+
+            // Bỏ mờ JD
+            document.querySelectorAll('.jd-blur').forEach(item => {
+                item.classList.remove('jd-blur');
+                const desc = item.querySelector('.jd-desc');
+                if (desc) desc.textContent = '';
+
+                const jdId = item.getAttribute('data-jd-id');
+                item.style.cursor = 'pointer';
+                item.onclick = () => window.location.href = '/job-detail/' + jdId;
+            });
+
+            alert("🎉 Bạn đã mở khóa thành công Top 5 JD phù hợp!");
+        } else {
+            alert(data.msg || "Bạn không đủ coin để mở khóa. Vui lòng nạp thêm coin.");
+        }
+    } catch (err) {
+        console.error('Error:', err);
+        alert('Lỗi khi trừ coin. Vui lòng thử lại sau.');
+    } finally {
+        button.disabled = false;
+        button.innerHTML = 'Mở khóa ngay Top 5 JD phù hợp<img style="width: 20px; height: 20px; margin-left: 5px;" src="/static/images/coin.png" alt="Coin">5';
+    }
+}
+</script>
         <div class="jd-list">
             <!--Top 5 JD bị che mờ-->
             {% for jd in job_descriptions[:5] %}
