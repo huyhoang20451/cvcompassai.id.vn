@@ -39,6 +39,9 @@
         border-bottom: 1px solid #eee;
         cursor: pointer;
     }
+    .cv-items.selected {
+        background: #eef7ff;
+    }
     .cv-items img {
         width: 40px;
         height: 40px;
@@ -170,7 +173,7 @@
             <h2>Top CV</h2>
             {% if results %}
                 {% for r in results %}
-                <div class="cv-items" onclick="showDetail({{ loop.index0 }})" style="cursor:pointer;">
+                <div class="cv-items" data-idx="{{ loop.index0 }}" data-cv-id="{{ r.id if r.id is defined else '' }}" data-cv-url="{{ r.cv_url }}" onclick="showDetail({{ loop.index0 }})" style="cursor:pointer;">
                     <img src="https://via.placeholder.com/40" alt="cv">
                     <div class="cv-info">
                         <p><a href="{{ r.cv_url }}" target="_blank">{{ r.cv_url }}</a></p>
@@ -212,9 +215,103 @@
         </div>
     </div>
     <div class="action-buttons">
-        <button style="background-color: red; color: white;" class="btn-reject">Loại</button>
-        <button style="background-color: green; color: white;" class="btn-approve">Duyệt</button>
+        <button onclick="rejectCV()" style="background-color: red; color: white;" class="btn-reject">Loại</button>
+        <button onclick="approveCV()" style="background-color: green; color: white;" class="btn-approve">Duyệt</button>
     </div>
+
+    <!-- Modal gửi email mời phỏng vấn -->
+    <div class="modal" id="interview-modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('interview-modal')">&times;</span>
+            <h2>Gửi email mời phỏng vấn</h2>
+            <!-- Submit to backend /send-email which expects form fields: to, subject, content -->
+            <form id="interview-form" action="/send-email" method="POST" onsubmit="prepareInterviewForm()">
+                <label for="candidate-email">Email ứng viên:</label>
+                <input type="email" id="candidate-email" name="to" required>
+                <label for="interview-date">Ngày phỏng vấn:</label>
+                <input type="date" id="interview-date" name="interview-date" required>
+                <label for="interview-time">Thời gian phỏng vấn:</label>
+                <input type="time" id="interview-time" name="interview-time" required>
+                <label for="email-content">Nội dung email:</label>
+                <textarea id="email-content" name="content" required></textarea>
+                <!-- hidden subject field that backend expects -->
+                <input type="hidden" id="email-subject" name="subject" value="Mời phỏng vấn">
+                <button type="submit">Gửi</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        // track currently selected CV and JD id (if jd_id present in query params)
+        var currentSelectedIdx = null;
+        var currentCvId = '';
+        var currentJdId = "{{ request.query_params.get('jd_id','') }}";
+
+        function approveCV() {
+            // Hiển thị modal gửi email mời phỏng vấn
+            document.getElementById('interview-modal').style.display = 'block';
+            // if selected CV has email/cv-url, prefill the email input
+            if(currentSelectedIdx !== null){
+                const el = document.querySelector('.cv-items[data-idx="'+currentSelectedIdx+'"]');
+                if(el && el.dataset.cvUrl){
+                    // prefilling candidate email field is best-effort; leave blank if unknown
+                }
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function prepareInterviewForm(){
+            // Called onsubmit to ensure subject is set from date/time
+            const date = document.getElementById('interview-date').value;
+            const time = document.getElementById('interview-time').value;
+            const subjectEl = document.getElementById('email-subject');
+            if(date || time){
+                subjectEl.value = 'Mời phỏng vấn - ' + (date ? date : '') + (time ? (' ' + time) : '');
+            }
+            // allow normal form submit so backend can return RedirectResponse
+            return true;
+        }
+
+        async function rejectCV(){
+            if(currentCvId === '' || !currentCvId){
+                alert('Không xác định CV ID. Vui lòng chọn CV từ danh sách đã so sánh hoặc dùng trang quản lý JD.');
+                return;
+            }
+            if(!currentJdId){
+                alert('Không xác định JD ID. Vui lòng mở trang với tham số jd_id để thực hiện thao tác này.');
+                return;
+            }
+            if(!confirm('Bạn chắc chắn muốn loại CV này khỏi JD?')) return;
+            try{
+                const resp = await fetch('/delete-cv-from-jd', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ cv_id: currentCvId, jd_id: currentJdId })
+                });
+                if(resp.ok){
+                    let data = null;
+                    try{ data = await resp.json(); } catch(e) { /* ignore parse errors */ }
+                    alert((data && data.message) ? data.message : 'Đã xóa CV khỏi JD.');
+                    // remove from left panel
+                    const el = document.querySelector('.cv-items[data-idx="'+currentSelectedIdx+'"]');
+                    if(el) el.remove();
+                    // clear right lists
+                    document.getElementById('advantages-list').innerHTML = '<li>Không có dữ liệu.</li>';
+                    document.getElementById('disadvantages-list').innerHTML = '<li>Không có dữ liệu.</li>';
+                    currentSelectedIdx = null;
+                    currentCvId = '';
+                } else {
+                    const text = await resp.text();
+                    alert('Xóa thất bại: ' + text);
+                }
+            }catch(err){
+                console.error(err);
+                alert('Có lỗi xảy ra: ' + err.message);
+            }
+        }
+    </script>
 
         <footer class="footer">
         <div class="footer-contact">
@@ -252,34 +349,43 @@
 </body>
 </html>
 <script>
+    // Client-side copy of server results for quick UI updates
+    var RESULTS = [];
+    try{ RESULTS = {{ results|tojson }}; } catch(e){ RESULTS = []; }
+
     function showDetail(idx){
-        // find the selected result data from server-side rendered lists
-        const details = document.querySelectorAll('[id^="detail-"]');
-        // if details for other indexes not present, replace panel by cloning server data
-        // simple approach: request reload with anchor? For now, try to find template block
-        // Fallback: just scroll to top of detail panel (server rendered first item only)
-        const panel = document.getElementById('cv-detail-panel');
-        if(!panel) return;
-        // Try to find element with id detail-<idx>
-        const target = document.getElementById('detail-' + idx);
-        if(target){
-            // hide others
-            details.forEach(d=>d.style.display='none');
-            target.style.display = 'block';
-        } else {
-            // Not pre-rendered: just show a message
-            panel.innerHTML = '<p>Chi tiết CV được chọn (mục ' + (idx+1) + '). Thực hiện tải lại trang để xem chi tiết.</p>';
+        // mark selected item in left panel
+        document.querySelectorAll('.cv-items').forEach(el=>el.classList.remove('selected'));
+        const selectedEl = document.querySelector('.cv-items[data-idx="'+idx+'"]');
+        if(selectedEl){
+            selectedEl.classList.add('selected');
+            currentSelectedIdx = idx;
+            currentCvId = selectedEl.dataset.cvId || '';
         }
-        // update advantages/disadvantages lists if alternative items exist
+
         const adv = document.getElementById('advantages-list');
         const dis = document.getElementById('disadvantages-list');
-        if(adv && dis){
-            // naive: if multiple detail-N blocks exist, copy lists
-            const t = document.getElementById('detail-' + idx);
-            if(t){
-                const mets = t.querySelectorAll('h4 + ul > li');
-                // Not robust to structure changes; leave as-is for now
+        if(Array.isArray(RESULTS) && RESULTS[idx]){
+            const r = RESULTS[idx];
+            if(adv){
+                if(r.met && r.met.length){
+                    adv.innerHTML = '';
+                    r.met.forEach(i=>{ const li=document.createElement('li'); li.textContent = i; adv.appendChild(li); });
+                } else {
+                    adv.innerHTML = '<li>Không có dữ liệu.</li>';
+                }
             }
+            if(dis){
+                if(r.not_met && r.not_met.length){
+                    dis.innerHTML = '';
+                    r.not_met.forEach(i=>{ const li=document.createElement('li'); li.textContent = i; dis.appendChild(li); });
+                } else {
+                    dis.innerHTML = '<li>Không có dữ liệu.</li>';
+                }
+            }
+        } else {
+            if(adv) adv.innerHTML = '<li>Không có dữ liệu.</li>';
+            if(dis) dis.innerHTML = '<li>Không có dữ liệu.</li>';
         }
     }
 </script>
