@@ -66,7 +66,7 @@
 }
 
 .pricing-features {
-  list-style: none;
+  font-size: 14px;
   padding: 0;
   margin: 0 0 20px 0;
   text-align: left;
@@ -188,7 +188,7 @@
         {% if packages and packages | length > 0 %}
             {% for package in packages %}
             <div class="card-pricing {{ 'premium' if package.name.startswith('candidate_') else 'business' }}"> <!--Bắt đầu các gói dịch vụ-->
-                <div class="card-header">{{ package.name }}</div>
+                <div class="card-header">{{ 'Gói Theo Xu' if package.name == 'candidate_xu' else 'Gói Premium' }}</div>
                 <div class="price">{{ package.price }} {{ 'VNĐ/2 xu' if package.name == 'candidate_xu' else 'VNĐ/tháng' }}</div>
                 <div class="card-body">
                     <ul class='pricing-features'>
