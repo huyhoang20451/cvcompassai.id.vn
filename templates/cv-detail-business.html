@@ -277,42 +277,19 @@
             return true;
         }
 
-        async function rejectCV(){
-            if(currentCvId === '' || !currentCvId){
-                alert('Không xác định CV ID. Vui lòng chọn CV từ danh sách đã so sánh hoặc dùng trang quản lý JD.');
-                return;
+        // helper: call /approve-cv endpoint for single id and approval boolean
+        async function sendApprovalRequest(id, approval){
+            if(!id) throw new Error('Missing id');
+            const resp = await fetch('/approve-cv', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ id: id.toString(), approval: approval ? 'true' : 'false' })
+            });
+            if(!resp.ok){
+                const txt = await resp.text();
+                throw new Error(txt || ('HTTP ' + resp.status));
             }
-            if(!currentJdId){
-                alert('Không xác định JD ID. Vui lòng mở trang với tham số jd_id để thực hiện thao tác này.');
-                return;
-            }
-            if(!confirm('Bạn chắc chắn muốn loại CV này khỏi JD?')) return;
-            try{
-                const resp = await fetch('/delete-cv-from-jd', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams({ cv_id: currentCvId, jd_id: currentJdId })
-                });
-                if(resp.ok){
-                    let data = null;
-                    try{ data = await resp.json(); } catch(e) { /* ignore parse errors */ }
-                    alert((data && data.message) ? data.message : 'Đã xóa CV khỏi JD.');
-                    // remove from left panel
-                    const el = document.querySelector('.cv-items[data-idx="'+currentSelectedIdx+'"]');
-                    if(el) el.remove();
-                    // clear right lists
-                    document.getElementById('advantages-list').innerHTML = '<li>Không có dữ liệu.</li>';
-                    document.getElementById('disadvantages-list').innerHTML = '<li>Không có dữ liệu.</li>';
-                    currentSelectedIdx = null;
-                    currentCvId = '';
-                } else {
-                    const text = await resp.text();
-                    alert('Xóa thất bại: ' + text);
-                }
-            }catch(err){
-                console.error(err);
-                alert('Có lỗi xảy ra: ' + err.message);
-            }
+            try{ return await resp.json(); } catch(e){ return {}; }
         }
     </script>
 <script>
@@ -343,7 +320,7 @@
         }
     }
 
-    // Update approve/reject to use checkboxes
+    // Update approve/reject to use checkboxes and the sendApprovalRequest helper
     async function approveCV(){
         const checked = getCheckedCvElements();
         if(checked.length === 0){
@@ -357,20 +334,8 @@
         const cvEl = checked[0];
         const cvId = cvEl.dataset.cvId;
         if(!cvId){ alert('CV không có id hợp lệ.'); return; }
-        // call backend approve-cv endpoint to mark approval
         try{
-            const resp = await fetch('/approve-cv', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ id: cvId, approval: 'true' })
-            });
-            if(!resp.ok){
-                const text = await resp.text();
-                alert('Approve failed: ' + text);
-                return;
-            }
-            let data = {};
-            try{ data = await resp.json(); } catch(e){}
+            const data = await sendApprovalRequest(cvId, true);
             alert(data.message || 'CV approved successfully');
             // update selection state
             currentCvId = cvId;
@@ -398,23 +363,10 @@
         const cvIds = checked.map(el=>el.dataset.cvId).filter(Boolean);
         if(cvIds.length === 0){ alert('Không tìm thấy ID hợp lệ cho CV được chọn.'); return; }
         try{
-            // send delete requests in parallel
-            const promises = cvIds.map(id => fetch('/approve-cv', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ id: id, approval: 'false' })
-            }));
-            const responses = await Promise.all(promises);
-            // check results
-            for(let i=0;i<responses.length;i++){
-                const resp = responses[i];
-                if(!resp.ok){
-                    const text = await resp.text();
-                    alert('Xóa CV thất bại: ' + text);
-                    return;
-                }
-            }
-            // all succeeded: remove elements from DOM
+            // send approve=false requests in parallel
+            const promises = cvIds.map(id => sendApprovalRequest(id, false));
+            const results = await Promise.all(promises);
+            // success: remove elements from DOM
             checked.forEach(el=>{
                 const idx = el.dataset.cvIdx;
                 const item = document.querySelector('.cv-items[data-idx="'+idx+'"]');
@@ -424,10 +376,10 @@
             document.getElementById('advantages-list').innerHTML = '<li>Không có dữ liệu.</li>';
             document.getElementById('disadvantages-list').innerHTML = '<li>Không có dữ liệu.</li>';
             currentSelectedIdx = null; currentCvId = '';
-            alert('Đã xóa CV đã chọn khỏi JD.');
+            alert('Đã loại CV đã chọn thành công.');
         } catch(err){
             console.error(err);
-            alert('Có lỗi xảy ra khi xóa CV: ' + err.message);
+            alert('Có lỗi xảy ra khi loại CV: ' + err.message);
         }
     }
 </script>
