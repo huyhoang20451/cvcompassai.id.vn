@@ -228,15 +228,26 @@ def clean_and_parse(result_json: str):
     # Loại bỏ comment kiểu // ...
     cleaned = re.sub(r'//.*', '', cleaned)
 
-    #  Loại bỏ comment kiểu # ...
+    # Loại bỏ comment kiểu # ...
     cleaned = re.sub(r'#.*', '', cleaned)
 
-    #  Loại bỏ dấu phẩy thừa trước dấu đóng ngoặc }
+    # Loại bỏ dấu phẩy thừa trước dấu đóng ngoặc } hoặc ]
     cleaned = re.sub(r',\s*([}\]])', r'\1', cleaned)
 
     # Xử lý ký tự đặc biệt không hợp lệ (nếu có)
     cleaned = cleaned.replace("\u2013", "-").replace("\u2014", "-")
 
+    # 🧩 Tìm phần JSON lớn nhất (toàn bộ, không bị cắt)
+    # Dấu `*` thay vì `*?` để match dài nhất có thể (greedy)
+    json_match = re.search(r'\{[\s\S]*\}', cleaned)
+    if json_match:
+        cleaned = json_match.group(0)
+    else:
+        print("❌ Không tìm thấy JSON hợp lệ trong chuỗi!")
+        print("Raw output:\n", result_json)
+        raise ValueError("No valid JSON found")
+
+    # 🧠 Parse JSON
     try:
         data = json.loads(cleaned)
     except json.JSONDecodeError as e:
@@ -245,6 +256,7 @@ def clean_and_parse(result_json: str):
         print("\n--- Cleaned Attempt ---\n", cleaned)
         raise ValueError("Invalid JSON format from model")
 
+    # ✅ Gọi hàm xử lý sau khi parse thành công
     return parse_evaluation(data)
 
 def compare_OCR(image, JD):

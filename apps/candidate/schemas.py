@@ -28,6 +28,9 @@ class jd_CV(BaseModel):
     jd_id: int
     URL: str
     candidate_id: int
+    company_id: int
+    approved: bool
+    
     model_config = ConfigDict(from_attributes=True)
 
 class jd(BaseModel):

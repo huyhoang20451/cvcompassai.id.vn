@@ -1,5 +1,5 @@
 from sqlmodel import Session, func, select
-from models import JobCategory_db, User_db, jd_db, jd_CV_db, candidate_CV_db
+from models import JobCategory_db, SavedJob, User_db, jd_db, jd_CV_db, candidate_CV_db
 from .schemas import JD_create, JobCategory, jd_response, jd_CV, candidate_CV
 from typing import List
 
@@ -150,3 +150,21 @@ def approve_cv(session: Session, id: int, approval: bool) -> bool:
     session.commit()
     session.refresh(jd_cv)
     return True
+
+def count_approved_cv_by_company(session: Session, company_id: int) -> int:
+    """
+    Đếm số lượng CV đã được approved=True cho một công ty cụ thể.
+    """
+    result = session.exec(
+        select(func.count()).where(
+            (jd_CV_db.company_id == company_id) &
+            (jd_CV_db.approved == True)
+        )
+    ).one()
+    return result
+
+def count_saved_jobs_by_company(session: Session, company_id: int) -> int:
+    count = session.exec(
+        select(func.count()).where(SavedJob.company_id == company_id)
+    ).one()
+    return count

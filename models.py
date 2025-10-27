@@ -63,6 +63,7 @@ class jd_CV_db(SQLModel, table=True):
     jd_id: int = Field(foreign_key="jd.id")   # liên kết với bảng job
     URL: str = Field(max_length=255)
     candidate_id: int = Field(foreign_key="user.id")  # liên kết với bảng users
+    company_id: int = Field(foreign_key="user.id")  # liên kết với bảng users
     approved: bool = Field(default=False)
     
 class Order_db(SQLModel, table=True):
@@ -98,6 +99,7 @@ class SavedJob(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     candidate_id: int = Field(foreign_key="user.id", nullable=False)
     job_id: int = Field(foreign_key="jd.id", nullable=False)
+    company_id: int = Field(foreign_key="user.id", nullable=False)
     saved_at: datetime = Field(default_factory=datetime.utcnow)
 
 class JobCategory_db(SQLModel, table=True):

@@ -136,8 +136,8 @@ def get_candidate_cv_by_id(session: Session, cv_id:int) -> candidate_CV:
     cv = session.exec(select(candidate_CV_db).where(candidate_CV_db.id == cv_id)).first()
     return candidate_CV.model_validate(cv)
 
-def add_cv_into_jd(session: Session, URL: str, jd_id: int, candidate_id: int) -> jd_CV:
-    db_obj = jd_CV_db(URL=URL, jd_id=jd_id, candidate_id=candidate_id)
+def add_cv_into_jd(session: Session, URL: str, jd_id: int, candidate_id: int, business_id: int) -> jd_CV:
+    db_obj = jd_CV_db(URL=URL, jd_id=jd_id, candidate_id=candidate_id, company_id=business_id)
 
     session.add(db_obj)
     session.commit()
@@ -161,7 +161,7 @@ def get_cvs_by_id(session: Session, cv_id: int) -> candidate_CV:
         return candidate_CV.model_validate(result)
     return None
 
-def save_jd(session: Session, candidate_id: int, job_id: int):
+def save_jd(session: Session, candidate_id: int, job_id: int, business_id: int) -> Optional[SavedJob]:
     # Kiểm tra xem job đã được lưu chưa
     existing = session.exec(
         select(SavedJob)
@@ -173,7 +173,7 @@ def save_jd(session: Session, candidate_id: int, job_id: int):
         return None  # hoặc raise HTTPException nếu muốn báo lỗi
 
     # Tạo bản ghi mới
-    saved_job = SavedJob(candidate_id=candidate_id, job_id=job_id)
+    saved_job = SavedJob(candidate_id=candidate_id, job_id=job_id, company_id=business_id)
     session.add(saved_job)
     session.commit()
     session.refresh(saved_job)  # cập nhật lại instance với id mới sinh ra

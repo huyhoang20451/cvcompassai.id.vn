@@ -75,7 +75,11 @@ def get_candidate_cv_by_id(session: Session, cv_id: int) -> candidate_CV:
     return cv
 
 def add_cv_into_jd(session: Session, URL: str, jd_id: int, candidate_id: int) -> jd_CV:
-    cv = repo_add_cv_into_jd(session, URL, jd_id, candidate_id)
+    jd = get_jd_by_id(session, jd_id)
+    if not jd:
+        raise HTTPException(status_code=404, detail="Job not found")
+    business_id = jd.business_id
+    cv = repo_add_cv_into_jd(session, URL, jd_id, candidate_id, business_id)
     return cv
 
 def jd_to_str(jd: jd) -> str:
@@ -119,7 +123,11 @@ def get_top_10_jds_by_cv(session: Session, cv: str) -> List[jd]:
     return [r["jd"] for r in top_10]
 
 def save_jd(session: Session, candidate_id: int, job_id: int):
-    jd = repo_save_jd(session, candidate_id, job_id)
+    jd = get_jd_by_id(session, job_id)
+    if not jd:
+        raise HTTPException(status_code=404, detail="Job not found")
+    business_id = jd.business_id
+    jd = repo_save_jd(session, candidate_id, job_id, business_id)
     return jd
 
 def get_job_categories(session: Session) -> List[JobCategory]:
