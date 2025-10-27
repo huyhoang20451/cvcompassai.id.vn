@@ -291,14 +291,19 @@
         <div class="icon">📑</div>
         <div>Số lượng CV ghi nhận: {{ total_cv }}</div>
     </div>
-    <div class="stat-box blue">
-        <div class="icon">👤</div>
-        <div>Quan tâm / Yêu thích: 15</div>
-    </div>
+  <div class="stat-box blue">
+    <div class="icon">👤</div>
+    <div>Quan tâm / Yêu thích: <span id="saved-jobs-count">{{ total_saved_jobs or 0 }}</span></div>
+  </div>
+
+  <div class="stat-box blue">
+    <div class="icon">✅</div>
+    <div>CV đã duyệt: <span id="approved-cvs-count">0</span></div>
+  </div>
 
     <div class="stat-box yellow">
       <div class="icon">👥</div>
-      <div>Đã phỏng vấn: 10</div>
+      <div>Đã phỏng vấn: 0</div>
     </div>
   </div>
   <div style="margin: 20px 0; font-weight: bold;">Biểu đồ thống kê nhanh:</div>
@@ -430,3 +435,29 @@
 </footer>
 </body>
 </html>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  async function fetchCount(url){
+    try{
+      const resp = await fetch(url, { credentials: 'same-origin' });
+      if(!resp.ok) throw new Error('HTTP ' + resp.status);
+      return await resp.json();
+    }catch(e){ console.debug('fetchCount error', url, e); return null; }
+  }
+
+  (async function updateCounts(){
+    const [saved, approved] = await Promise.all([
+      fetchCount('/count-saved-jobs'),
+      fetchCount('/count-approved-cvs')
+    ]);
+    if(saved && typeof saved.count !== 'undefined'){
+      const el = document.getElementById('saved-jobs-count');
+      if(el) el.innerText = saved.count;
+    }
+    if(approved && typeof approved.count !== 'undefined'){
+      const el = document.getElementById('approved-cvs-count');
+      if(el) el.innerText = approved.count;
+    }
+  })();
+});
+</script>
