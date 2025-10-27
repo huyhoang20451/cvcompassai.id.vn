@@ -207,7 +207,7 @@ async def approve_cv(request: Request,
     else:
         return JSONResponse(content={"message": "CV rejected successfully"})
 
-@router.post("/count-approved-cvs", response_class=HTMLResponse)
+@router.get("/count-approved-cvs", response_class=HTMLResponse)
 async def count_approved_cvs(request: Request,
                              session: Session = Depends(get_session),
                              user_info: user = Depends(authorize_role(["business", "business_premium"]))):
@@ -217,7 +217,7 @@ async def count_approved_cvs(request: Request,
         raise HTTPException(status_code=404, detail="CV not found or not authorized to approve")
     return JSONResponse(content={"count": result})
 
-@router.post("/count-saved-jobs", response_class=HTMLResponse)
+@router.get("/count-saved-jobs", response_class=HTMLResponse)
 async def count_saved_jobs(request: Request,
                            session: Session = Depends(get_session),
                            user_info: user = Depends(authorize_role(["business", "business_premium"]))):
