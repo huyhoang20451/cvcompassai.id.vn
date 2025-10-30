@@ -295,11 +295,6 @@ body {
       <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
         <a class="view-cv" href="/compare_cv_vs_jd?jd_id={{ job.id }}" style="display:inline-block; padding:8px 12px; background:#2b6cb0; color:#fff; border-radius:6px; text-decoration:none;">So sánh CV</a>
       </div>
-      {% else %}
-      <!-- Hidden the button -->
-      <div style="flex-direction:column; gap:8px; align-items:flex-end; display:none;">
-        <a class="view-cv" href="/compare_cv_vs_jd?jd_id={{ job.id }}" style="display:inline-block; padding:8px 12px; background:#2b6cb0; color:#fff; border-radius:6px; text-decoration:none;">So sánh CV</a>
-      </div>
       {% endif %}
     </div>
     <!-- Job Details -->
