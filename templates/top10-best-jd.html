@@ -77,9 +77,15 @@
         <h2 class="jd-title">Top 10 Job Description phù hợp nhất</h2>
                 <button onclick="unlockTop5JD()" class="unlock-top5-button">Mở khóa ngay Top 5 JD phù hợp<img style="width: 20px; height: 20px; margin-left: 5px;" src="/static/images/coin.png" alt="Coin">5</button>
                 <script>
-                    const CV_ID = {{ cv_id | tojson }};
+                    // Ensure CV_ID is a proper JSON value (null when not provided).
+                    const CV_ID = {{ cv_id | default(None) | tojson }};
                     function goToJob(jdId){
-                        const url = '/job-detail/' + jdId + (CV_ID ? '?cv_id=' + encodeURIComponent(CV_ID) : '');
+                        // Only append cv_id when it's a valid non-empty, non-null, non-'undefined' value
+                        let suffix = '';
+                        if (CV_ID !== null && CV_ID !== '' && CV_ID !== 'undefined') {
+                            suffix = '?cv_id=' + encodeURIComponent(CV_ID);
+                        }
+                        const url = '/job-detail/' + jdId + suffix;
                         window.location.href = url;
                     }
                     async function unlockTop5JD() {
