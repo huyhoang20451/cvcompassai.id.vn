@@ -109,7 +109,7 @@
         <div id="editModal" class="modal" style="display:none;">
             <div class="modal-content">
                 <span class="close" title="Đóng">&times;</span>
-                <form method="POST" action="/update-service" id="editForm">
+                <form method="PATCH" action="/services" id="editForm">
                     <h2>Cập nhật dịch vụ</h2>
                     <input type="hidden" id="service_id" name="id">
                     <label for="service_name">Service Name:</label>
