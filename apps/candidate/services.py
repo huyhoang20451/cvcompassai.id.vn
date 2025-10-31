@@ -56,8 +56,8 @@ def add_cv_into_candidate(session: Session, URL: str, user_id: int) -> candidate
     cv = repo_add_cv_into_candidate(session, URL, user_id)
     return cv
 
-def update_candidate_cv(session: Session, cv_id: int, top10_jds: List[int], unlocked: bool) -> candidate_CV:
-    cv = repo_update_candidate_cv(session, cv_id, top10_jds, unlocked)
+def update_candidate_cv(session: Session, cv_id: int, top10_jds: Optional[List[int]] = None, unlocked: Optional[bool] = None) -> candidate_CV:
+    cv = repo_update_candidate_cv(session, cv_id, top10_jds=top10_jds, unlocked=unlocked)
     return cv
 
 async def upload_cv(file: UploadFile, user_id: int, session: Session):

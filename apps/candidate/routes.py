@@ -270,17 +270,17 @@ async def top10_best_jd(request: Request,
     # Chạy luồng nền
     thread = Thread(target=process_cv, args=(cv_str,))
     thread.start()
-
+    print(cv.id)
     # Trả về giao diện HTML hiển thị tiến trình
     html = f"""
     <html>
     <body>
-      <h3>Đang xử lý CV...</h3>
-      <progress id="bar" value="0" max="10" style="width:300px;"></progress>
-      <div id="status">Bắt đầu xử lý...</div>
+    <h3>Đang xử lý CV...</h3>
+    <progress id="bar" value="0" max="10" style="width:300px;"></progress>
+    <div id="status">Bắt đầu xử lý...</div>
 
-      <script>
-        const cv_id = {cv.id};  // 👈 gắn ID vào đây
+    <script>
+        const cv_id = {cv.id};  // ✅ đã có cv_id sẵn
         async function checkProgress() {{
             const res = await fetch(`/progress`);
             const data = await res.json();
@@ -292,12 +292,12 @@ async def top10_best_jd(request: Request,
             if (!data.done) {{
                 setTimeout(checkProgress, 5000);
             }} else {{
-                // khi hoàn tất → chuyển tới trang kết quả
-                window.location.href = `/result?cv_id=${{data.cv_id}}`;
+                // ✅ dùng biến cv_id đã gắn sẵn
+                window.location.href = `/result?cv_id=${{cv_id}}`;
             }}
         }}
         checkProgress();
-      </script>
+    </script>
     </body>
     </html>
     """
@@ -312,11 +312,12 @@ async def get_progress():
 @router.get("/result", response_class=HTMLResponse)
 async def result_page(request: Request,
                       cv_id: int,
-                      user_info: user = Depends(authorize_role(["candidate", "candidate_premium"]))):
+                      user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
+                      session: Session = Depends(get_session)):
     result_store.sort(key=lambda x: x["Ratio"], reverse=True)
     top_10 = result_store[:10]
     top_10jd_ids = [item['jd'].id for item in top_10]
-    update_candidate_cv(session=Depends(get_session),
+    update_candidate_cv(session,
                         cv_id=cv_id,
                         top10_jds=top_10jd_ids)
     return templates.TemplateResponse("top10-best-jd.html", {"request": request,

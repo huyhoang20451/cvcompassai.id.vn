@@ -6,6 +6,8 @@
 # pip install einops timm
 # pip install flash-attn --no-build-isolation
 # pip install pillow
+# pip install google-generativeai
+
 import io
 import re
 import torch
@@ -17,6 +19,7 @@ import json
 from PyPDF2 import PdfReader
 from io import BytesIO
 from fastapi import UploadFile
+import google.generativeai as genai
 
 # ===============================
 # IMAGE PREPROCESSING
@@ -147,19 +150,22 @@ def run_vintern(image_path):
     """
     response, _ = vintern_model.chat(vintern_tokenizer, pixel_values, question, generation_config, history=None, return_history=True)
     return response  # Đây chính là CR
+# ===============================
+# MODEL 3: gemini
+# ===============================
+
+
+
+
 
 # ===============================
 # MODEL 2: QWEN
 # ===============================
-def run_qwen(JD, CR):
-    model_id = "Gensyn/Qwen2.5-1.5B-Instruct"
-    tokenizer = AutoTokenizer.from_pretrained(model_id)
-    model = AutoModelForCausalLM.from_pretrained(
-        model_id,
-        torch_dtype=torch.float16,
-        device_map="auto"
-    )
+import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import google.generativeai as genai
 
+def run_qwen(JD, CR):
     prompt = f"""You are a recruitment assistant. Your task is to evaluate a candidate’s CV against the job description.
 
 List each job requirement separately and respond with:
@@ -177,18 +183,43 @@ Do not explain. Do not add comments. Only return a JSON object with each require
 
 Return the result in JSON format.
 """
+    # ---------- ƯU TIÊN GỌI GEMINI ----------
+    try:
+        genai.configure(api_key="AIzaSyDA5_iLT6Xsldc99gTfbe1WI-6cNyNPlvM")
+        gemini = genai.GenerativeModel(model_name="models/gemini-2.5-flash")
 
-    inputs = tokenizer(prompt, return_tensors="pt", truncation=True).to(model.device)
-    outputs = model.generate(
-        **inputs,
-        max_new_tokens=1000,
-        do_sample=True,
-        temperature=0.7,
-        top_p=0.9,
-        pad_token_id=tokenizer.eos_token_id
-    )
-    generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    return generated_text[len(prompt):].strip()
+        response = gemini.generate_content(prompt)
+        if hasattr(response, "text") and response.text.strip():
+            print("✅ Gemini trả kết quả thành công.")
+            return response.text.strip()
+        else:
+            raise ValueError("Gemini trả về rỗng hoặc lỗi.")
+
+    # ---------- Fallback sang QWEN ----------
+    except Exception as e:
+        print(f"⚠️ Gemini lỗi hoặc hết token ({e}). Chuyển sang Qwen...")
+
+        model_id = "Gensyn/Qwen2.5-1.5B-Instruct"
+        tokenizer = AutoTokenizer.from_pretrained(model_id)
+        model = AutoModelForCausalLM.from_pretrained(
+            model_id,
+            torch_dtype=torch.float16,
+            device_map="auto"
+        )
+
+        inputs = tokenizer(prompt, return_tensors="pt", truncation=True).to(model.device)
+        outputs = model.generate(
+            **inputs,
+            max_new_tokens=1000,
+            do_sample=True,
+            temperature=0.7,
+            top_p=0.9,
+            pad_token_id=tokenizer.eos_token_id
+        )
+        generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+        print("✅ Đã fallback sang Qwen.")
+        return generated_text[len(prompt):].strip()
 
 # ===============================
 # JSON PROCESSING (NEW)
@@ -292,3 +323,5 @@ def compare(url, JD, file_type):
     qwen_output = run_qwen(JD, CR)
     result = clean_and_parse(qwen_output)
     return result
+
+
