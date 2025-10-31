@@ -111,7 +111,7 @@
                 <span class="close" title="Đóng">&times;</span>
                 <form method="POST" action="/services" id="editForm">
                     <h2>Cập nhật dịch vụ</h2>
-                    <input type="hidden" id="service_id" name="id">
+                    <input type="hidden" id="service_id" name="service_id">
                     <label for="service_name">Service Name:</label>
                     <input type="text" id="service_name" name="name" required>
                     <label for="service_price">Price:</label>
@@ -196,11 +196,18 @@
                     }
 
                     try {
+                        // send as form-encoded to match backend Form(...) parameters
+                        const params = new URLSearchParams();
+                        params.append('service_id', id);
+                        if (name !== null) params.append('name', name);
+                        if (price !== null) params.append('price', price);
+                        if (description !== null) params.append('description', description);
+
                         const resp = await fetch(target, {
                             method: 'PATCH',
                             credentials: 'same-origin',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ id: id, name: name, price: price, description: description })
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: params
                         });
 
                         if (!resp.ok) {
