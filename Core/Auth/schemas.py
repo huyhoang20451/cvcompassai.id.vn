@@ -25,7 +25,7 @@ class user(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class userinDB(user):
-    hashed_password: str
+    hashed_password: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 

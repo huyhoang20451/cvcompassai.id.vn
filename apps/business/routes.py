@@ -1,4 +1,5 @@
 # Chứa API
+from threading import Thread
 from fastapi import APIRouter, BackgroundTasks, Depends, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from sqlmodel import Session
@@ -17,7 +18,7 @@ from .services import (get_jds_by_user_name,
                        approve_cv as service_approve_cv,
                        count_approved_cv_by_company,
                        count_saved_jobs_by_company)
-from db import get_session
+from db import get_session, engine
 from Core.Auth.dependencies import templates, authorize_role
 from Core.Auth.schemas import user
 from Core.Auth.services import get_user_by_id
@@ -115,25 +116,113 @@ def cv_detail_business(request: Request,
     return templates.TemplateResponse("cv-detail-business.html", {"request": request, 
                                                                   "user_info": user_info})
 
+#@router.get("/compare_cv_vs_jd", response_class=HTMLResponse)
+#def compare_cv_vs_jd(request: Request,
+#                     jd_id: int, 
+#                     user_info: user = Depends(authorize_role(["business", "business_premium"])),
+#                     session: Session = Depends(get_session)):
+#    cvs = get_cvs_by_jd_id(session, jd_id)
+#    jd = get_jd_by_id(session, jd_id)
+#    results = []
+#    for cv in cvs:
+#        file_type = detect_file_type(cv.URL)
+#        comparison = compare(cv.URL, jd, file_type)
+#        results.append({"cv_url": cv.URL,
+#                        "met": comparison.get("Met", []),
+#                        "not_met": comparison.get("Not_Met", []),
+#                        "id": cv.id})
+#    print(results)
+#    return templates.TemplateResponse("cv-detail-business.html", {"request": request,
+#                                                                  "user_info": user_info,
+#                                                                  "results": results})
+
+compare_progress_store = {}
+compare_result_store = []
+
+def process_compare_cv_vs_jd(jd_id: int):
+
+    with Session(engine) as session:
+        global compare_progress_store, compare_result_store
+        jd = get_jd_by_id(session, jd_id)
+        cvs = get_cvs_by_jd_id(session, jd_id)
+
+        total = len(cvs)
+        compare_progress_store = {"progress": 0, "total": total, "done": False}
+        compare_result_store = []
+
+        for i, cv in enumerate(cvs):
+            try:
+                file_type = detect_file_type(cv.URL)
+                comparison = compare(cv.URL, jd, file_type)
+                compare_result_store.append({
+                    "cv_url": cv.URL,
+                    "met": comparison.get("Met", []),
+                    "not_met": comparison.get("Not_Met", []),
+                    "id": cv.id
+                })
+                print(f"✅ CV ID {cv.id} done ({i+1}/{total})")
+            except Exception as e:
+                print(f"❌ Error with CV {cv.id}: {e}")
+
+            compare_progress_store["progress"] = i + 1
+        
+        compare_progress_store["done"] = True
+
 @router.get("/compare_cv_vs_jd", response_class=HTMLResponse)
-def compare_cv_vs_jd(request: Request,
-                     jd_id: int, 
-                     user_info: user = Depends(authorize_role(["business", "business_premium"])),
-                     session: Session = Depends(get_session)):
-    cvs = get_cvs_by_jd_id(session, jd_id)
-    jd = get_jd_by_id(session, jd_id)
-    results = []
-    for cv in cvs:
-        file_type = detect_file_type(cv.URL)
-        comparison = compare(cv.URL, jd, file_type)
-        results.append({"cv_url": cv.URL,
-                        "met": comparison.get("Met", []),
-                        "not_met": comparison.get("Not_Met", []),
-                        "id": cv.id})
-    print(results)
-    return templates.TemplateResponse("cv-detail-business.html", {"request": request,
-                                                                  "user_info": user_info,
-                                                                  "results": results})
+def compare_cv_vs_jd_start(request: Request,
+                           jd_id: int,
+                           user_info: user = Depends(authorize_role(["business", "business_premium"]))):
+    # Chạy luồng nền
+    thread = Thread(target=process_compare_cv_vs_jd, args=(jd_id,))
+    thread.start()
+
+    html = f"""
+    <html>
+    <body>
+      <h3>Đang so sánh CVs với JD ID {jd_id}...</h3>
+      <progress id="bar" value="0" max="10" style="width:300px;"></progress>
+      <div id="status">Bắt đầu xử lý...</div>
+
+      <script>
+        const jd_id = {jd_id};
+        async function checkProgress() {{
+            const res = await fetch(`/compare_progress`);
+            const data = await res.json();
+            document.getElementById('bar').value = data.progress;
+            document.getElementById('status').innerText = 
+                data.done ? "✅ Hoàn tất! Chuyển hướng tới kết quả..." :
+                `Đã xử lý ${{data.progress}} / ${{data.total}} CV...`;
+
+            if (!data.done) {{
+                setTimeout(checkProgress, 5000);
+            }} else {{
+                window.location.href = `/compare_cv_vs_jd/result?jd_id=${{jd_id}}`;
+            }}
+        }}
+        checkProgress();
+      </script>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=html)
+
+@router.get("/compare_progress")
+async def get_compare_progress():
+    return JSONResponse(compare_progress_store)
+
+@router.get("/compare_cv_vs_jd/result", response_class=HTMLResponse)
+def compare_cv_vs_jd_result(request: Request,
+                            jd_id: int,
+                            user_info: user = Depends(authorize_role(["business", "business_premium"]))):
+    return templates.TemplateResponse(
+        "cv-detail-business.html",
+        {
+            "request": request,
+            "user_info": user_info,
+            "results": compare_result_store,
+            "jd_id": jd_id
+        }
+    )
 
 # Update jd by job.id
 @router.post("/update-jd/{jd_id}", response_class=HTMLResponse)

@@ -19,10 +19,12 @@ from .services import (jd_to_str, search_jobs,
                        get_top_10_jds_by_cv,
                        save_jd as service_save_jd,
                        get_job_categories,
-                       get_saved_jobs_by_user)
+                       get_saved_jobs_by_user,
+                       update_candidate_cv,
+                       get_cvs_with_top10_jds)
 from db import get_session, engine
 from Core.Auth.schemas import user
-from .schemas import JobResponse, JobSearchRequest, candidate_CV, jd
+from .schemas import CVData, JobResponse, JobSearchRequest, candidate_CV, jd
 from Core.Auth.dependencies import templates, get_current_user, decode_token, authorize_role
 from Core.OCR import compare_qwen, run_vintern
 from ..payment.services import get_packages
@@ -133,7 +135,8 @@ async def get_cvs_by_username(user_info: user = Depends(authorize_role(["candida
 
 # Trừ coin trong database
 @router.post("/deduct-coin")
-async def deduct_coin(amount: int = Form(...), 
+async def deduct_coin(amount: int = Form(...),
+                      cv_id: int = Form(...),
                       user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])), 
                       session: Session = Depends(get_session)):
     '''
@@ -145,6 +148,7 @@ async def deduct_coin(amount: int = Form(...),
         return JSONResponse(content={"success": False, "msg": "Bạn không đủ coin."})
     new_coin = coin - amount
     update_coin(session, user_info.id, new_coin)
+    update_candidate_cv(session, cv_id, unlocked=True)
     return JSONResponse(content={"success": True, "coin": new_coin})
 
 # Lấy số coin trong database
@@ -163,7 +167,7 @@ async def create_free_cv(request: Request,
 async def mycv_settings(request: Request,
                         user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
                         session: Session = Depends(get_session)):
-    cvs = service_get_cvs_by_username(user_info.username, session)
+    cvs = get_cvs_with_top10_jds(user_info.username, session)
     return templates.TemplateResponse("mycv-settings.html", {"request": request, 
                                                              "user_info": user_info,
                                                              "cvs": cvs})
@@ -187,8 +191,7 @@ async def submit_cv(request: Request,
     URL = cv.URL
     cv = add_cv_into_jd(session, URL, jd_id, user_info.id) # Add cv vào bảng jd_CV
 
-    return templates.TemplateResponse("finding-jobs.html",{"request": request, 
-                                                           "user_info": user_info})
+    return JSONResponse(content={"success": True, "msg": "Đã nộp CV thành công!"})
 
 # Nộp cv cho jd bằng cv upload từ máy
 @router.post("/submit-upload-cv", response_class=HTMLResponse)
@@ -202,8 +205,7 @@ async def submit_cv(request: Request,
     file_path, cv_file = await service_upload_cv(new_cv, user_info.id, session) # Lưu cv về server và database bảng candidate_cv
     cv = add_cv_into_jd(session, file_path, jd_id, user_info.id) # Add cv vào bảng jd_CV
 
-    return templates.TemplateResponse("finding-jobs.html",{"request": request, 
-                                                           "user_info": user_info})
+    return JSONResponse(content={"success": True, "msg": "Đã nộp CV thành công!"})
 
 @router.get("/pricing-user-loggedin", response_class=HTMLResponse)
 async def pricing_user_logged_in(request: Request,
@@ -278,6 +280,7 @@ async def top10_best_jd(request: Request,
       <div id="status">Bắt đầu xử lý...</div>
 
       <script>
+        const cv_id = {cv.id};  // 👈 gắn ID vào đây
         async function checkProgress() {{
             const res = await fetch(`/progress`);
             const data = await res.json();
@@ -290,7 +293,7 @@ async def top10_best_jd(request: Request,
                 setTimeout(checkProgress, 5000);
             }} else {{
                 // khi hoàn tất → chuyển tới trang kết quả
-                window.location.href = `/result`;
+                window.location.href = `/result?cv_id=${{data.cv_id}}`;
             }}
         }}
         checkProgress();
@@ -307,29 +310,26 @@ async def get_progress():
 
 # --- Route kết quả ---
 @router.get("/result", response_class=HTMLResponse)
-async def result_page(request: Request, 
+async def result_page(request: Request,
+                      cv_id: int,
                       user_info: user = Depends(authorize_role(["candidate", "candidate_premium"]))):
     result_store.sort(key=lambda x: x["Ratio"], reverse=True)
     top_10 = result_store[:10]
-    return templates.TemplateResponse("top10-best-jd.html", {"request": request, 
+    top_10jd_ids = [item['jd'].id for item in top_10]
+    update_candidate_cv(session=Depends(get_session),
+                        cv_id=cv_id,
+                        top10_jds=top_10jd_ids)
+    return templates.TemplateResponse("top10-best-jd.html", {"request": request,
+                                                             "cv_id": cv_id,
                                                              "job_descriptions": [jd['jd'] for jd in top_10],
                                                              "user_info": user_info})
 
-@router.post("/top10-best-jd-unblur", response_class=HTMLResponse)
-async def top10_best_jd_unblur(request: Request, 
-                               user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
-                               session: Session = Depends(get_session)):
-    form = await request.form()
-    print(form)
-    return templates.TemplateResponse("top10-best-jd.html", {"request": request, 
-                                                             #"job_descriptions": [jd['jd'] for jd in top_10],
-                                                             "user_info": user_info})
+@router.post("/create_cv")
+async def create_cv(cv_data: CVData,
+                    user_info=Depends(authorize_role(["candidate", "candidate_premium"])),
+                    session: Session = Depends(get_session)):
+    # Ví dụ: lưu vào DB, hoặc tạm thời chỉ in ra console
+    print("CV nhận được:", cv_data.model_dump())
 
-@router.get("/saved-jobs", response_class=HTMLResponse)
-async def saved_jobs(request: Request,
-                     user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
-                     session: Session = Depends(get_session)):
-    saved_jds = get_saved_jobs_by_user(session, user_info.id)
-    return templates.TemplateResponse("user-cv-storage.html", {"request": request,
-                                                               "user_info": user_info,
-                                                               "job_descriptions": saved_jds})
+    
+    return JSONResponse({"status": "ok", "name": cv_data.name, "skills_count": len(cv_data.skills)})

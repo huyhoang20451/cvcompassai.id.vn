@@ -154,6 +154,19 @@ def add_cv_into_candidate(session: Session, URL: str, user_id: int) -> candidate
     
     return candidate_CV.model_validate(db_obj)
 
+def update_candidate_cv(session: Session, cv_id: int, **kwargs):
+    db_obj = session.get(candidate_CV_db, cv_id)
+    if not db_obj:
+        return None
+
+    for key, value in kwargs.items():
+        if value is not None:
+            setattr(db_obj, key, value)
+
+    session.commit()
+    session.refresh(db_obj)
+    return candidate_CV.model_validate(db_obj)
+
 def get_cvs_by_id(session: Session, cv_id: int) -> candidate_CV:
     statement = (select(candidate_CV_db).where(candidate_CV_db.id == cv_id))
     result = session.exec(statement).first()
@@ -210,3 +223,24 @@ def get_saved_jobs_by_user(session: Session, user_id: int) -> List[jd]:
     )
     results = session.exec(statement).all()
     return [jd.model_validate(result) for result in results]
+
+def get_cv_with_top10_jds(session: Session, cv_id: int) -> Optional[candidate_CV]:
+    # 1️⃣ Lấy CV theo id
+    statement = select(candidate_CV_db).where(candidate_CV_db.id == cv_id)
+    cv_record = session.exec(statement).first()
+    if not cv_record:
+        return None
+
+    # 2️⃣ Convert sang Pydantic model
+    cv_obj = candidate_CV.model_validate(cv_record)
+
+    # 3️⃣ Nếu có danh sách top10_jds thì lấy thông tin chi tiết từng JD
+    if cv_obj.top10_jds and len(cv_obj.top10_jds) > 0:
+        jd_statement = select(jd_db).where(jd_db.id.in_(cv_obj.top10_jds))
+        jd_records = session.exec(jd_statement).all()
+
+        # Convert từng bản ghi sang model Pydantic jd
+        cv_obj.top10_jds_details = [jd.model_validate(j) for j in jd_records]
+
+    # 4️⃣ Trả về CV kèm chi tiết top10 JD
+    return cv_obj

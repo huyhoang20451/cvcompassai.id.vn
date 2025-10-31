@@ -1,8 +1,8 @@
 # Chứa các models của database
 import uuid
 from sqlalchemy import Column, DateTime, func
-from sqlmodel import SQLModel, Field, UniqueConstraint
-from typing import Optional, Text
+from sqlmodel import JSON, SQLModel, Field, UniqueConstraint
+from typing import List, Optional, Text
 from datetime import datetime, timezone, date
 import json
 from apps.payment.schemas import OrderStatus
@@ -55,6 +55,8 @@ class candidate_CV_db(SQLModel, table=True):
     user_id: int = Field(foreign_key="user.id")   # liên kết với bảng users
     URL: str = Field(max_length=255)
     details: Optional[str] = Field(default=None, max_length=2000)  # đổi sang VARCHAR(2000)
+    top10_jds: Optional[List[int]] = Field(default=None, sa_column=Column(JSON))
+    unlocked: Optional[bool] = Field(default=False)
 
 class jd_CV_db(SQLModel, table=True):
     __tablename__ = "jd_CV"

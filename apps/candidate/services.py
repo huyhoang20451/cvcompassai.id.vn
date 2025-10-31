@@ -11,7 +11,9 @@ from .repository import (search_jobs as repo_search_jobs,
                          get_cvs_by_id as repo_get_cvs_by_id,
                          save_jd as repo_save_jd,
                          get_job_categories as repo_get_job_categories,
-                         get_saved_jobs_by_user as repo_get_saved_jobs_by_user)
+                         get_saved_jobs_by_user as repo_get_saved_jobs_by_user,
+                         update_candidate_cv as repo_update_candidate_cv,
+                         get_cv_with_top10_jds as repo_get_cv_with_top10_jds)
 from fastapi import Depends, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 from typing import Annotated, List, Optional
@@ -52,6 +54,10 @@ def get_jd_by_id(session: Session, id: int) -> jd:
 
 def add_cv_into_candidate(session: Session, URL: str, user_id: int) -> candidate_CV:
     cv = repo_add_cv_into_candidate(session, URL, user_id)
+    return cv
+
+def update_candidate_cv(session: Session, cv_id: int, top10_jds: List[int], unlocked: bool) -> candidate_CV:
+    cv = repo_update_candidate_cv(session, cv_id, top10_jds, unlocked)
     return cv
 
 async def upload_cv(file: UploadFile, user_id: int, session: Session):
@@ -135,3 +141,15 @@ def get_job_categories(session: Session) -> List[JobCategory]:
 
 def get_saved_jobs_by_user(session: Session, user_id: int) -> List[jd]:
     return repo_get_saved_jobs_by_user(session, user_id)
+
+def get_cv_with_top10_jds(session: Session, cv_id: int) -> Optional[candidate_CV]:
+    return repo_get_cv_with_top10_jds(session, cv_id)
+
+def get_cvs_with_top10_jds(username: str, session: Session) -> List[candidate_CV]:
+    cvs = repo_get_cvs_by_username(session, username)
+    result_cvs = []
+    for cv in cvs:
+        cv_with_jds = get_cv_with_top10_jds(session, cv.id)
+        if cv_with_jds:
+            result_cvs.append(cv_with_jds)
+    return result_cvs
