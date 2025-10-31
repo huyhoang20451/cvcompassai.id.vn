@@ -292,9 +292,22 @@ body {
                 <div class="cv-file">
                     <h4>CV #{{ cv.id }}</h4>
                     <p>Filename: {{ cv.URL }}</p>
-                    <p>CV đã quét: {{ cv.top10_jds_details }}</p>
-                    <a href="{{ cv.URL }}" class="cv-detail">Xem chi tiết</a>
+                    <p>
+                      CV đã quét: 
+                      <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample{{ cv.id }}" aria-expanded="false" aria-controls="collapseExample{{ cv.id }}">
+                        Xem chi tiết
+                      </button>
+                    </p>
+                    <a href="{{ cv.URL }}" class="cv-detail">Xem chi tiết ảnh</a>
                 </div>
+                <div class="cv-details collapse" id="collapseExample{{ cv.id }}">
+                  {% for detail in cv.top10_jds_details %}
+                  <h4>Chi tiết CV #{{ cv.id }}</h4>
+                  <p><strong>Tên vị trí tuyển dụng:</strong> {{ detail.title }}</p>
+                  <p><strong>Địa chỉ làm việc:</strong> {{ detail.location }}</p>
+                  <p><strong>Mức lương:</strong> {{ detail.min_salary }} - {{ detail.max_salary }}</p>
+                  <p><strong>Yêu cầu công việc:</strong> {{ detail.job_descriptions }}</p>
+                  {% endfor %}
             </div>
             {% endfor %}
         </main>
