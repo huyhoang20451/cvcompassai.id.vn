@@ -77,6 +77,11 @@
         <h2 class="jd-title">Top 10 Job Description phù hợp nhất</h2>
                 <button onclick="unlockTop5JD()" class="unlock-top5-button">Mở khóa ngay Top 5 JD phù hợp<img style="width: 20px; height: 20px; margin-left: 5px;" src="/static/images/coin.png" alt="Coin">5</button>
                 <script>
+                    const CV_ID = {{ cv_id | tojson }};
+                    function goToJob(jdId){
+                        const url = '/job-detail/' + jdId + (CV_ID ? '?cv_id=' + encodeURIComponent(CV_ID) : '');
+                        window.location.href = url;
+                    }
                     async function unlockTop5JD() {
                         const button = document.querySelector('.unlock-top5-button');
                         button.disabled = true; // chặn spam
@@ -108,7 +113,7 @@
 
                 const jdId = item.getAttribute('data-jd-id');
                 item.style.cursor = 'pointer';
-                item.onclick = () => window.location.href = '/job-detail/' + jdId;
+                item.onclick = () => goToJob(jdId);
             });
 
             alert("🎉 Bạn đã mở khóa thành công Top 5 JD phù hợp!");
@@ -138,7 +143,7 @@
             {%endfor%}
             <!--Top 6-10 JD hiển thị bình thường-->
             {% for job in job_descriptions[5:10] %}
-            <div onclick="location.href='/job-detail/{{ job.id }}'" class="jd-item">
+            <div onclick="goToJob({{ job.id }})" class="jd-item">
                 <div class="jd-rank">#{{ job.id }}</div>
                 <div class="jd-info">
                     <div class="jd-name">{{ job.title }}</div>
