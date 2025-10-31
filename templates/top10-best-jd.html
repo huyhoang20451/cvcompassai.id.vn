@@ -96,10 +96,16 @@
                         try {
                             const amountToDeduct = 5;
 
+                            // Include cv_id when available so backend can link the deduction to a CV flow
+                            const params = new URLSearchParams({ amount: amountToDeduct });
+                            if (CV_ID !== null && CV_ID !== '' && CV_ID !== 'undefined') {
+                                params.append('cv_id', CV_ID);
+                            }
+
                             const response = await fetch('/deduct-coin', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                                body: new URLSearchParams({ amount: amountToDeduct })
+                                body: params
                 });
 
                             const data = await response.json();
