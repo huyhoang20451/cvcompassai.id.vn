@@ -91,8 +91,12 @@ def services(request: Request,
 # Cập nhật dịch vụ
 @router.patch("/services", response_class=HTMLResponse)
 def update_service(request: Request,
+                   service_id: int = Form(...),
+                   name: Optional[str] = Form(None),
+                   description: Optional[str] = Form(None),
+                   price: Optional[int] = Form(None),
                    session: Session = Depends(get_session)):
-    service_list = update_service_by_id(session)
+    service_list = update_service_by_id(session, service_id, name, description, price)
     return templates.TemplateResponse("services.html", {"request": request, "services": service_list})
 
 @router.get("/quality-cv-checker", response_class=HTMLResponse)
