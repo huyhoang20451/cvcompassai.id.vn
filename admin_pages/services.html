@@ -109,7 +109,7 @@
         <div id="editModal" class="modal" style="display:none;">
             <div class="modal-content">
                 <span class="close" title="Đóng">&times;</span>
-                <form method="PATCH" action="/services" id="editForm">
+                <form method="POST" action="/services" id="editForm">
                     <h2>Cập nhật dịch vụ</h2>
                     <input type="hidden" id="service_id" name="id">
                     <label for="service_name">Service Name:</label>
@@ -175,6 +175,64 @@
             if (closeBtn) closeBtn.addEventListener('click', closeModal);
             if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
             window.addEventListener('click', function(e){ if (e.target === modal) closeModal(); });
+            // Intercept the modal form submit and send PATCH via fetch
+            if (form) {
+                form.addEventListener('submit', async function(e){
+                    e.preventDefault();
+                    const id = document.getElementById('service_id').value;
+                    const name = document.getElementById('service_name').value;
+                    const price = document.getElementById('service_price').value;
+                    const description = document.getElementById('service_description').value;
+
+                    // Determine target URL. Prefer RESTful /services/{id} if id present.
+                    let target = form.getAttribute('action') || '/services';
+                    // if target already ends with the id, avoid doubling
+                    if (id) {
+                        // ensure no trailing slash
+                        target = target.replace(/\/$/, '');
+                        if (!target.endsWith('/' + id)) {
+                            target = target + '/' + encodeURIComponent(id);
+                        }
+                    }
+
+                    try {
+                        const resp = await fetch(target, {
+                            method: 'PATCH',
+                            credentials: 'same-origin',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id: id, name: name, price: price, description: description })
+                        });
+
+                        if (!resp.ok) {
+                            const text = await resp.text();
+                            throw new Error('HTTP ' + resp.status + ' - ' + text);
+                        }
+
+                        // Try parse json response; if not JSON, ignore
+                        let data = null;
+                        try { data = await resp.json(); } catch(_) { data = null; }
+
+                        // Update the table row in-place if found
+                        const rows = document.querySelectorAll('table tbody tr');
+                        for (const row of rows) {
+                            const firstTd = row.querySelector('td');
+                            if (!firstTd) continue;
+                            if (String(firstTd.innerText).trim() === String(id)) {
+                                const tds = row.querySelectorAll('td');
+                                if (tds[1]) tds[1].innerText = name;
+                                if (tds[2]) tds[2].innerText = price;
+                                if (tds[3]) tds[3].innerText = description;
+                                break;
+                            }
+                        }
+
+                        closeModal();
+                    } catch (err) {
+                        console.error('Update service failed', err);
+                        alert('Lỗi khi cập nhật dịch vụ: ' + (err.message || err));
+                    }
+                });
+            }
         })();
     </script>
 </html>
