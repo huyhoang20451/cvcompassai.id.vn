@@ -299,9 +299,9 @@ body {
         <tbody>
           <tr>
             {% for cv in cvs %}
-            <td>{{ cv.job_title }}</td>
+            <td>{{ cv.position }}</td>
             <td>{{ cv.location }}</td>
-            <td><a href="#" class="cv-detail">{{ cv.file_name }}</a></td>
+            <td><a href="{{ cv.URL }}" class="cv-detail">{{ cv.URL }}</a></td>
             <td style="color: {{ 'green' if cv.approved == 1 else 'red' }}">{{ 'Đã duyệt' if cv.approved == 1 else 'Chưa duyệt' }}</td>
           </tr>
         {% endfor %}
