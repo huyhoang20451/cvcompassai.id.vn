@@ -309,7 +309,7 @@ body {
                                   <div class="jd-detail" style="margin-bottom:12px;padding:8px;border-radius:6px;background:#f5f7fa;">
                                     <p><strong>Tên vị trí tuyển dụng:</strong> {{ cv.top10_jds_details.title }}</p>
                                     <p><strong>Địa chỉ làm việc:</strong> {{ cv.top10_jds_details.location }}</p>
-                                    <p><strong>Mức lương:</strong> {{ "{:, .0f}".format(cv.top10_jds_details.min_salary) | default('') }} - {{ "{:, .0f}".format(cv.top10_jds_details.max_salary) | default('') }} VNĐ</p>
+                                    <p><strong>Mức lương:</strong> {% if cv.top10_jds_details.min_salary is not none and cv.top10_jds_details.max_salary is not none %}{{ "{:,.0f}".format(cv.top10_jds_details.min_salary) }} - {{ "{:,.0f}".format(cv.top10_jds_details.max_salary) }} VNĐ{% else %}Liên hệ{% endif %}</p>
                                     <p><strong>Yêu cầu công việc:</strong> {{ cv.top10_jds_details.job_descriptions | default(cv.top10_jds_details.job_description) | default(cv.top10_jds_details.requirements) | default('') }}</p>
                                   </div>
                                 {% else %}
@@ -317,7 +317,7 @@ body {
                                     <div class="jd-detail" style="margin-bottom:12px;padding:8px;border-radius:6px;background:#f5f7fa;">
                                       <p><strong>Tên vị trí tuyển dụng:</strong> {{ jd.title | default(jd.job_title) | default('N/A') }}</p>
                                       <p><strong>Địa chỉ làm việc:</strong> {{ jd.location | default(jd.company_location) | default('N/A') }}</p>
-                                      <p><strong>Mức lương:</strong> {{ "{:, .0f}".format(jd.min_salary) | default('') }} - {{ "{:, .0f}".format(jd.max_salary) | default('') }} VNĐ</p>
+                                      <p><strong>Mức lương:</strong> {% if jd.min_salary is not none and jd.max_salary is not none %}{{ "{:,.0f}".format(jd.min_salary) }} - {{ "{:,.0f}".format(jd.max_salary) }} VNĐ{% else %}Liên hệ{% endif %}</p>
                                       <p><strong>Yêu cầu công việc:</strong> {{ jd.job_descriptions | default(jd.job_description) | default(jd.requirements) | default('N/A') }}</p>
                                     </div>
                                   {% endfor %}
