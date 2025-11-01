@@ -71,7 +71,7 @@
         <div class="job-header">
             <div class="job-main">
                 <h1>{{ job.title }}</h1>
-                <p><b>Lương:</b> {{ job.min_salary }} - {{ job.max_salary }}</p>
+                <p><b>Lương:</b> {{ "{:, .0f}".format(job.min_salary) }} - {{ "{:, .0f}".format(job.max_salary) }} VNĐ</p>
                 <p><b>Địa điểm:</b> {{ job.location }}</p>
                 <p><b>Hạn nộp hồ sơ:</b> {{ job.deadline }}</p>
         <button onclick="openUpdateFormModal()" class="btn-apply">Gửi CV</button>

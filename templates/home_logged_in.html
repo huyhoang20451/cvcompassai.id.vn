@@ -150,7 +150,7 @@
                             </div>
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
                                 <div class="job-card-tags" style="font-size:13px; color:#444;">
-                                    <span class="job-tag" style="font-weight:700;">{{jd.min_salary}} - {{jd.max_salary}}</span>
+                                    <span class="job-tag" style="font-weight:700;">{{ "{:, .0f}".format(jd.min_salary) }} - {{ "{:, .0f}".format(jd.max_salary) }} VNĐ</span>
                                     <span class="job-tag" style="margin-left:8px; color:#777;">{{jd.location}}</span>
                                 </div>
                                 <button class="job-card-fav" style="background:transparent; border:none; color:#e33; cursor:pointer; font-size:18px;">
@@ -361,7 +361,7 @@
                             <div class="job-card-title">{{jd.title}}</div>
                             <div class="job-card-company">{% if jd.location and jd.location != 'None' %}{{jd.location}}{% else %}Công ty chưa cập nhật{% endif %}</div>
                             <div class="job-card-tags">
-                                <span class="job-tag">{{jd.min_salary}} - {{jd.max_salary}}</span>
+                                <span class="job-tag">{{ "{:, .0f}".format(jd.min_salary) }} - {{ "{:, .0f}".format(jd.max_salary) }} VNĐ</span>
                                 <span class="job-tag">{{jd.location}}</span>
                             </div>
                         </div>
