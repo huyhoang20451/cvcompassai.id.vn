@@ -1,6 +1,7 @@
 # Logic nghiệp vụ
 from sqlmodel import Session
-from .repository import (add_avatar_path_into_user as repo_add_avatar_path_into_user)
+from .repository import (add_avatar_path_into_user as repo_add_avatar_path_into_user,
+                         update_user as repo_update_user)
 from fastapi import Depends, UploadFile
 from fastapi.responses import JSONResponse
 from typing import Annotated, List
@@ -33,3 +34,8 @@ async def upload_avatar(file: UploadFile, user_id: int, session: Session) -> str
         return avatar_url
     except Exception as e:
         raise RuntimeError(f"Lỗi khi upload CV: {e}")
+    
+def update_user(session: Session, 
+                user_id: int, 
+                update_data: dict):
+    return repo_update_user(session, user_id, update_data)

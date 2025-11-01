@@ -336,7 +336,8 @@ async def result_page(request: Request,
                                                              "user_info": user_info})
 
 @router.post("/create_cv")
-async def create_cv(cv_data: CVData,
+async def create_cv(request: Request,
+                    cv_data: CVData,
                     user_info=Depends(authorize_role(["candidate", "candidate_premium"])),
                     session: Session = Depends(get_session)):
     # Ví dụ: lưu vào DB, hoặc tạm thời chỉ in ra console
@@ -346,7 +347,8 @@ async def create_cv(cv_data: CVData,
     return JSONResponse({"status": "ok", "name": cv_data.name, "skills_count": len(cv_data.skills)})
 
 @router.get("/applied-cvs")
-async def get_applied_cvs_endpoint(user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
+async def get_applied_cvs_endpoint(request: Request,
+                                   user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
                                    session: Session = Depends(get_session)):
     cvs = get_applied_cvs(session, user_info.id)
 

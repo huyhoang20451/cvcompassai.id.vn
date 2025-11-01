@@ -28,3 +28,23 @@ async def update_avatar(request: Request,
                                                               "user_avatar": avatar_path,
                                                               "username": user_info.username})
     # return JSONResponse(content={"avatar_path": avatar_path})
+
+@router.patch("/update_user")
+async def update_user(request: Request,
+                      user_info: user = Depends(authorize_role(["candidate", "business"])),
+                      session: Session = Depends(get_session)):
+    # Lấy toàn bộ dữ liệu form
+    form = await request.form()
+    update_data = dict(form)
+
+    if not update_data:
+        raise HTTPException(status_code=400, detail="Không có dữ liệu form để cập nhật")
+    
+    try:
+        update_result = update_user(session, user_info.id, update_data)
+        if update_result:
+            return JSONResponse(content={"message": "Cập nhật thông tin user thành công"})
+        else:
+            raise HTTPException(status_code=500, detail="Cập nhật thông tin user thất bại")
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
