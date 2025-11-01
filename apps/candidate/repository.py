@@ -244,3 +244,24 @@ def get_cv_with_top10_jds(session: Session, cv_id: int) -> Optional[candidate_CV
 
     # 4️⃣ Trả về CV kèm chi tiết top10 JD
     return cv_obj
+
+def get_applied_cvs(session: Session, candidate_id: int):
+    """
+    Lấy danh sách các CV mà ứng viên đã nộp,
+    kèm thông tin JD và trạng thái approved.
+    """
+    statement = (
+        select(
+            jd_CV_db.candidate_id,
+            jd_db.position,
+            jd_db.location,
+            jd_CV_db.URL,
+            jd_CV_db.approved
+        )
+        .join(User_db, User_db.id == jd_CV_db.candidate_id)
+        .join(jd_db, jd_db.id == jd_CV_db.jd_id)
+        .where(jd_CV_db.candidate_id == candidate_id)
+    )
+
+    results = session.exec(statement).all()
+    return results

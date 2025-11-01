@@ -21,7 +21,8 @@ from .services import (jd_to_str, search_jobs,
                        get_job_categories,
                        get_saved_jobs_by_user,
                        update_candidate_cv,
-                       get_cvs_with_top10_jds)
+                       get_cvs_with_top10_jds,
+                       get_applied_cvs)
 from db import get_session, engine
 from Core.Auth.schemas import user
 from .schemas import CVData, JobResponse, JobSearchRequest, candidate_CV, jd
@@ -214,6 +215,15 @@ async def pricing_user_logged_in(request: Request,
     return templates.TemplateResponse("pricing-user-loggedin.html", {"request": request, 
                                                                      "user_info": user_info})
 
+@router.get("/saved-jobs", response_class=HTMLResponse)
+async def saved_jobs(request: Request,
+                     user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
+                     session: Session = Depends(get_session)):
+    save_jds = get_saved_jobs_by_user(session, user_info.id)
+    return templates.TemplateResponse("user-cv-storage.html", {"request": request,
+                                                               "user_info": user_info,
+                                                               "jds": save_jds})
+
 # Lưu công việc vào danh sách yêu thích
 @router.post("/save-jd/{jd_id}", response_class=HTMLResponse)
 async def save_jd(request: Request,
@@ -334,3 +344,12 @@ async def create_cv(cv_data: CVData,
 
     
     return JSONResponse({"status": "ok", "name": cv_data.name, "skills_count": len(cv_data.skills)})
+
+@router.get("/applied-cvs")
+async def get_applied_cvs_endpoint(user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
+                                   session: Session = Depends(get_session)):
+    cvs = get_applied_cvs(session, user_info.id)
+
+    return templates.TemplateResponse("applied_cvs.html", {"request": request,
+                                                             "user_info": user_info,
+                                                             "cvs": cvs})

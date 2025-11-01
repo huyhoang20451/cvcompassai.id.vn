@@ -89,9 +89,9 @@ def services(request: Request,
     return templates.TemplateResponse("services.html", {"request": request, "services": service_list})
 
 # Cập nhật dịch vụ
-@router.patch("/services", response_class=HTMLResponse)
+@router.patch("/services/{service_id}", response_class=HTMLResponse)
 def update_service(request: Request,
-                   service_id: int = Form(...),
+                   service_id: int,
                    name: Optional[str] = Form(None),
                    description: Optional[str] = Form(None),
                    price: Optional[int] = Form(None),

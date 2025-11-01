@@ -13,7 +13,8 @@ from .repository import (search_jobs as repo_search_jobs,
                          get_job_categories as repo_get_job_categories,
                          get_saved_jobs_by_user as repo_get_saved_jobs_by_user,
                          update_candidate_cv as repo_update_candidate_cv,
-                         get_cv_with_top10_jds as repo_get_cv_with_top10_jds)
+                         get_cv_with_top10_jds as repo_get_cv_with_top10_jds,
+                         get_applied_cvs as repo_get_applied_cvs)
 from fastapi import Depends, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 from typing import Annotated, List, Optional
@@ -153,3 +154,6 @@ def get_cvs_with_top10_jds(username: str, session: Session) -> List[candidate_CV
         if cv_with_jds:
             result_cvs.append(cv_with_jds)
     return result_cvs
+
+def get_applied_cvs(session: Session, candidate_id: int):
+    return repo_get_applied_cvs(session, candidate_id)
