@@ -294,9 +294,40 @@ body {
                     <p>Filename: {{ cv.URL }}</p>
                     <p>
                       CV đã quét: 
-                      <button class="btn btn-primary open-top10-btn" type="button" data-top10='{{ cv.top10_jds_details | tojson | e }}' aria-expanded="false" aria-controls="collapseExample{{ cv.id }}">
-                        Xem chi tiết
-                      </button>
+                      {% if cv.top10_jds_details %}
+                      <div class="accordion" id="accordionPanelsStayOpenExample">
+                        <div class="accordion-item">
+                          <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                              Job Descriptions #{{ cv.top10_jds_details.id }}
+                            </button>
+                          </h2>
+                          <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show">
+                            <div class="accordion-body">
+                              {% if cv.top10_jds_details %}
+                              {# If top10_jds_details is a single object with attributes #}
+                                {% if cv.top10_jds_details.title is defined %}
+                                  <p><strong>Tên vị trí tuyển dụng:</strong> {{ cv.top10_jds_details.title }}</p>
+                                  <p><strong>Địa chỉ làm việc:</strong> {{ cv.top10_jds_details.location }}</p>
+                                  <p><strong>Mức lương:</strong> {{ cv.top10_jds_details.min_salary | default('') }} - {{ cv.top10_jds_details.max_salary | default('') }}</p>
+                                  <p><strong>Yêu cầu công việc:</strong> {{ cv.top10_jds_details.job_descriptions | default(cv.top10_jds_details.job_description) | default(cv.top10_jds_details.requirements) | default('') }}</p>
+                                {% else %}
+                                {# Otherwise assume it's an iterable/list of JD objects/dicts #}
+                                  {% for jd in cv.top10_jds_details %}
+                                    <div class="jd-detail" style="margin-bottom:12px;padding:8px;border-radius:6px;background:#f5f7fa;">
+                                      <p><strong>Tên vị trí tuyển dụng:</strong> {{ jd.title | default(jd.job_title) | default('N/A') }}</p>
+                                      <p><strong>Địa chỉ làm việc:</strong> {{ jd.location | default(jd.company_location) | default('N/A') }}</p>
+                                      <p><strong>Mức lương:</strong> {{ jd.min_salary | default(jd.minSalary) | default('') }} - {{ jd.max_salary | default(jd.maxSalary) | default('') }}</p>
+                                      <p><strong>Yêu cầu công việc:</strong> {{ jd.job_descriptions | default(jd.job_description) | default(jd.requirements) | default('N/A') }}</p>
+                                    </div>
+                                  {% endfor %}
+                                {% endif %}
+                            {% else %}
+                              <p>Không có JD đã quét cho CV này.</p>
+                            {% endif %}
+                            </div>
+                          </div>
+                        </div>
                     </p>
                     <a href="{{ cv.URL }}" class="cv-detail">Xem chi tiết ảnh</a>
                 </div>
@@ -361,72 +392,5 @@ body {
     </div>
   </div>
 </footer>
-    <!-- Top10 modal -->
-    <div id="top10Modal" style="display:none; position:fixed; z-index:2000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6); align-items:center; justify-content:center;">
-      <div style="background:#fff; max-width:900px; width:92%; max-height:80vh; overflow:auto; border-radius:8px; padding:18px; margin:40px auto; position:relative;">
-        <button id="top10ModalClose" style="position:absolute; right:12px; top:8px; font-size:20px; background:transparent;border:none;cursor:pointer;">&times;</button>
-        <h3>Top JDs đã quét</h3>
-        <div id="top10ModalContent"></div>
-      </div>
-    </div>
-
-    <script>
-      // Small vanilla JS to show top10 modal when clicking the 'Xem chi tiết' button
-      (function(){
-        function buildJDCard(jd){
-          const title = jd.title || jd.job_title || jd.name || 'Không có tiêu đề';
-          const location = jd.location || jd.company_location || jd.workplace || '';
-          const minSalary = jd.min_salary ?? jd.minSalary ?? jd.salary ?? '';
-          const maxSalary = jd.max_salary ?? jd.maxSalary ?? '';
-          const desc = jd.job_descriptions || jd.job_description || jd.requirements || '';
-          const id = jd.id || jd.jd_id || jd.job_id || '';
-          const a = id ? `<a href="/job-detail/${id}" style="color:#0b5ed7; text-decoration:underline;">Xem chi tiết JD</a>` : '';
-          return `
-            <div style="padding:10px;border-radius:6px;border:1px solid #eee;margin-bottom:10px;background:#fafafa;">
-              <div style="font-weight:700;margin-bottom:6px;">${title}</div>
-              <div style="font-size:13px;color:#444;margin-bottom:6px;">${location} &nbsp; ${minSalary || maxSalary ? ('| ' + (minSalary || '') + (maxSalary ? (' - ' + maxSalary) : '')) : ''}</div>
-              <div style="font-size:13px;color:#333;">${desc}</div>
-              <div style="margin-top:8px;">${a}</div>
-            </div>`;
-        }
-
-        function openModalWith(data){
-          const modal = document.getElementById('top10Modal');
-          const content = document.getElementById('top10ModalContent');
-          if(!modal || !content) return;
-          content.innerHTML = '';
-          let arr = [];
-          if(!data) { content.innerHTML = '<p>Không có JD đã quét cho CV này.</p>'; }
-          else if(Array.isArray(data)) arr = data.slice(0,10);
-          else arr = [data];
-          if(arr.length === 0) content.innerHTML = '<p>Không có JD đã quét cho CV này.</p>';
-          else{
-            arr.forEach(jd => { content.innerHTML += buildJDCard(jd); });
-          }
-          modal.style.display = 'flex';
-          modal.style.alignItems = 'center';
-          modal.style.justifyContent = 'center';
-        }
-
-        document.addEventListener('click', function(e){
-          const btn = e.target.closest('.open-top10-btn');
-          if(btn){
-            e.preventDefault();
-            // read data-top10
-            let raw = btn.getAttribute('data-top10');
-            let parsed = null;
-            try{ parsed = raw ? JSON.parse(raw) : null; }catch(err){ parsed = null; }
-            openModalWith(parsed);
-          }
-          if(e.target && e.target.id === 'top10ModalClose'){
-            document.getElementById('top10Modal').style.display = 'none';
-          }
-          // click outside modal content closes it
-          if(e.target && e.target.id === 'top10Modal'){
-            document.getElementById('top10Modal').style.display = 'none';
-          }
-        });
-      })();
-    </script>
 </body>
 </html>
