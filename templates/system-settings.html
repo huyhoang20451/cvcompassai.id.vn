@@ -244,7 +244,7 @@ body {
                     <p><a href="/edit-profile?username={{username}}" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
                     <p><a href="/mycv-settings?username={{username}}" style="text-decoration:none;color:#222;">CV của tôi</a></p>
                     <p><a href="/system-settings?username={{username}}" style="text-decoration:none;color:#222;">Cài đặt tài khoản</a></p>
-                    <p><a href="/home" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
+                    <p><a href="/" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
                 `;
                 document.body.appendChild(box);
                 document.addEventListener('click', function handleClickOutside(event) {
@@ -280,7 +280,7 @@ body {
                 <li><a style="text-decoration: none;" href="/edit-profile">Thông tin cá nhân</a></li>
                 <li><a style="text-decoration: none;" href="/mycv-settings">CV của tôi</a></li>
                 <li><a style="text-decoration: none;" href="/saved-jobs">Công việc/Đã lưu</a></li>
-                <li>Lịch sử ứng tuyển</li>
+                <li><a style="text-decoration: none;" href="/applied-cvs">Lịch sử ứng tuyển</a></li>
                 <li class="active"><a style="text-decoration: none;" href="/system-settings">Cài đặt hệ thống</a></li>
             </ul>
         </aside>

@@ -298,11 +298,13 @@ body {
         </thead>
         <tbody>
           <tr>
-            <td>Chuyên viên Marketing</td>
-            <td>Hà Nội</td>
-            <td><a href="#" class="cv-detail">CV_Marketing_JohnDoe.pdf</a></td>
-            <td>Thành công</td>
+            {% for cv in cvs %}
+            <td>{{ cv.job_title }}</td>
+            <td>{{ cv.location }}</td>
+            <td><a href="#" class="cv-detail">{{ cv.file_name }}</a></td>
+            <td style="color: {{ 'green' if cv.approved == 1 else 'red' }}">{{ 'Đã duyệt' if cv.approved == 1 else 'Chưa duyệt' }}</td>
           </tr>
+        {% endfor %}
         </tbody>
       </table>
 
