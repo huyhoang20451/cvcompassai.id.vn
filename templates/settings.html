@@ -251,18 +251,18 @@ body {
 
             <p class="note">(*) Các thông tin bắt buộc</p>
 
-            <form class="form">
-                <label for="fullname">Họ và tên <span>*</span></label>
-                <input type="text" id="fullname" value="{{ user_info.full_name }}" required>
+      <form method="POST" action="/update-profile" class="form" id="update-profile-form" novalidate>
+        <label for="fullname">Họ và tên <span>*</span></label>
+        <input type="text" id="fullname" name="full_name" value="{{ user_info.full_name }}" required>
 
-                <label for="email">Email <span>*</span></label>
-                <input type="email" id="email" value="" required>
+        <label for="email">Email <span>*</span></label>
+        <input type="email" id="email" name="email" value="{{ user_info.email if user_info.email else '' }}" required>
 
-                <label for="phone">Số điện thoại <span>*</span></label>
-                <input type="tel" id="phone" value="" required>
+        <label for="phone">Số điện thoại <span>*</span></label>
+        <input type="tel" id="phone" name="phone" value="{{ user_info.phone if user_info.phone else '' }}" required>
 
-                <button type="submit" class="save-btn">Lưu</button>
-            </form>
+        <button type="submit" class="save-btn">Lưu</button>
+      </form>
         </main>
     </div>
             <footer class="footer">
@@ -299,4 +299,74 @@ body {
   </div>
 </footer>
 </body>
+</body>
+<script>
+// Client-side handler for profile update form
+(function(){
+  const form = document.getElementById('update-profile-form');
+  if(!form) return;
+
+  const saveBtn = form.querySelector('.save-btn');
+  // message element inserted above the button
+  const msg = document.createElement('div');
+  msg.id = 'update-profile-message';
+  msg.style.margin = '8px 0';
+  form.insertBefore(msg, saveBtn);
+
+  function showMessage(text, ok){
+    msg.textContent = text;
+    msg.style.color = ok ? 'green' : 'red';
+  }
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    showMessage('', true);
+
+    const full = document.getElementById('fullname').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+
+    // Basic validation
+    if(!full){ showMessage('Họ và tên là bắt buộc', false); return; }
+    const emailRe = /^\S+@\S+\.\S+$/;
+    if(!email || !emailRe.test(email)){ showMessage('Email không hợp lệ', false); return; }
+    const phoneRe = /^[0-9()+\-\s]{7,20}$/;
+    if(!phone || !phoneRe.test(phone)){ showMessage('Số điện thoại không hợp lệ', false); return; }
+
+    // disable button while sending
+    if(saveBtn){ saveBtn.disabled = true; saveBtn.textContent = 'Đang lưu...'; }
+
+    try{
+      const fd = new FormData();
+      fd.append('full_name', full);
+      fd.append('email', email);
+      fd.append('phone', phone);
+
+      const resp = await fetch('/update_user', {
+        method: 'PATCH',
+        body: fd,
+        credentials: 'same-origin'
+      });
+
+      let payload = null;
+      try{ payload = await resp.json(); }catch(e){ }
+
+      if(resp.ok){
+        showMessage((payload && payload.message) ? payload.message : 'Cập nhật thông tin user thành công', true);
+        // optionally update visible name in header
+        const welcome = document.getElementById('welcome-user');
+        if(welcome) welcome.textContent = 'Chào mừng, ' + full + '!';
+      } else {
+        showMessage((payload && (payload.detail || payload.message)) ? (payload.detail || payload.message) : 'Cập nhật thất bại', false);
+      }
+    }catch(err){
+      console.error('Update profile error', err);
+      showMessage('Lỗi kết nối, vui lòng thử lại', false);
+    } finally {
+      if(saveBtn){ saveBtn.disabled = false; saveBtn.textContent = 'Lưu'; }
+    }
+  });
+})();
+</script>
+</html>
 </html>
