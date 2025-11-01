@@ -251,7 +251,7 @@ body {
 
             <p class="note">(*) Các thông tin bắt buộc</p>
 
-      <form method="POST" action="/update-profile" class="form" id="update-profile-form" novalidate>
+  <form method="POST" action="/update_user" class="form" id="update-profile-form" novalidate>
         <label for="fullname">Họ và tên <span>*</span></label>
         <input type="text" id="fullname" name="full_name" value="{{ user_info.full_name }}" required>
 
@@ -298,8 +298,7 @@ body {
     </div>
   </div>
 </footer>
-</body>
-</body>
+
 <script>
 // Client-side handler for profile update form
 (function(){
@@ -368,5 +367,5 @@ body {
   });
 })();
 </script>
-</html>
+</body>
 </html>
