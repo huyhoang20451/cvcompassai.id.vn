@@ -251,7 +251,7 @@ body {
 
             <p class="note">(*) Các thông tin bắt buộc</p>
 
-  <form method="POST" action="/edit-profile" class="form" id="update-profile-form" novalidate>
+  <form method="POST" action="/edit-profile" class="form" id="userProfileForm" novalidate>
         <label for="full_name">Họ và tên <span>*</span></label>
         <input type="text" id="full_name" name="full_name" value="{{ user_info.full_name }}" required>
 
@@ -262,6 +262,9 @@ body {
         <input type="tel" id="phone" name="phone" value="{{ user_info.phone if user_info.phone else '' }}" required>
 
         <button type="submit" class="save-btn">Lưu</button>
+
+        <div class="alert alert-success" id="successMessage" style="display:none; margin-top:10px;">Cập nhật thành công!</div>
+        <div class="alert alert-danger" id="errorMessage" style="display:none; margin-top:10px;">Đã xảy ra lỗi!</div>
       </form>
         </main>
     </div>
@@ -301,83 +304,49 @@ body {
 
 
 <script>
-// POST-based profile update (graceful, works when server expects POST)
-(function(){
-  const form = document.getElementById('update-profile-form');
-  if(!form) return;
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('userProfileForm');
+  const successMsg = document.getElementById('successMessage');
+  const errorMsg = document.getElementById('errorMessage');
 
-  const saveBtn = form.querySelector('.save-btn');
-  // message element (insert above button if not present)
-  let msg = document.getElementById('update-profile-message');
-  if(!msg){
-    msg = document.createElement('div');
-    msg.id = 'update-profile-message';
-    msg.style.margin = '8px 0';
-    form.insertBefore(msg, saveBtn);
-  }
-
-  function showMessage(text, ok){
-    msg.textContent = text;
-    msg.style.color = ok ? 'green' : 'red';
-  }
-
-  form.addEventListener('submit', async function(e){
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    showMessage('');
+    successMsg.style.display = 'none';
+    errorMsg.style.display = 'none';
 
-    const fd = new FormData(form);
-    const full = (fd.get('full_name') || '').toString().trim();
-    const email = (fd.get('email') || '').toString().trim();
-    const phone = (fd.get('phone') || '').toString().trim();
+    const formData = new FormData(form);
+    const saveBtn = form.querySelector('.save-btn');
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Đang lưu...';
 
-    // Basic client-side validation
-    if(!full){ showMessage('Họ và tên là bắt buộc', false); return; }
-    const emailRe = /^\S+@\S+\.\S+$/;
-    if(!email || !emailRe.test(email)){ showMessage('Email không hợp lệ', false); return; }
-    const phoneRe = /^[0-9()+\-\s]{7,20}$/;
-    if(!phone || !phoneRe.test(phone)){ showMessage('Số điện thoại không hợp lệ', false); return; }
-
-    if(saveBtn){ saveBtn.disabled = true; saveBtn.textContent = 'Đang lưu...'; }
-
-    try{
-      // endpoint: prefer data-endpoint or fallback to '/edit-profile'
-      const endpoint = form.dataset.endpoint || '/edit-profile';
-
-      const resp = await fetch(endpoint, {
+    try {
+      const response = await fetch('/edit-profile', {
         method: 'POST',
-        body: fd,
-        credentials: 'same-origin'
+        body: formData
       });
 
-      let payload = null;
-      const ct = resp.headers.get('content-type') || '';
-      if(ct.includes('application/json')){
-        try{ payload = await resp.json(); }catch(e){ payload = null; }
-      } else {
-        // try text, but attempt JSON parse
-        const text = await resp.text();
-        try{ payload = JSON.parse(text); }catch(e){ payload = { message: text }; }
-      }
+      const data = await response.json();
 
-      if(resp.ok){
-        showMessage((payload && payload.message) ? payload.message : 'Cập nhật thành công', true);
-        // update header name immediately
+      if (response.ok) {
+        successMsg.textContent = data.message || 'Cập nhật thông tin user thành công!';
+        successMsg.style.display = 'block';
+        // Cập nhật tên hiển thị
         const welcome = document.getElementById('welcome-user');
-        if(welcome) welcome.textContent = 'Chào mừng, ' + full + '!';
-        // optionally reload to reflect server-side rendered changes
-        setTimeout(()=> location.reload(), 900);
+        if (welcome) welcome.textContent = 'Chào mừng, ' + formData.get('full_name') + '!';
       } else {
-        const errMsg = payload && (payload.detail || payload.message) ? (payload.detail || payload.message) : 'Cập nhật thất bại';
-        showMessage(errMsg, false);
+        errorMsg.textContent = data.detail || data.message || 'Không thể cập nhật thông tin.';
+        errorMsg.style.display = 'block';
       }
-    }catch(err){
-      console.error('Update profile error', err);
-      showMessage('Lỗi kết nối, vui lòng thử lại', false);
+    } catch (err) {
+      console.error('Lỗi khi gửi dữ liệu:', err);
+      errorMsg.textContent = 'Lỗi kết nối, vui lòng thử lại.';
+      errorMsg.style.display = 'block';
     } finally {
-      if(saveBtn){ saveBtn.disabled = false; saveBtn.textContent = 'Lưu'; }
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Lưu';
     }
   });
-})();
+});
 </script>
 </body>
 </html>
