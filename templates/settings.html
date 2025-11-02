@@ -251,21 +251,64 @@ body {
 
             <p class="note">(*) Các thông tin bắt buộc</p>
 
-  <form method="POST" action="/edit-profile" data-endpoint="/update_user" class="form" id="userProfileForm" novalidate>
-        <label for="full_name">Họ và tên <span>*</span></label>
-        <input type="text" id="full_name" name="full_name" value="{{ user_info.full_name }}" required>
-
-        <label for="email">Email <span>*</span></label>
-        <input type="email" id="email" name="email" value="{{ user_info.email if user_info.email else '' }}" required>
-
-        <label for="phone">Số điện thoại <span>*</span></label>
-        <input type="tel" id="phone" name="phone" value="{{ user_info.phone if user_info.phone else '' }}" required>
-
-        <button type="submit" class="save-btn">Lưu</button>
-
-        <div class="alert alert-success" id="successMessage" style="display:none; margin-top:10px;">Cập nhật thành công!</div>
-        <div class="alert alert-danger" id="errorMessage" style="display:none; margin-top:10px;">Đã xảy ra lỗi!</div>
-      </form>
+  <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Họ và tên:</th>
+                    <th>Email:</th>
+                    <th>Số điện thoại:</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ user_info.full_name }}</td>
+                    <td>{{ user_info.email }}</td>
+                    <td>{{ user_info.phone }}</td>
+                    <td>
+                        <button type="button" class="badge blue edit-btn"
+                            data-id="{{ user_info.id }}"
+                            data-name="{{ user_info.full_name | e }}"
+                            data-email="{{ user_info.email | e }}"
+                            data-phone="{{ user_info.phone | e }}">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <style>
+        /* Modal styles */
+        .modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 20px; border-radius: 8px; width: 480px; max-width: 90%; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+        .modal-content h2 { margin-top: 0; }
+        .modal-content label { display:block; margin-top: 8px; font-weight:600; }
+        .modal-content input[type="text"], .modal-content textarea { width:100%; padding:8px; margin-top:6px; border:1px solid #ddd; border-radius:6px; }
+        .modal-content textarea { min-height: 100px; resize: vertical; }
+        .close { float: right; font-size: 22px; cursor: pointer; }
+        .edit-btn { border:none; background:transparent; padding:8px 12px; cursor:pointer; border-radius:6px; }
+        .edit-btn i { margin-right:6px; }
+        </style>
+        <!-- Modal for editing a service -->
+        <div id="editModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <span class="close" title="Đóng">&times;</span>
+                <form method="POST" action="/edit-profile" id="editForm">
+                    <h2>Cập nhật thông tin cá nhân</h2>
+                    <label for="full_name">Họ và tên:</label>
+                    <input type="text" id="full_name" name="full_name" required>
+                    <label for="email">Email:</label>
+                    <input type="text" id="email" name="email" required>
+                    <label for="phone">Số điện thoại:</label>
+                    <textarea id="phone" name="phone" required></textarea>
+                    <div style="margin-top:12px; display:flex; gap:8px;">
+                        <button type="submit">Cập nhật</button>
+                        <button type="button" id="cancelBtn">Hủy</button>
+                    </div>
+                </form>
+            </div>
+        </div>
         </main>
     </div>
             <footer class="footer">
@@ -304,58 +347,102 @@ body {
 
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('userProfileForm');
-  const successMsg = document.getElementById('successMessage');
-  const errorMsg = document.getElementById('errorMessage');
+  (function(){
+            const modal = document.getElementById('editModal');
+            const closeBtn = modal && modal.querySelector('.close');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const form = document.getElementById('editForm');
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    successMsg.style.display = 'none';
-    errorMsg.style.display = 'none';
+            function openModal(data){
+                document.getElementById('full_name').value = data.full_name || '';
+                document.getElementById('email').value = data.email || '';
+                document.getElementById('phone').value = data.phone || '';
+                modal.style.display = 'flex';
+            }
 
-    const formData = new FormData(form);
-    const saveBtn = form.querySelector('.save-btn');
-    saveBtn.disabled = true;
-    saveBtn.textContent = 'Đang lưu...';
+            function closeModal(){
+                modal.style.display = 'none';
+            }
 
-    try {
-      const endpoint = form.dataset.endpoint || form.action || '/update_user';
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        body: formData,
-        credentials: 'same-origin'
-      });
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', function(){
+                    const data = {
+                        full_name: this.getAttribute('data-full_name'),
+                        email: this.getAttribute('data-email'),
+                        phone: this.getAttribute('data-phone')
+                    };
+                    openModal(data);
+                });
+            });
 
-      let data = null;
-      const ct = response.headers.get('content-type') || '';
-      if (ct.includes('application/json')) {
-        try { data = await response.json(); } catch(e) { data = { message: await response.text() } }
-      } else {
-        const text = await response.text();
-        try { data = JSON.parse(text); } catch(e) { data = { message: text } }
-      }
+            if (closeBtn) closeBtn.addEventListener('click', closeModal);
+            if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+            window.addEventListener('click', function(e){ if (e.target === modal) closeModal(); });
+            // Intercept the modal form submit and send PATCH via fetch
+            if (form) {
+                form.addEventListener('submit', async function(e){
+                    e.preventDefault();
+                    const full_name = document.getElementById('full_name').value;
+                    const email = document.getElementById('email').value;
+                    const phone = document.getElementById('phone').value;
 
-      if (response.ok) {
-        successMsg.textContent = data.message || 'Cập nhật thông tin user thành công!';
-        successMsg.style.display = 'block';
-        // Cập nhật tên hiển thị
-        const welcome = document.getElementById('welcome-user');
-        if (welcome) welcome.textContent = 'Chào mừng, ' + formData.get('full_name') + '!';
-      } else {
-        errorMsg.textContent = data.detail || data.message || 'Không thể cập nhật thông tin.';
-        errorMsg.style.display = 'block';
-      }
-    } catch (err) {
-      console.error('Lỗi khi gửi dữ liệu:', err);
-      errorMsg.textContent = 'Lỗi kết nối, vui lòng thử lại.';
-      errorMsg.style.display = 'block';
-    } finally {
-      saveBtn.disabled = false;
-      saveBtn.textContent = 'Lưu';
-    }
-  });
-});
+                    // Determine target URL. Prefer RESTful /services/{id} if id present.
+                    let target = form.getAttribute('action') || '/services';
+                    // if target already ends with the id, avoid doubling
+                    if (id) {
+                        // ensure no trailing slash
+                        target = target.replace(/\/$/, '');
+                        if (!target.endsWith('/' + id)) {
+                            target = target + '/' + encodeURIComponent(id);
+                        }
+                    }
+
+                    try {
+                        // send as form-encoded to match backend Form(...) parameters
+                        const params = new URLSearchParams();
+                        params.append('service_id', id);
+                        if (full_name !== null) params.append('full_name', full_name);
+                        if (email !== null) params.append('email', email);
+                        if (phone !== null) params.append('phone', phone);
+
+                        const resp = await fetch(target, {
+                            method: 'PATCH',
+                            credentials: 'same-origin',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: params
+                        });
+
+                        if (!resp.ok) {
+                            const text = await resp.text();
+                            throw new Error('HTTP ' + resp.status + ' - ' + text);
+                        }
+
+                        // Try parse json response; if not JSON, ignore
+                        let data = null;
+                        try { data = await resp.json(); } catch(_) { data = null; }
+
+                        // Update the table row in-place if found
+                        const rows = document.querySelectorAll('table tbody tr');
+                        for (const row of rows) {
+                            const firstTd = row.querySelector('td');
+                            if (!firstTd) continue;
+                            if (String(firstTd.innerText).trim() === String(id)) {
+                                const tds = row.querySelectorAll('td');
+                                if (tds[1]) tds[1].innerText = full_name;
+                                if (tds[2]) tds[2].innerText = email;
+                                if (tds[3]) tds[3].innerText = phone;
+                                break;
+                            }
+                        }
+
+                        closeModal();
+                    } catch (err) {
+                        console.error('Update service failed', err);
+                        alert('Lỗi khi cập nhật dịch vụ: ' + (err.message || err));
+                    }
+                });
+            }
+        })();
 </script>
 </body>
 </html>
