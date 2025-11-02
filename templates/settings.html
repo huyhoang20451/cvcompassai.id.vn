@@ -251,7 +251,7 @@ body {
 
             <p class="note">(*) Các thông tin bắt buộc</p>
 
-  <form method="POST" action="/update_user" class="form" id="update-profile-form" novalidate>
+  <form method="POST" action="#" data-endpoint="/update_user" class="form" id="update-profile-form" novalidate>
         <label for="fullname">Họ và tên <span>*</span></label>
         <input type="text" id="fullname" name="full_name" value="{{ user_info.full_name }}" required>
 
@@ -341,7 +341,8 @@ body {
       fd.append('email', email);
       fd.append('phone', phone);
 
-      const resp = await fetch('/update_user', {
+      const endpoint = (form.dataset && form.dataset.endpoint) ? form.dataset.endpoint : '/update_user';
+      const resp = await fetch(endpoint, {
         method: 'PATCH',
         body: fd,
         credentials: 'same-origin'
