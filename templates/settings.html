@@ -251,7 +251,7 @@ body {
 
             <p class="note">(*) Các thông tin bắt buộc</p>
 
-  <form method="POST" action="/edit-profile" class="form" id="userProfileForm" novalidate>
+  <form method="POST" action="/edit-profile" data-endpoint="/update_user" class="form" id="userProfileForm" novalidate>
         <label for="full_name">Họ và tên <span>*</span></label>
         <input type="text" id="full_name" name="full_name" value="{{ user_info.full_name }}" required>
 
@@ -320,12 +320,21 @@ document.addEventListener('DOMContentLoaded', () => {
     saveBtn.textContent = 'Đang lưu...';
 
     try {
-      const response = await fetch('/edit-profile', {
+      const endpoint = form.dataset.endpoint || form.action || '/update_user';
+      const response = await fetch(endpoint, {
         method: 'POST',
-        body: formData
+        body: formData,
+        credentials: 'same-origin'
       });
 
-      const data = await response.json();
+      let data = null;
+      const ct = response.headers.get('content-type') || '';
+      if (ct.includes('application/json')) {
+        try { data = await response.json(); } catch(e) { data = { message: await response.text() } }
+      } else {
+        const text = await response.text();
+        try { data = JSON.parse(text); } catch(e) { data = { message: text } }
+      }
 
       if (response.ok) {
         successMsg.textContent = data.message || 'Cập nhật thông tin user thành công!';
