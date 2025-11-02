@@ -3,7 +3,8 @@ from typing import Annotated, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Request, Cookie, File, UploadFile, Form
 from fastapi.responses import HTMLResponse, JSONResponse
 from sqlmodel import Session
-from .services import upload_avatar
+from .services import (upload_avatar, 
+                       update_user as service_update_user)
 from db import get_session
 from Core.Auth.schemas import user
 from Core.Auth.dependencies import templates, authorize_role
@@ -29,7 +30,7 @@ async def update_avatar(request: Request,
                                                               "username": user_info.username})
     # return JSONResponse(content={"avatar_path": avatar_path})
 
-@router.patch("/update_user")
+@router.patch("/edit-profile")
 async def update_user(request: Request,
                       user_info: user = Depends(authorize_role(["candidate", "business"])),
                       session: Session = Depends(get_session)):
@@ -41,7 +42,7 @@ async def update_user(request: Request,
         raise HTTPException(status_code=400, detail="Không có dữ liệu form để cập nhật")
     
     try:
-        update_result = update_user(session, user_info.id, update_data)
+        update_result = service_update_user(session, user_info.id, update_data)
         if update_result:
             return JSONResponse(content={"message": "Cập nhật thông tin user thành công"})
         else:
