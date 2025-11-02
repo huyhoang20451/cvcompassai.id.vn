@@ -364,83 +364,72 @@ body {
                 modal.style.display = 'none';
             }
 
-            document.querySelectorAll('.edit-btn').forEach(btn => {
-                btn.addEventListener('click', function(){
-                    const data = {
-                        full_name: this.getAttribute('data-full_name'),
-                        email: this.getAttribute('data-email'),
-                        phone: this.getAttribute('data-phone')
-                    };
-                    openModal(data);
-                });
+        let currentId = null;
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', function(){
+              // read attributes from button (use data-name as provided in template)
+              currentId = this.getAttribute('data-id');
+              const data = {
+                full_name: this.getAttribute('data-name') || this.getAttribute('data-full_name') || '',
+                email: this.getAttribute('data-email') || '',
+                phone: this.getAttribute('data-phone') || ''
+              };
+              openModal(data);
             });
+          });
 
             if (closeBtn) closeBtn.addEventListener('click', closeModal);
             if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
             window.addEventListener('click', function(e){ if (e.target === modal) closeModal(); });
             // Intercept the modal form submit and send PATCH via fetch
             if (form) {
-                form.addEventListener('submit', async function(e){
-                    e.preventDefault();
-                    const full_name = document.getElementById('full_name').value;
-                    const email = document.getElementById('email').value;
-                    const phone = document.getElementById('phone').value;
+        form.addEventListener('submit', async function(e){
+          e.preventDefault();
+          const full_name = document.getElementById('full_name').value;
+          const email = document.getElementById('email').value;
+          const phone = document.getElementById('phone').value;
 
-                    // Determine target URL. Prefer RESTful /services/{id} if id present.
-                    let target = form.getAttribute('action') || '/services';
-                    // if target already ends with the id, avoid doubling
-                    if (id) {
-                        // ensure no trailing slash
-                        target = target.replace(/\/$/, '');
-                        if (!target.endsWith('/' + id)) {
-                            target = target + '/' + encodeURIComponent(id);
-                        }
-                    }
+          // Determine target URL. We expect the backend's user-update endpoint.
+          let target = form.getAttribute('action') || '/edit-profile';
 
-                    try {
-                        // send as form-encoded to match backend Form(...) parameters
-                        const params = new URLSearchParams();
-                        params.append('service_id', id);
-                        if (full_name !== null) params.append('full_name', full_name);
-                        if (email !== null) params.append('email', email);
-                        if (phone !== null) params.append('phone', phone);
+          try {
+            // send as form-encoded to match backend Form(...) parameters
+            const params = new URLSearchParams();
+            if (currentId) params.append('user_id', currentId);
+            if (full_name !== null) params.append('full_name', full_name);
+            if (email !== null) params.append('email', email);
+            if (phone !== null) params.append('phone', phone);
 
-                        const resp = await fetch(target, {
-                            method: 'PATCH',
-                            credentials: 'same-origin',
-                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                            body: params
-                        });
+            const resp = await fetch(target, {
+              method: 'POST',
+              credentials: 'same-origin',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: params.toString()
+            });
 
-                        if (!resp.ok) {
-                            const text = await resp.text();
-                            throw new Error('HTTP ' + resp.status + ' - ' + text);
-                        }
+            if (!resp.ok) {
+              const text = await resp.text();
+              throw new Error('HTTP ' + resp.status + ' - ' + text);
+            }
 
-                        // Try parse json response; if not JSON, ignore
-                        let data = null;
-                        try { data = await resp.json(); } catch(_) { data = null; }
+            // parse response if JSON or show text
+            let data = null;
+            const ct = resp.headers.get('content-type') || '';
+            if (ct.includes('application/json')) {
+              try { data = await resp.json(); } catch(_) { data = null; }
+            }
 
-                        // Update the table row in-place if found
-                        const rows = document.querySelectorAll('table tbody tr');
-                        for (const row of rows) {
-                            const firstTd = row.querySelector('td');
-                            if (!firstTd) continue;
-                            if (String(firstTd.innerText).trim() === String(id)) {
-                                const tds = row.querySelectorAll('td');
-                                if (tds[1]) tds[1].innerText = full_name;
-                                if (tds[2]) tds[2].innerText = email;
-                                if (tds[3]) tds[3].innerText = phone;
-                                break;
-                            }
-                        }
-
-                        closeModal();
-                    } catch (err) {
-                        console.error('Update service failed', err);
-                        alert('Lỗi khi cập nhật dịch vụ: ' + (err.message || err));
-                    }
-                });
+            // Option: update UI or reload to reflect server-side state
+            const welcome = document.getElementById('welcome-user');
+            if (welcome && full_name) welcome.textContent = 'Chào mừng, ' + full_name + '!';
+            // close modal and reload to ensure data consistency
+            closeModal();
+            setTimeout(() => location.reload(), 600);
+          } catch (err) {
+            console.error('Update failed', err);
+            alert('Lỗi khi cập nhật: ' + (err.message || err));
+          }
+        });
             }
         })();
 </script>
