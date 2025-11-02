@@ -341,7 +341,7 @@ body {
       fd.append('email', email);
       fd.append('phone', phone);
 
-      const endpoint = (form.dataset && form.dataset.endpoint) ? form.dataset.endpoint : '/update_user';
+      const endpoint = (form.dataset && form.dataset.endpoint) ? form.dataset.endpoint : '/edit-profile';
       const resp = await fetch(endpoint, {
         method: 'PATCH',
         body: fd,
