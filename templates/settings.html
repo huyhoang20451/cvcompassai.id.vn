@@ -341,9 +341,10 @@ body {
       fd.append('email', email);
       fd.append('phone', phone);
 
-  const endpoint = (form.dataset && form.dataset.endpoint) ? form.dataset.endpoint : (form.getAttribute('action') || '/edit-profile');
+      // prefer explicit data-endpoint, otherwise POST to the update_user endpoint
+      const endpoint = (form.dataset && form.dataset.endpoint) ? form.dataset.endpoint : '/edit-profile';
       const resp = await fetch(endpoint, {
-        method: 'PATCH',
+        method: 'POST',
         body: fd,
         credentials: 'same-origin'
       });
