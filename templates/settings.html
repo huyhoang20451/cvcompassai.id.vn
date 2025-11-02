@@ -299,18 +299,22 @@ body {
   </div>
 </footer>
 
+
 <script>
-// Client-side handler for profile update form
+// POST-based profile update (graceful, works when server expects POST)
 (function(){
   const form = document.getElementById('update-profile-form');
   if(!form) return;
 
   const saveBtn = form.querySelector('.save-btn');
-  // message element inserted above the button
-  const msg = document.createElement('div');
-  msg.id = 'update-profile-message';
-  msg.style.margin = '8px 0';
-  form.insertBefore(msg, saveBtn);
+  // message element (insert above button if not present)
+  let msg = document.getElementById('update-profile-message');
+  if(!msg){
+    msg = document.createElement('div');
+    msg.id = 'update-profile-message';
+    msg.style.margin = '8px 0';
+    form.insertBefore(msg, saveBtn);
+  }
 
   function showMessage(text, ok){
     msg.textContent = text;
@@ -319,30 +323,26 @@ body {
 
   form.addEventListener('submit', async function(e){
     e.preventDefault();
-    showMessage('', true);
+    showMessage('');
 
-    const full = document.getElementById('fullname').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const phone = document.getElementById('phone').value.trim();
+    const fd = new FormData(form);
+    const full = (fd.get('full_name') || '').toString().trim();
+    const email = (fd.get('email') || '').toString().trim();
+    const phone = (fd.get('phone') || '').toString().trim();
 
-    // Basic validation
+    // Basic client-side validation
     if(!full){ showMessage('Họ và tên là bắt buộc', false); return; }
     const emailRe = /^\S+@\S+\.\S+$/;
     if(!email || !emailRe.test(email)){ showMessage('Email không hợp lệ', false); return; }
     const phoneRe = /^[0-9()+\-\s]{7,20}$/;
     if(!phone || !phoneRe.test(phone)){ showMessage('Số điện thoại không hợp lệ', false); return; }
 
-    // disable button while sending
     if(saveBtn){ saveBtn.disabled = true; saveBtn.textContent = 'Đang lưu...'; }
 
     try{
-      const fd = new FormData();
-      fd.append('full_name', full);
-      fd.append('email', email);
-      fd.append('phone', phone);
+      // endpoint: prefer data-endpoint or fallback to '/edit-profile'
+      const endpoint = form.dataset.endpoint || '/edit-profile';
 
-      // prefer explicit data-endpoint, otherwise POST to the update_user endpoint
-      const endpoint = (form.dataset && form.dataset.endpoint) ? form.dataset.endpoint : '/edit-profile';
       const resp = await fetch(endpoint, {
         method: 'POST',
         body: fd,
@@ -350,15 +350,25 @@ body {
       });
 
       let payload = null;
-      try{ payload = await resp.json(); }catch(e){ }
+      const ct = resp.headers.get('content-type') || '';
+      if(ct.includes('application/json')){
+        try{ payload = await resp.json(); }catch(e){ payload = null; }
+      } else {
+        // try text, but attempt JSON parse
+        const text = await resp.text();
+        try{ payload = JSON.parse(text); }catch(e){ payload = { message: text }; }
+      }
 
       if(resp.ok){
-        showMessage((payload && payload.message) ? payload.message : 'Cập nhật thông tin user thành công', true);
-        // optionally update visible name in header
+        showMessage((payload && payload.message) ? payload.message : 'Cập nhật thành công', true);
+        // update header name immediately
         const welcome = document.getElementById('welcome-user');
         if(welcome) welcome.textContent = 'Chào mừng, ' + full + '!';
+        // optionally reload to reflect server-side rendered changes
+        setTimeout(()=> location.reload(), 900);
       } else {
-        showMessage((payload && (payload.detail || payload.message)) ? (payload.detail || payload.message) : 'Cập nhật thất bại', false);
+        const errMsg = payload && (payload.detail || payload.message) ? (payload.detail || payload.message) : 'Cập nhật thất bại';
+        showMessage(errMsg, false);
       }
     }catch(err){
       console.error('Update profile error', err);
