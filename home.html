@@ -11,109 +11,92 @@
     <title>Trang chủ - CV Compass</title>
 </head>
 <body style="background-color: #F6FCFF">
-<!-- HEADER HTML -->
-<div class="header">
-    <div class="header-logo">
-        <img src="/static/images/Logo_Final2.png" alt="Logo CV Compass" />
-        <div class="logo-text">
-            <h1>CV Compass</h1>
-            <p>Smart Insight - Right Choice - Bright Future</p>
+    <!--Bắt đầu phần header-->
+    <div class="header">
+        <div class="header-logo">
+            <img src="/static/images/Screenshot 2025-08-25 150046.png" alt="Logo CV Compass">
         </div>
-    </div>
-    <div class="header-menu">
-        <ul>
-            <li><a href="/">Trang chủ</a></li>
-            <li><a href="/about-us">Về chúng tôi</a></li>
-            <li><a href="/">Tìm việc làm</a></li>
-            <li><a href="/login">Quét CV bằng OCR</a></li>
-            <li><a href="/pricing">Gói dịch vụ</a></li>
-        </ul>
-    </div>
-    <div class="header-actions">
-        <button onclick="location.href='/login'" class="btn btn-login">Đăng nhập</button>
-        <button onclick="location.href='/signup'" class="btn btn-register">Đăng ký</button>
+        <div class="header-menu"> <!-- Menu lựa chọn -->
+            <ul>
+                <li><a href="/">Trang chủ</a></li>
+                <li><a href="/about-us">Về chúng tôi</a></li>
+                <li><a href="/">Tìm việc làm</a></li>
+                <li><a href="/login">Quét CV bằng OCR</a></li>
+                <li><a href="/pricing">Gói dịch vụ</a></li>
+            </ul>
+        </div>
+        <div class="header-actions">
+            <button onclick="location.href='/login'" class="btn btn-login">Đăng nhập</button>
+            <button onclick="location.href='/signup'" class="btn btn-register">Đăng ký</button>
+        </div>
         <div class="header-nhatuyendung">
-            <p class="cau_hoi">Bạn là nhà tuyển dụng?</p>
-            <p><a href="/business-home" target="_blank">Đăng tin ngay</a></p>
+           <p class="cau_hoi">Bạn là nhà tuyển dụng?</p>
+           <p><a href="/business-home" target='_blank'>Đăng tin ngay</a></p>
         </div>
-    </div>
-</div>
+    </div> <!-- kết thúc phần header -->
 
-
-
-
-<!-- Introduction Section -->
-<div class="introduction">
-    <div class="background_intro"></div>
-    <div class="content-introduction">
-        <h1 class="intro-title">CV Compass</h1>
-        <h2 class="intro-subtitle">Công cụ giúp bạn hiểu rõ hơn về hồ sơ ứng tuyển của mình</h2>
-        <button onclick="location.href='/login'" class="btn-upload-cv">
-            Tải CV ngay
-            <span class="material-symbols-outlined">upload</span>
-        </button>
-    </div>
-</div>
-
-
-
-<!-- Section How It Works -->
-<div class="how-it-works">
-    <div class="how-bg">
+    <!--Bắt đầu phần introduction-->
+    <div class="introduction">
+        <div class="background_intro">
+            <!-- <img src="../img_bgr.png" alt="Introduction Image"> -->
+        </div>
+        <div class="content-introduction">
+            <div class="title_content">
+                <h1>CV Compass</h1>
+            </div>
+            <div class="description_content">
+                <h2>Công cụ giúp bạn hiểu rõ hơn về hồ sơ ứng tuyển của mình</h2>
+            </div>
+            <div class="button_content">
+                <button onclick="location.href='/login'" class="btn btn-upload-cv">Tải CV ngay <span class="material-symbols-outlined">upload</span></button>
+            </div>
+        </div>
+    </div> <!-- kết thúc phần introduction -->
+    <div class="how-it-works"> <!--giới thiệu cách hoạt động-->
         <div class="header-instruction">
             <h2>Cách CV Compass hoạt động</h2>
         </div>
         <div class="step-by-step">
-            <div class="how-step">
-                <div class="how-icon"><i class="fa-solid fa-upload"></i></div>
-                <div class="how-label">Tải File CV lên</div>
-            </div>
-            <div class="how-step">
-                <div class="how-icon"><i class="fa-solid fa-file-lines"></i></div>
-                <div class="how-label">Quét OCR</div>
-            </div>
-            <div class="how-step">
-                <div class="how-icon"><i class="fa-solid fa-brain"></i></div>
-                <div class="how-label">Phân tích bằng LLM</div>
-            </div>
-            <div class="how-step">
-                <div class="how-icon"><i class="fa-solid fa-file-circle-check"></i></div>
-                <div class="how-label">So sánh CV – JD</div>
-            </div>
+            <ul>
+                    <div class="how-step">
+                        <div class="how-icon"><i class="fa-solid fa-upload"></i></div>
+                        <div class="how-label">Tải File CV lên</div>
+                    </div>
+                    <div class="how-step">
+                        <div class="how-icon"><i class="fa-solid fa-file-lines"></i></div>
+                        <div class="how-label">Quét OCR</div>
+                    </div>
+                    <div class="how-step">
+                        <div class="how-icon"><i class="fa-solid fa-brain"></i></div>
+                        <div class="how-label">Phân tích bằng LLM</div>
+                    </div>
+                    <div class="how-step">
+                        <div class="how-icon"><i class="fa-solid fa-file-circle-check"></i></div>
+                        <div class="how-label">So sánh CV – JD</div>
+                    </div>
+            </ul>
         </div>
-    </div>
-</div>
-
-
-
     </div> <!-- kết thúc phần giới thiệu cách hoạt động-->
     <div class="thanh-timkiemvavitri"> <!--thanh tìm kiếm vị trí-->
-        <form method="POST" action="/jobs-search" style="display: flex; gap: 10px; align-items: center;">
+        <form method="POST" action="/search-jobs" style="display: flex; gap: 10px; align-items: center;">
             <input type="text" name="keyword" placeholder="🔍Tìm kiếm công việc (từ khóa, công ty, địa điểm...)" style="flex: 1;">
             <input type="hidden" name="username" value="">
             <button type="submit">Tìm kiếm</button>
         </form>
     </div> <!-- kết thúc thanh tìm kiếm vị trí -->
-<div class="phan_congvieclienquan">
-    <div class="filter-header-box">
-        <!-- Header -->
-        <div class="header-chance-recruit">
-            <h2>Cơ hội tuyển dụng hôm nay</h2>
+    <div class="phan_congvieclienquan"> <!--Bắt đầu phần công việc liên quan-->
+        <div class="filter-selection" style="display: flex; align-items: center; gap: 24px; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 12px; font-weight: bold; color: #3674B5;">
+                <label for="filter-by">Lọc theo:</label>
+                <select id="filter-by" name="filter-by" style="border: 1px solid #ccc; border-radius: 5px; padding: 5px;">
+                    <option value="all">Tất cả</option>
+                    <option value="full-time">Toàn thời gian</option>
+                    <option value="part-time">Bán thời gian</option>
+                    <option value="internship">Thực tập</option>
+                </select>
+            </div>
+            <div class="header-chance-recruit"><h2>Cơ hội tuyển dụng hôm nay</h2></div>
         </div>
-
-        <!-- Filter -->
-        <div class="filter-selection">
-            <label for="filter-by">Lọc theo:</label>
-            <select id="filter-by" name="filter-by">
-                <option value="all">Tất cả</option>
-                <option value="full-time">Toàn thời gian</option>
-                <option value="part-time">Bán thời gian</option>
-                <option value="internship">Thực tập</option>
-            </select>
-        </div>
-    </div>
-</div>
-
         
         <section onclick="location.href='/login'" class="job-listing-grid">
                 {%for jd in job_descriptions%}
@@ -134,8 +117,6 @@
                 {% endfor %}
         </section>
         </div>
-
-        
     </div> <!-- kết thúc phần công việc liên quan-->
     <div class="sotrang">
         <p>1</p>

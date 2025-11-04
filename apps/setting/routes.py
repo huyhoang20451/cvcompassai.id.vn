@@ -30,7 +30,7 @@ async def update_avatar(request: Request,
                                                               "username": user_info.username})
     # return JSONResponse(content={"avatar_path": avatar_path})
 
-@router.patch("/edit-profile")
+@router.post("/edit-profile")
 async def update_user(request: Request,
                       user_info: user = Depends(authorize_role(["candidate", "business"])),
                       session: Session = Depends(get_session)):
