@@ -1,309 +1,253 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/x-icon" href="../static/favicon.ico">
-  <link rel="stylesheet" href="/static/css/home-business.css">
-  <link rel="stylesheet" href="/static/css/business_dashboard.css">
-  <script src="/static/js/theme.js"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <title>Dashboard - Doanh nghiệp (CV Compass)</title>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/static/css/home-business.css">
+    <link rel="stylesheet" href="/static/css/business_dashboard.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=upload" />
-    <title>Dashboard - Doanh nghiệp (CV Compass)</title>
-</head>
-<body style="background-color: #F6FCFF">
-    <!--Bắt đầu phần header-->
-    <div class="header">
-        <div class="logo-container">
-            <div class="logo-image">
-              <img src="/static/images/Logo_Final2.png" alt="Logo CV Compass">
-            </div>
+    <script src="/static/js/theme.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" defer></script>
+  </head>
+  <body style="background-color: #F6FCFF">
+
+    <!-- Header / Nav -->
+    <header class="bg-white shadow-sm">
+      <div class="container d-flex align-items-center justify-content-between py-3">
+        <div class="d-flex align-items-center gap-3">
+          <div class="logo-image">
+            <a href="/business-dashboard"><img src="/static/images/Logo_Final2.png" alt="Logo CV Compass" height="48"></a>
+          </div>
+          <div>
             <div class="logo-text">CV Compass</div>
             <div class="logo-slogan">Smart Insight - Right Choice - Bright Future</div>
-        </div>
-        <div class="header-menu"> <!-- Menu lựa chọn -->
-            <ul>
-                <li><a method='get' href="/business-dashboard">Trang chủ</a></li>
-                <li><a method="get" href="/job-storage">Quản lý JD</a></li>
-                <li><a method="get" href="/pricing-business-logged-in">Nâng cấp Premium</a></li>
-            </ul>
-        </div>
-        <div class="header-actions">
-            <!--Chào mừng khi đăng nhập thành công-->
-            <p id="welcome-user">Chào mừng, {{user_info.company_name}}!</p>
-        </div>
-        <div class="user-avatar">
-            <img onclick="boxAppear()" style="width: 40px; height: 40px; border-radius: 50%;" src="/static/images/business_avatar.png" alt="User Avatar">
-        </div>
-        <script>
-            function boxAppear() {
-                const box = document.createElement('div');
-                box.style.position = 'absolute';
-                box.style.top = '60px';
-                box.style.right = '20px';
-                box.style.backgroundColor = '#fff';
-                box.style.border = '1px solid #ccc';
-                box.style.borderRadius = '5px';
-                box.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
-                box.style.padding = '10px';
-                box.innerHTML = `
-                    <p><a href="/business-profile" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
-                    <p><a href="/job-storage" style="text-decoration:none;color:#222;">Lưu trữ JD</a></p>
-                    <p><a href="#" style="text-decoration:none;color:#222;">Cài đặt</a></p>
-                    <p><a href="/business-home" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
-                `;
-                document.body.appendChild(box);
-                document.addEventListener('click', function handleClickOutside(event) {
-                    if (!box.contains(event.target) && event.target !== document.querySelector('.user-avatar img')) {
-                        box.remove();
-                        document.removeEventListener('click', handleClickOutside);
-                    }
-                });
-            }
-        </script>
-    </div> <!-- kết thúc phần header -->
-    <div class="introduction">
-        <div class="background_intro">
-            <!-- <img src="../img_bgr.png" alt="Introduction Image"> -->
-        </div>
-        <div class="content-introduction">
-            <div class="title_content">
-                <h1>Chào mừng {{user_info.company_name}}, hãy cùng tuyển dụng hiệu quả với AI!</h1>
-            </div>
-            <div class="button_content">
-                <button onclick="location.href='/dang-tuyen-ngay'" class="btn btn-upload-cv">Đăng tuyển ngay<span class="material-symbols-outlined">upload</span></button>
-            </div>  
-        </div>
-    </div> <!-- kết thúc phần introduction -->
-    <div class="cac-tin-tuyen-noi-bat">
-        <div class="header-tin-tuyen-dung">
-            <h1>Các tin tuyển dụng nổi bật</h1>
-        </div>
-            <div class="filter-bar">
-            <input type="text" class="form-control" placeholder="Vị trí">
-            <input type="date" class="form-control" value="2025-01-01">
-            <button class="btn btn-warning">Tìm kiếm</button>
-        </div>
-        <!-- Danh sách job -->
-    <div class="row g-3">
-        {# Render job cards from the provided `job_position` list (safe, frontend-only) #}
-  {% for jd in job_descriptions %}
-          <div class="col-md-4">
-            <div class="job-card">
-              <div class="d-flex align-items-center">
-                <img src="{{ jd.company_logo_url or '/static/images/business_avatar.png' }}" alt="logo">
-                <h6 class="{% if job and jd.id == job.id %}active{% endif %}">{{ jd.title }}</h6>
-              </div>
-              <p class="job-info">📍 Khu vực: {{ jd.location or 'N/A' }}</p>
-              <p class="job-info">📄 Số đơn ứng tuyển: {{ jd.applicants or 0 }}</p>
-              <p class="job-info">⏰ Hạn nộp hồ sơ: {{ jd.deadline or '—' }}</p>
-              <a href="/job-storage?jd_id={{ jd.id }}" class="job-link">Xem chi tiết</a>
-            </div>
           </div>
-        {% endfor %}
+        </div>
 
-    <!-- Pagination -->
-    <nav>
-      <ul class="pagination">
-        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-      </ul>
-    </nav>
-    </div>
-    <!-- Kết thúc phần các tin tuyển nổi bật -->
-    <section>
-    <div class="recruitment-container">
-        <div class="recruitment-title">Quản lý tuyển dụng >></div>
-        <select>
+        <nav class="d-none d-md-block">
+          <ul class="nav">
+            <li class="nav-item"><a class="nav-link text-muted" href="/business-dashboard">Trang chủ</a></li>
+            <li class="nav-item"><a class="nav-link text-muted" href="/job-storage">Quản lý JD</a></li>
+            <li class="nav-item"><a class="nav-link text-muted" href="/pricing-business-logged-in">Nâng cấp Premium</a></li>
+          </ul>
+        </nav>
+
+        <div class="d-flex align-items-center gap-3">
+          <div class="me-2 text-end d-none d-md-block">
+            <div id="welcome-user" class="small text-muted">Xin chào, {{ user_info.company_name or 'Doanh nghiệp' }}</div>
+          </div>
+          <div class="dropdown">
+            <a class="d-inline-block user-avatar" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="/static/images/business_avatar.png" alt="avatar" width="44" height="44" class="rounded-circle border">
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="/business-profile">Hồ sơ của tôi</a></li>
+              <li><a class="dropdown-item" href="/job-storage">Lưu trữ JD</a></li>
+              <li><a class="dropdown-item" href="#">Cài đặt</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/business-home">Đăng xuất</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Introduction / Hero -->
+    <section class="introduction">
+      <div class="background_intro"></div>
+      <div class="content-introduction container text-center text-white">
+        <div class="title_content">
+          <h1>Chào mừng {{ user_info.company_name }}, hãy cùng tuyển dụng hiệu quả với AI!</h1>
+        </div>
+        <div class="button_content mt-3">
+          <button onclick="location.href='/dang-tuyen-ngay'" class="btn btn-upload-cv">Đăng tuyển ngay <span class="material-symbols-outlined">upload</span></button>
+        </div>
+      </div>
+    </section>
+
+    <main class="container my-5">
+      <!-- Featured jobs header -->
+      <section class="cac-tin-tuyen-noi-bat mb-4">
+        <div class="header-tin-tuyen-dung text-center mb-3">
+          <h2 class="mb-0">Các tin tuyển dụng nổi bật</h2>
+          <div class="mx-auto" style="width:80px;height:3px;background:#007bff;border-radius:2px;margin-top:12px;"></div>
+        </div>
+
+        <div class="filter-bar d-flex justify-content-center mb-4">
+          <input type="text" class="form-control me-2" placeholder="Vị trí">
+          <input type="date" class="form-control me-2" value="2025-01-01">
+          <button class="btn btn-warning">Tìm kiếm</button>
+        </div>
+
+        <!-- Job listing grid -->
+        <div class="row g-4">
+          {% for jd in job_descriptions %}
+            <div class="col-lg-4 col-md-6">
+              <article class="card h-100 job-card d-flex flex-column">
+                <div class="card-body d-flex align-items-start gap-3">
+                  <img src="{{ jd.company_logo_url or '/static/images/business_avatar.png' }}" alt="logo" class="rounded-circle" width="56" height="56">
+                  <div class="flex-grow-1">
+                    <h6 class="mb-1 {% if job and jd.id == job.id %}active{% endif %}">{{ jd.title }}</h6>
+                    <div class="small text-muted">
+                      <div class="job-info">📍 {{ jd.location or 'N/A' }}</div>
+                      <div class="job-info">📄 {{ jd.applicants or 0 }} ứng viên</div>
+                      <div class="job-info">⏰ Hạn: {{ jd.deadline or '—' }}</div>
+                    </div>
+                  </div>
+                  <div class="align-self-center ms-2">
+                    <a href="/job-storage?jd_id={{ jd.id }}" class="job-link">Xem chi tiết</a>
+                  </div>
+                </div>
+              </article>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        <nav class="mt-4 d-flex justify-content-center">
+          <ul class="pagination">
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+          </ul>
+        </nav>
+      </section>
+
+      <!-- Recruitment management + stats -->
+      <section class="mb-5">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div class="recruitment-title">Quản lý tuyển dụng &gt;&gt;</div>
+          <select class="form-select w-auto">
             <option>Vị trí</option>
             <option>Nhân viên IT</option>
             <option>Kế toán</option>
             <option>Marketing</option>
-        </select>
-    </div>
+          </select>
+        </div>
 
-    <div class="stats-grid">
-        <div class="stat-box yellow">
+        <div class="stats-grid mb-4">
+          <div class="stat-box yellow text-center">
             <div class="icon">📄</div>
             <div>Số bài đăng tuyển dụng: {{ total_jd }}</div>
-        </div>
-    
-    <div class="stat-box blue">
-        <div class="icon">📑</div>
-        <div>Số lượng CV ghi nhận: {{ total_cv }}</div>
-    </div>
-  <div class="stat-box blue">
-    <div class="icon">👤</div>
-    <div>Quan tâm / Yêu thích: <span id="saved-jobs-count">{{ total_saved_jobs or 0 }}</span></div>
-  </div>
-
-  <div class="stat-box blue">
-    <div class="icon">✅</div>
-    <div>CV đã duyệt: <span id="approved-cvs-count">0</span></div>
-  </div>
-
-    <div class="stat-box yellow">
-      <div class="icon">👥</div>
-      <div>Đã phỏng vấn: 0</div>
-    </div>
-  </div>
-  <div style="margin: 20px 0; font-weight: bold;">Biểu đồ thống kê nhanh:</div>
-  <div id="carouselExampleDark" class="carousel carousel-dark slide">
-      <div class="carousel-indicators">
-        <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="0" 
-                class="active" aria-current="true" aria-label="Slide 1"></button>
-        <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="1" 
-                aria-label="Slide 2"></button>
-        <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="2" 
-                aria-label="Slide 3"></button>
-      </div>
-
-      <div class="carousel-inner">
-        <!-- Slide 1: Biểu đồ -->
-        <div class="carousel-item active" data-bs-interval="10000">
-          <div class="d-flex justify-content-center">
-            <canvas id="myChart" style="max-width:800px; width:100%; height:400px;"></canvas>
+          </div>
+          <div class="stat-box blue text-center">
+            <div class="icon">📑</div>
+            <div>Số lượng CV ghi nhận: {{ total_cv }}</div>
+          </div>
+          <div class="stat-box blue text-center">
+            <div class="icon">👤</div>
+            <div>Quan tâm / Yêu thích: <span id="saved-jobs-count">{{ total_saved_jobs or 0 }}</span></div>
+          </div>
+          <div class="stat-box blue text-center">
+            <div class="icon">✅</div>
+            <div>CV đã duyệt: <span id="approved-cvs-count">0</span></div>
+          </div>
+          <div class="stat-box yellow text-center">
+            <div class="icon">👥</div>
+            <div>Đã phỏng vấn: 0</div>
           </div>
         </div>
 
-        <!-- Slide 2 -->
-        <div class="carousel-item" data-bs-interval="2000">
-          <img src="https://via.placeholder.com/800x400?text=Second+slide" 
-               class="d-block w-100" alt="Second slide">
+        <div class="mb-3 fw-bold">Biểu đồ thống kê nhanh:</div>
+        <div id="carouselExampleDark" class="carousel carousel-dark slide">
+          <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="2" aria-label="Slide 3"></button>
+          </div>
+          <div class="carousel-inner">
+            <div class="carousel-item active" data-bs-interval="10000">
+              <div class="d-flex justify-content-center">
+                <canvas id="myChart" style="max-width:800px; width:100%; height:400px;"></canvas>
+              </div>
+            </div>
+            <div class="carousel-item" data-bs-interval="2000">
+              <img src="https://via.placeholder.com/800x400?text=Second+slide" class="d-block w-100" alt="Second slide">
+            </div>
+            <div class="carousel-item">
+              <img src="https://via.placeholder.com/800x400?text=Third+slide" class="d-block w-100" alt="Third slide">
+            </div>
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
         </div>
+      </section>
+    </main>
 
-        <!-- Slide 3 -->
-        <div class="carousel-item">
-          <img src="https://via.placeholder.com/800x400?text=Third+slide" 
-               class="d-block w-100" alt="Third slide">
+    <!-- Footer -->
+    <footer class="footer mt-5">
+      <div class="container d-flex flex-wrap gap-4 py-4">
+        <div class="footer-contact">
+          <div class="footer-contact-item"><i class="fa fa-phone me-2"></i>0123456789</div>
+          <div class="footer-contact-item"><i class="fa fa-envelope me-2"></i>hexacode@gmail.com</div>
+        </div>
+        <div class="footer-logo ms-auto text-end">
+          <img src="/static/images/hexacode_logo.png" alt="Hexacode Logo" class="footer-logo-img mb-2">
+          <div class="footer-logo-text">HEXACODE</div>
+        </div>
+        <div class="footer-links">
+          <div class="footer-links-group">
+            <div class="footer-links-title">Overview</div>
+            <a href="#">App</a>
+          </div>
+          <div class="footer-links-group">
+            <div class="footer-links-title">Company</div>
+            <a href="home.html">Home</a>
+            <a href="about-us.html">About us</a>
+            <a href="#">Pricing</a>
+          </div>
+          <div class="footer-links-group">
+            <div class="footer-links-title">Follow us</div>
+            <a href="#"><i class="fa fa-facebook"></i> CVCompass</a>
+            <a href="#"><i class="fa fa-tiktok"></i> CVCompass</a>
+          </div>
         </div>
       </div>
+    </footer>
 
-      <!-- Nút điều hướng -->
-      <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
-      </button>
-      <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
-      </button>
-    </div>
-
-    <!-- Script Chart.js -->
+    <!-- Chart and counts script -->
     <script>
-      const xValues = ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"];
-      const barValues = [162, 116, 106, 95, 88, 35, 35, 35, 10, 5, 0, 0];
-      const lineValues = [49, 48, 50, 130, 80, 40, 30, 20, 10, 5, 0, 0];
-
-      new Chart("myChart", {
-        data: {
-          labels: xValues,
-          datasets: [
-            {
-              type: "line",
-              label: "Số CV ứng tuyển",
-              data: lineValues,
-              borderColor: "orange",
-              borderWidth: 2,
-              fill: false
-            },
-            {
-              type: "bar",
-              label: "Số bài đăng tuyển",
-              data: barValues,
-              backgroundColor: "blue"
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { display: true }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              title: {
-                display: true,
-                text: "Số lượng"
-              }
-            },
-            x: {
-              title: {
-                display: true,
-                text: "Tháng"
-              }
-            }
-          }
+      document.addEventListener('DOMContentLoaded', function(){
+        async function fetchCount(url){
+          try{ const resp = await fetch(url, { credentials: 'same-origin' }); if(!resp.ok) throw new Error('HTTP ' + resp.status); return await resp.json(); }
+          catch(e){ console.debug('fetchCount error', url, e); return null; }
         }
+
+        (async function updateCounts(){
+          const [saved, approved] = await Promise.all([
+            fetchCount('/count-saved-jobs'),
+            fetchCount('/count-approved-cvs')
+          ]);
+          if(saved && typeof saved.count !== 'undefined'){ const el = document.getElementById('saved-jobs-count'); if(el) el.innerText = saved.count; }
+          if(approved && typeof approved.count !== 'undefined'){ const el = document.getElementById('approved-cvs-count'); if(el) el.innerText = approved.count; }
+        })();
+      });
+
+      /* Chart.js setup (deferred earlier) */
+      document.addEventListener('DOMContentLoaded', function(){
+        const xValues = ["Tháng 1","Tháng 2","Tháng 3","Tháng 4","Tháng 5","Tháng 6","Tháng 7","Tháng 8","Tháng 9","Tháng 10","Tháng 11","Tháng 12"];
+        const barValues = [162,116,106,95,88,35,35,35,10,5,0,0];
+        const lineValues = [49,48,50,130,80,40,30,20,10,5,0,0];
+
+        const ctx = document.getElementById('myChart');
+        if(ctx){ new Chart(ctx, {
+          data: { labels: xValues, datasets: [ { type: 'line', label: 'Số CV ứng tuyển', data: lineValues, borderColor: 'orange', borderWidth: 2, fill: false }, { type: 'bar', label: 'Số bài đăng tuyển', data: barValues, backgroundColor: 'blue' } ] },
+          options: { responsive: true, plugins: { legend: { display: true } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Số lượng' } }, x: { title: { display: true, text: 'Tháng' } } } }
+        }); }
       });
     </script>
-    </section>
-    </div>
-    <footer class="footer">
-        <div class="footer-contact">
-            <div class="footer-contact-item">
-                <i class="fa fa-phone"></i>
-                <span>0123456789</span>
-    </div>
-    <div class="footer-contact-item">
-      <i class="fa fa-envelope"></i>
-      <span>hexacode@gmail.com</span>
-    </div>
-  </div>
-  <div class="footer-logo">
-    <img src="/static/images/hexacode_logo.png" alt="Hexacode Logo" class="footer-logo-img">
-    <div class="footer-logo-text">HEXACODE</div>
-  </div>
-  <div class="footer-links">
-    <div class="footer-links-group">
-      <div class="footer-links-title">Overview</div>
-      <a href="#">App</a>
-    </div>
-    <div class="footer-links-group">
-      <div class="footer-links-title">Company</div>
-      <a href="home.html">Home</a>
-      <a href="about-us.html">About us</a>
-      <a href="#">Pricing</a>
-    </div>
-    <div class="footer-links-group">
-      <div class="footer-links-title">Follow us</div>
-      <a href="#"><i class="fa fa-facebook"></i> CVCompass</a>
-      <a href="#"><i class="fa fa-tiktok"></i> CVCompass</a>
-    </div>
-  </div>
-</footer>
-</body>
+  </body>
 </html>
-<script>
-document.addEventListener('DOMContentLoaded', function(){
-  async function fetchCount(url){
-    try{
-      const resp = await fetch(url, { credentials: 'same-origin' });
-      if(!resp.ok) throw new Error('HTTP ' + resp.status);
-      return await resp.json();
-    }catch(e){ console.debug('fetchCount error', url, e); return null; }
-  }
-
-  (async function updateCounts(){
-    const [saved, approved] = await Promise.all([
-      fetchCount('/count-saved-jobs'),
-      fetchCount('/count-approved-cvs')
-    ]);
-    if(saved && typeof saved.count !== 'undefined'){
-      const el = document.getElementById('saved-jobs-count');
-      if(el) el.innerText = saved.count;
-    }
-    if(approved && typeof approved.count !== 'undefined'){
-      const el = document.getElementById('approved-cvs-count');
-      if(el) el.innerText = approved.count;
-    }
-  })();
-});
-</script>
