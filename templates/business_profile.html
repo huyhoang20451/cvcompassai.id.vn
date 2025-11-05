@@ -16,56 +16,45 @@
     <title>Hồ sơ doanh nghiệp - CV Compass</title>
   </head>
   <body style="background-color: #F6FCFF">
-    <!--Bắt đầu phần header-->
-    <div class="header">
-        <div class="logo-container">
-            <div class="logo-image">
-              <img src="/static/images/Logo_Final2.png" alt="Logo CV Compass">
-            </div>
+    <header class="bg-white shadow-sm">
+      <div class="container d-flex align-items-center justify-content-between py-3">
+        <div class="d-flex align-items-center gap-3">
+          <div class="logo-image">
+            <a href="/business-dashboard"><img src="/static/images/Logo_Final2.png" alt="Logo CV Compass" height="48"></a>
+          </div>
+          <div>
             <div class="logo-text">CV Compass</div>
             <div class="logo-slogan">Smart Insight - Right Choice - Bright Future</div>
+          </div>
         </div>
-        <div class="header-menu"> <!-- Menu lựa chọn -->
-            <ul>
-                <li><a href="/business-dashboard">Trang chủ</a></li>
-                <li><a href="/job-storage">Quản lý JD</a></li>
-                <li><a href="/pricing-business-logged-in">Nâng cấp Premium</a></li>
+
+        <nav class="d-none d-md-block">
+          <ul class="nav">
+            <li class="nav-item"><a class="nav-link text-muted" href="/business-dashboard">Trang chủ</a></li>
+            <li class="nav-item"><a class="nav-link text-muted" href="/job-storage">Quản lý JD</a></li>
+            <li class="nav-item"><a class="nav-link text-muted" href="/pricing-business-logged-in">Nâng cấp Premium</a></li>
+          </ul>
+        </nav>
+
+        <div class="d-flex align-items-center gap-3">
+          <div class="me-2 text-end d-none d-md-block">
+            <div id="welcome-user" class="small text-muted">Xin chào, {{ user_info.company_name or 'Doanh nghiệp' }}</div>
+          </div>
+          <div class="dropdown">
+            <a class="d-inline-block user-avatar" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="/static/images/business_avatar.png" alt="avatar" width="44" height="44" class="rounded-circle border">
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="/business-profile">Hồ sơ của tôi</a></li>
+              <li><a class="dropdown-item" href="/job-storage">Lưu trữ JD</a></li>
+              <li><a class="dropdown-item" href="#">Cài đặt</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/business-home">Đăng xuất</a></li>
             </ul>
+          </div>
         </div>
-        <div class="header-actions">
-            <!--Chào mừng khi đăng nhập thành công-->
-            <p id="welcome-user">Chào mừng, {{ user_info.company_name }}!</p>
-        </div>
-        <div class="user-avatar">
-            <img onclick="boxAppear()" style="width: 40px; height: 40px; border-radius: 50%;" src="/static/images/business_avatar.png" alt="User Avatar">
-        </div>
-        <script>
-            function boxAppear() {
-                const box = document.createElement('div');
-                box.style.position = 'absolute';
-                box.style.top = '60px';
-                box.style.right = '20px';
-                box.style.backgroundColor = '#fff';
-                box.style.border = '1px solid #ccc';
-                box.style.borderRadius = '5px';
-                box.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
-                box.style.padding = '10px';
-                box.innerHTML = `
-                    <p><a href="/business-profile" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
-                    <p><a href="/job-storage" style="text-decoration:none;color:#222;">Lưu trữ JD</a></p>
-                    <p><a href="#" style="text-decoration:none;color:#222;">Cài đặt</a></p>
-                    <p><a href="/business-home" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
-                `;
-                document.body.appendChild(box);
-                document.addEventListener('click', function handleClickOutside(event) {
-                    if (!box.contains(event.target) && event.target !== document.querySelector('.user-avatar img')) {
-                        box.remove();
-                        document.removeEventListener('click', handleClickOutside);
-                    }
-                });
-            }
-        </script>
-    </div> <!-- kết thúc phần header -->
+      </div>
+    </header> <!-- Kết thúc phần header -->
     <div class="container">
       <div class="profile-card">
         <div class="logo-box">
