@@ -1,95 +1,65 @@
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    background-color: white;
+/* Business dashboard styles - professional, responsive */
+:root{
+  --bg: #f6fbff;
+  --card: #ffffff;
+  --muted: #6b7280;
+  --accent: #004aad;
+  --accent-2: #0ea5a4;
+  --yellow: #f2c94c;
+  --shadow: 0 6px 18px rgba(16,24,40,0.08);
+  --radius: 12px;
+  --container-max: 1200px;
 }
 
-.logo-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Căn giữa các thành phần */
-    font-family: Arial, sans-serif; /* Hoặc font tương tự như trong hình */
-    padding: 20px;
-    background-color: #fff; /* Màu nền trắng */
+body{ background: var(--bg); font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; color:#0f172a; }
+.container{ max-width: var(--container-max); margin: 0 auto; padding: 24px; }
+
+/* Header */
+.header{ display:flex; align-items:center; justify-content:space-between; gap:16px; padding:18px 24px; background: linear-gradient(90deg, #fff 0%, #f8fbff 100%); box-shadow: var(--shadow); border-radius: 10px; margin:18px 24px; }
+.logo-container{ display:flex; gap:12px; align-items:center; }
+.logo-image img{ width:56px; height:56px; object-fit:cover; border-radius:8px; }
+.logo-text{ font-weight:700; font-size:20px; color:var(--accent); }
+.logo-slogan{ font-size:12px; color:var(--muted); }
+.header-menu ul{ display:flex; gap:10px; list-style:none; margin:0; padding:0; }
+.header-menu a{ text-decoration:none; color:var(--muted); padding:8px 12px; border-radius:8px; transition:all .18s ease; font-weight:600; }
+.header-menu a:hover{ background:#eef6ff; color:var(--accent); }
+.header-actions{ font-size:14px; color:var(--accent); font-weight:600; }
+.user-avatar img{ width:44px; height:44px; border-radius:50%; cursor:pointer; box-shadow:0 4px 12px rgba(2,6,23,0.08); }
+
+/* Introduction */
+.introduction{ margin: 18px 24px; padding: 22px; background: linear-gradient(180deg, #ffffff, #fbfdff); border-radius: 12px; box-shadow: var(--shadow); }
+.title_content h1{ margin:0; font-size:20px; color:var(--accent); }
+.button_content .btn-upload-cv{ background:var(--accent); color:#fff; border:none; padding:10px 14px; border-radius:8px; font-weight:700; }
+
+/* Job cards */
+.row.g-3{ display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:18px; margin: 18px 24px; }
+.job-card{ background:var(--card); border-radius:12px; padding:16px; box-shadow: var(--shadow); transition: transform .12s ease, box-shadow .12s ease; }
+.job-card:hover{ transform: translateY(-6px); box-shadow: 0 12px 30px rgba(16,24,40,0.12); }
+.job-card h6{ margin:0 0 6px 0; color:#05204A; font-weight:700; }
+.job-card img{ width:44px; height:44px; object-fit:cover; border-radius:8px; margin-right:10px; }
+.job-info{ color:var(--muted); margin:6px 0; font-size:14px; }
+.job-link{ display:inline-block; margin-top:8px; color:var(--accent-2); text-decoration:none; font-weight:700; }
+
+/* Stats grid */
+.stats-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin: 18px 24px; }
+.stat-box{ background: linear-gradient(180deg,#fff,#fbfdff); border-radius:12px; padding:18px; box-shadow: var(--shadow); display:flex; align-items:center; gap:12px; }
+.stat-box .icon{ font-size:26px; }
+.stat-box.yellow{ border-left:4px solid var(--yellow); }
+.stat-box.blue{ border-left:4px solid #0ea5a4; }
+.stat-box div{ font-weight:700; color:#07203a; }
+
+/* Carousel */
+.carousel-inner{ border-radius:12px; overflow:hidden; margin: 18px 24px; box-shadow: var(--shadow); }
+
+/* Footer */
+.footer{ margin-top:28px; padding:24px; background:#ffffff; border-top:1px solid #eef2f7; }
+.footer .footer-contact, .footer .footer-links{ display:flex; gap:18px; align-items:center; }
+.footer a{ color:var(--muted); text-decoration:none; }
+
+/* Responsive tweaks */
+@media (max-width: 768px){
+  .header{ flex-direction:column; align-items:flex-start; }
+  .header-menu ul{ flex-wrap:wrap; }
+  .row.g-3{ grid-template-columns: 1fr; }
 }
 
-.logo-image {
-    /* Đây là nơi bạn sẽ tái tạo hình ảnh la bàn */
-    /* Trong ví dụ này, tôi sẽ dùng một placeholder màu */
-    width: 60px; /* Kích thước icon */
-    height: 60px;
-    background-color: #f7a000; /* Màu cam giả định cho icon */
-    border-radius: 50%; /* Nếu icon có hình tròn */
-    margin-bottom: 10px; /* Khoảng cách giữa icon và chữ */
-    /* Nếu bạn muốn tạo hình la bàn phức tạp hơn bằng CSS, sẽ cần nhiều thuộc tính hơn */
-    /* Tuy nhiên, cách tốt nhất cho icon phức tạp là dùng SVG hoặc PNG */
-
-    /* Để mô phỏng icon la bàn, có thể dùng thuộc tính background-image với SVG hoặc icon font */
-    /* Hoặc dùng pseudo-elements để tạo các chi tiết của la bàn */
-}
-
-.logo-text {
-    font-size: 36px; /* Kích thước chữ "CV Compass" */
-    font-weight: bold;
-    color: #333; /* Màu chữ đen đậm */
-    margin-bottom: 5px; /* Khoảng cách giữa text và slogan */
-}
-
-.logo-slogan {
-    font-size: 16px;
-    color: #555; /* Màu chữ xám cho slogan */
-}
-.header-menu ul {
-    display: flex;
-    font-family: Arial, Helvetica, sans-serif;
-}
-.header-menu ul li {
-    list-style: none;
-    margin: 0 10px;
-    padding: 10px 0;
-    cursor: pointer;
-}
-
-/* Effects change the header menu to blue and underline when mouse selected the menu */
-.header-menu ul li a:hover {
-    text-decoration: underline;
-    color: blue;
-}
-
-.header-menu ul li a {
-    text-decoration: none;
-    color: #556FB5;
-    /* underline */
-}
-.header-actions button {
-    background-color: #3674B5;
-    border: none;
-    color: white;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-    border-radius: 12px;
-}
-.header-actions button.btn-login {
-    background-color: #F6FCFF;
-    border-color: #3674B5;
-    color: #3674B5;
-}
-.header-actions button:hover {
-    background-color: #45a049;
-}
-.header-nhatuyendung {
-    border-radius: 5px;
-    padding: 10px 20px;
-    text-align: center;
-    font-weight: bold;
-}
-.header-nhatuyendung:hover {
-    background-color: #ff6b00;
-    color: white;
-}
