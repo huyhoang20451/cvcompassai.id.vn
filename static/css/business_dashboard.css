@@ -1,442 +1,229 @@
-/* Import Google Fonts - Inter for clean, modern look */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
-:root {
-    --primary-blue: #007bff;
-    --dark-blue: #0056b3;
-    --light-blue: #e0f2ff;
-    --accent-yellow: #ffc107;
-    --dark-grey: #343a40;
-    --mid-grey: #6c757d;
-    --light-grey: #f8f9fa;
-    --white: #ffffff;
-    --border-color: #dee2e6;
-    --shadow-light: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    --shadow-medium: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-}
-
+/* --- Global & Typography (Sử dụng Font 'Inter' hoặc 'Roboto' thay thế cho font mặc định) --- */
 body {
-    font-family: 'Inter', sans-serif;
-    background-color: var(--light-grey) !important; /* Override inline style */
-    color: var(--dark-grey);
-    line-height: 1.6;
+    font-family: 'Roboto', 'Inter', sans-serif; /* Thêm Inter/Roboto từ CDN nếu cần */
+    background-color: #F8F9FA !important; /* Nền trắng ngà/xám nhạt */
 }
 
-/* --- Header --- */
+a {
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+/* --- Header / Nav Cải Tiến --- */
 header {
-    background-color: var(--white) !important;
-    border-bottom: 1px solid var(--border-color);
-    box-shadow: var(--shadow-light);
-    padding: 1rem 0;
-}
-
-header .container {
-    padding: 0 1.5rem; /* Consistent padding */
-}
-
-.logo-image img {
-    height: 40px; /* Adjusted logo size */
+    border-bottom: 1px solid #E9ECEF; /* Đường kẻ phân cách nhẹ nhàng */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important; /* Shadow tinh tế hơn */
 }
 
 .logo-text {
-    font-size: 1.5rem; /* Larger logo text */
+    font-size: 1.2rem;
     font-weight: 700;
-    color: var(--primary-blue);
+    color: #004D9D; /* Màu xanh đậm thương hiệu */
 }
 
 .logo-slogan {
-    font-size: 0.85rem;
-    color: var(--mid-grey);
+    font-size: 0.75rem;
+    color: #6C757D; /* Màu xám tinh tế */
 }
 
 .nav-link {
-    color: var(--mid-grey) !important;
     font-weight: 500;
-    transition: color 0.2s ease-in-out;
+    color: #495057 !important;
+    padding: 0.5rem 1rem;
 }
 
 .nav-link:hover {
-    color: var(--primary-blue) !important;
+    color: #007BFF !important; /* Hover màu xanh dương */
 }
 
-#welcome-user {
-    font-size: 0.9rem;
-    color: var(--dark-grey);
-    font-weight: 500;
-}
-
-.user-avatar img {
-    border: 2px solid var(--primary-blue);
-    transition: border-color 0.2s ease-in-out;
-}
-
-.user-avatar img:hover {
-    border-color: var(--dark-blue);
-}
-
-.dropdown-menu {
-    border: none;
-    box-shadow: var(--shadow-medium);
-    border-radius: 0.5rem;
-}
-
-.dropdown-item {
-    color: var(--dark-grey);
-    font-size: 0.95rem;
-}
-
-.dropdown-item:hover {
-    background-color: var(--light-blue);
-    color: var(--primary-blue);
-}
-
-/* --- Introduction / Hero Section --- */
+/* --- Introduction / Hero Cải Tiến --- */
 .introduction {
     position: relative;
-    height: 380px; /* Increased height for prominence */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+    padding: 60px 0; /* Tăng padding */
+    background-image: url('/static/images/—Pngtree—cartoon style work space_411946.jpg');
+    /* background: linear-gradient(135deg, #007BFF 0%, #004D9D 100%); Gradient xanh dương */
     overflow: hidden;
-    margin-bottom: 4rem; /* More space below hero */
-    color: var(--white); /* Ensures text is white */
+    border-radius: 0 0 15px 15px; /* Bo góc dưới */
+    margin-bottom: 30px;
 }
 
 .background_intro {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    /* Update path if needed, ensure it exists */
-    background: url('/static/images/business_dashboard_bgr.jpg') no-repeat center center/cover;
-    filter: brightness(0.5); /* Make it darker for better text contrast */
-    z-index: 0;
+    display: none; /* Ẩn background cũ nếu có */
 }
 
 .content-introduction {
     position: relative;
-    z-index: 10; /* Ensure content is above background and filter */
-    padding: 2rem 1.5rem;
-    max-width: 900px; /* Max width for readability */
+    z-index: 2;
+    max-width: 800px;
 }
 
-.title_content h1 {
-    font-size: 2.8rem;
-    font-weight: 800; /* Extra bold */
-    line-height: 1.2;
-    margin-bottom: 1.5rem;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4); /* Stronger text shadow */
-    color: var(--dark-blue);
+.content-introduction h1 {
+    transform: translateY(200px);
+    font-size: 2rem;
+    font-weight: 700;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+    /*Căn ra chính giữa*/
+    margin: 0 auto;
 }
 
 .btn-upload-cv {
-    background-color: var(--accent-yellow);
-    color: var(--dark-grey);
-    border: none;
-    padding: 0.85rem 2rem;
-    border-radius: 0.5rem;
-    font-size: 1.1rem;
+    background-color: #FFC107; /* Màu vàng nổi bật */
+    color: #212529; /* Chữ đen/xám đậm */
     font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    transition: all 0.2s ease-in-out;
-    box-shadow: var(--shadow-medium);
+    padding: 10px 25px;
+    border-radius: 50px;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(255, 193, 7, 0.4);
+    transform: translateY(200px);
 }
 
 .btn-upload-cv:hover {
-    background-color: #e0a800; /* Darker yellow */
-    transform: translateY(-3px);
-    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.15);
+    background-color: #e0a800;
+    color: #212529;
+    box-shadow: 0 6px 8px rgba(255, 193, 7, 0.6);
 }
 
-.btn-upload-cv .material-symbols-outlined {
-    font-size: 1.5rem;
-    color: var(--dark-grey);
-}
-
-/* --- Main Content Container --- */
-main.container {
-    padding-top: 2rem;
-    padding-bottom: 4rem;
-}
-
-
-/* --- Featured Jobs Section --- */
+/* --- Featured Jobs & Cards --- */
 .header-tin-tuyen-dung h2 {
-    font-size: 2.2rem;
+    font-size: 1.8rem;
     font-weight: 700;
-    color: var(--dark-grey);
-    margin-bottom: 1rem;
+    color: #343A40;
 }
 
-.header-tin-tuyen-dung > div { /* The blue line */
-    background: var(--primary-blue) !important;
+.header-tin-tuyen-dung > div {
+    background: #FFC107 !important; /* Thay màu xanh dương bằng màu vàng thương hiệu */
 }
 
 .filter-bar .form-control {
-    border-radius: 0.375rem; /* Bootstrap default */
-    border: 1px solid var(--border-color);
-    padding: 0.65rem 1rem;
-    max-width: 220px; /* Limit width */
-}
-
-.filter-bar .btn-warning {
-    background-color: var(--primary-blue); /* Changed to primary blue */
-    border-color: var(--primary-blue);
-    color: var(--white);
-    font-weight: 600;
-    padding: 0.65rem 1.5rem;
-    border-radius: 0.375rem;
-    transition: all 0.2s ease-in-out;
-}
-
-.filter-bar .btn-warning:hover {
-    background-color: var(--dark-blue);
-    border-color: var(--dark-blue);
-    transform: translateY(-1px);
+    max-width: 250px; /* Giới hạn chiều rộng cho input */
+    border-radius: 8px;
 }
 
 .job-card {
-    background-color: var(--white);
-    border: none; /* Bootstrap card has border, remove it for cleaner look */
-    border-radius: 0.75rem;
-    box-shadow: var(--shadow-light);
-    transition: all 0.2s ease-in-out;
+    border: 1px solid #E9ECEF;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Shadow nhẹ nhàng */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .job-card:hover {
     transform: translateY(-5px);
-    box-shadow: var(--shadow-medium);
-}
-
-.job-card img {
-    border: 1px solid var(--border-color);
-    flex-shrink: 0; /* Prevent image from shrinking */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .job-card h6 {
-    font-size: 1.15rem;
     font-weight: 600;
-    color: var(--dark-blue);
-    margin-bottom: 0.25rem;
-    word-break: break-word; /* Prevent long titles from breaking layout */
+    color: #007BFF; /* Màu tiêu đề xanh dương */
 }
 
-.job-card .job-info {
-    font-size: 0.9rem;
-    color: var(--mid-grey);
-    margin-bottom: 0.2rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+.job-info {
+    margin-top: 3px;
+    color: #6C757D;
+    font-size: 0.85rem;
 }
 
-/* Font Awesome icons for job-info */
-.job-card .job-info:nth-child(1)::before { content: "\f3c5"; font-family: "Font Awesome 6 Free"; font-weight: 900; color: var(--primary-blue); margin-right: 0.25rem; } /* Map marker */
-.job-card .job-info:nth-child(2)::before { content: "\f15c"; font-family: "Font Awesome 6 Free"; font-weight: 900; color: var(--primary-blue); margin-right: 0.25rem; } /* File alt */
-.job-card .job-info:nth-child(3)::before { content: "\f017"; font-family: "Font Awesome 6 Free"; font-weight: 900; color: var(--primary-blue); margin-right: 0.25rem; } /* Clock */
-
-
-.job-card .job-link {
-    background-color: var(--light-blue);
-    color: var(--primary-blue);
-    padding: 0.5rem 1rem;
-    border-radius: 0.375rem;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 0.9rem;
-    transition: all 0.2s ease-in-out;
-    white-space: nowrap; /* Keep button on one line */
+.job-link {
+    font-weight: 600;
+    color: #FFC107;
 }
 
-.job-card .job-link:hover {
-    background-color: var(--primary-blue);
-    color: var(--white);
+.job-link:hover {
+    color: #e0a800;
 }
 
-/* Pagination */
-.pagination .page-item .page-link {
-    border-radius: 0.375rem !important;
-    margin: 0 0.25rem;
-    border-color: var(--border-color);
-    color: var(--primary-blue);
-    transition: all 0.2s ease-in-out;
-}
-
-.pagination .page-item.active .page-link,
-.pagination .page-item .page-link:hover {
-    background-color: var(--primary-blue);
-    border-color: var(--primary-blue);
-    color: var(--white);
-}
-
-/* --- Recruitment Management & Stats --- */
+/* --- Recruitment Stats & Management --- */
 .recruitment-title {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: var(--dark-grey);
-}
-
-.form-select.w-auto {
-    min-width: 180px;
-    border-radius: 0.375rem;
-    border: 1px solid var(--border-color);
-    padding: 0.65rem 1rem;
-    font-size: 0.95rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #343A40;
 }
 
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
+    gap: 20px;
 }
 
 .stat-box {
-    background-color: var(--white);
-    border-radius: 0.75rem;
-    box-shadow: var(--shadow-light);
-    padding: 1.5rem;
+    padding: 20px;
+    border-radius: 12px;
     font-size: 1rem;
     font-weight: 500;
-    color: var(--dark-grey);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 120px;
-    transition: all 0.2s ease-in-out;
+    color: #495057;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
 }
 
 .stat-box:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-medium);
+    transform: translateY(-3px);
 }
 
 .stat-box .icon {
-    font-size: 2.8rem;
-    margin-bottom: 0.75rem;
-    line-height: 1; /* Fix icon vertical alignment */
+    font-size: 2rem;
+    margin-bottom: 8px;
+    font-weight: 400;
 }
 
-.stat-box.yellow .icon { color: var(--accent-yellow); }
-.stat-box.blue .icon { color: var(--primary-blue); }
+.stat-box.yellow {
+    background-color: #FFF3CD; /* Màu nền vàng nhạt */
+    border: 1px solid #FFC107;
+}
 
-/* --- Carousel and Chart --- */
+.stat-box.blue {
+    background-color: #D1E7FD; /* Màu nền xanh dương nhạt */
+    border: 1px solid #007BFF;
+}
+
+/* --- Carousel và Chart --- */
 #carouselExampleDark {
-    background-color: var(--white);
-    border-radius: 0.75rem;
-    box-shadow: var(--shadow-medium);
-    padding: 1.5rem;
+    border-radius: 12px;
+    background-color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 20px;
 }
-
-.carousel-indicators [data-bs-target] {
-    background-color: var(--primary-blue);
-}
-
-.carousel-indicators .active {
-    background-color: var(--dark-blue);
-}
-
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-    filter: invert(1); /* Make arrows visible on dark background */
-}
-
-canvas#myChart {
-    background-color: var(--white);
-    padding: 1rem;
-    border-radius: 0.5rem;
-    box-shadow: var(--shadow-light);
+.carousel-indicators button {
+    background-color: #007BFF !important; /* Màu chỉ báo xanh dương */
 }
 
 /* --- Footer --- */
-footer.footer {
-    background-color: var(--dark-grey); /* Dark footer */
-    color: var(--light-grey);
-    padding: 2.5rem 0;
+.footer {
+    background-color: #343A40; /* Màu nền footer tối hơn */
+    color: #E9ECEF;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    border-top: 5px solid #FFC107; /* Đường kẻ vàng nổi bật */
 }
 
-footer .container {
-    padding: 0 1.5rem;
-}
-
-.footer-contact-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0.75rem;
-    font-size: 0.95rem;
-}
-
-.footer-contact-item i {
-    color: var(--primary-blue);
-    font-size: 1.1rem;
-}
-
-.footer-logo-img {
-    height: 50px;
-}
-
-.footer-logo-text {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: var(--white);
+.footer-contact-item, .footer-links a {
+    color: #CED4DA;
+    display: block;
+    margin-bottom: 8px;
 }
 
 .footer-links-title {
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 15px;
     font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    color: var(--white);
 }
 
-.footer-links a {
-    color: #ced4da; /* Lighter text for links */
-    text-decoration: none;
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
-    display: block;
-    transition: color 0.2s ease-in-out;
+.footer-logo-text {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #FFC107;
 }
 
-.footer-links a:hover {
-    color: var(--primary-blue);
+.footer-logo-img {
+    height: 40px; /* Điều chỉnh kích thước logo */
 }
 
-.footer-links a i {
-    width: 20px; /* Align icons */
+/* --- Pagination --- */
+.pagination .page-item a {
+    color: #007BFF;
 }
 
-
-/* --- Responsive Adjustments (Bootstrap handles much, but some custom tweaks) --- */
-@media (max-width: 768px) {
-    .logo-text { font-size: 1.3rem; }
-    .logo-slogan { display: none; } /* Hide slogan on small screens */
-    .header .container { flex-wrap: wrap; justify-content: center; gap: 1rem; }
-    .header .d-flex.align-items-center.gap-3:first-child { flex-grow: 1; } /* Logo on left */
-    .header .d-none.d-md-block { display: none !important; } /* Hide nav */
-    .header .d-flex.align-items-center.gap-3:last-child { margin-left: auto; } /* Actions on right */
-
-    .introduction { height: 300px; margin-bottom: 3rem; }
-    .title_content h1 { font-size: 2rem; }
-    .btn-upload-cv { padding: 0.75rem 1.5rem; font-size: 1rem; }
-
-    .header-tin-tuyen-dung h2 { font-size: 1.8rem; }
-    .filter-bar { flex-direction: column; gap: 1rem; }
-    .filter-bar .form-control, .filter-bar .btn-warning { max-width: 100%; width: 100%; }
-
-    .recruitment-title { font-size: 1.4rem; }
-    .stats-grid { grid-template-columns: 1fr; }
-
-    .footer .ms-auto { margin-left: 0 !important; } /* Revert ms-auto on small screens */
-    .footer .d-flex.flex-wrap.gap-4 { justify-content: center; text-align: center; }
-}
-
-@media (max-width: 576px) {
-    .introduction { height: 250px; }
-    .title_content h1 { font-size: 1.7rem; margin-bottom: 1rem; }
-    .btn-upload-cv { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
+.pagination .page-item.active .page-link {
+    background-color: #007BFF;
+    border-color: #007BFF;
 }
