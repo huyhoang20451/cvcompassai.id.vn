@@ -316,32 +316,35 @@
 
         <!-- Job Detail Content -->
         <div class="job-content">
-            {# --- MACRO MỚI: Xử lý thông minh cả List và String --- #}
+            {# --- MACRO V3: Xử lý thông minh dấu phẩy trong câu --- #}
     {% macro render_job_text(text) %}
-        {# TRƯỜNG HỢP 1: Dữ liệu đã là một danh sách thật sự (List Python) #}
+        {# TRƯỜNG HỢP 1: Dữ liệu đã là List Python thật (tốt nhất) #}
         {% if text is iterable and text is not string %}
             <ul style="padding-left: 20px; margin-top: 5px;">
                 {% for item in text %}
-                    {% if item and item.strip() %}
-                        <li style="margin-bottom: 5px;">{{ item | replace('"', '') | replace("'", "") }}</li>
-                    {% endif %}
+                    <li style="margin-bottom: 5px;">{{ item }}</li>
                 {% endfor %}
             </ul>
 
-        {# TRƯỜNG HỢP 2: Dữ liệu là chuỗi (String) nhưng nhìn giống danh sách ["A", "B"] #}
-        {% elif text and text.startswith('[') and text.endswith(']') %}
-            {# Loại bỏ các ký tự thừa: [ ] " ' #}
-            {% set clean_text = text[1:-1].replace('"', '').replace("'", "") %}
+        {# TRƯỜNG HỢP 2: Chuỗi JSON ["A", "B, C"] -> Tách bằng cụm [", "] thay vì chỉ [,] #}
+        {% elif text and text.strip().startswith('[') and text.strip().endswith(']') %}
             <ul style="padding-left: 20px; margin-top: 5px;">
-                {# Tách dựa trên dấu phẩy (lưu ý: cách này có thể tách sai nếu trong câu có dấu phẩy) #}
-                {% for item in clean_text.split(',') %}
-                    {% if item and item.strip() %}
-                        <li style="margin-bottom: 5px;">{{ item.strip() }}</li>
+                {# 1. Bỏ dấu [ và ] ở đầu cuối #}
+                {% set inner = text.strip()[1:-1] %}
+                {# 2. Mẹo quan trọng: Thay thế cụm phân cách `", "` bằng một ký tự đặc biệt hiếm gặp (ví dụ |||) #}
+                {# Chúng ta replace cả 2 trường hợp: có dấu cách và không có dấu cách sau dấu phẩy #}
+                {% set items = inner.replace('", "', '|||').replace('","', '|||').split('|||') %}
+                
+                {% for item in items %}
+                    {# 3. Làm sạch: Cắt bỏ các dấu ngoặc kép " hoặc ' còn sót lại ở đầu/cuối mỗi ý #}
+                    {% set clean_item = item.strip().strip('"').strip("'") %}
+                    {% if clean_item %}
+                        <li style="margin-bottom: 5px;">{{ clean_item }}</li>
                     {% endif %}
                 {% endfor %}
             </ul>
 
-        {# TRƯỜNG HỢP 3: Dữ liệu là văn bản thuần túy, tách bằng xuống dòng #}
+        {# TRƯỜNG HỢP 3: Văn bản thường, tách bằng xuống dòng (fallback) #}
         {% elif text %}
              <ul style="padding-left: 20px; margin-top: 5px;">
                 {% for line in text.replace('\r\n', '\n').split('\n') %}
