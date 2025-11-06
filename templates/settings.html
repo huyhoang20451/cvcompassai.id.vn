@@ -229,9 +229,10 @@
             if (form) {
         form.addEventListener('submit', async function(e){
             e.preventDefault();
-            const full_name = document.getElementById('full_name').value;
-            const email = document.getElementById('email').value;
-            const phone = document.getElementById('phone').value;
+                const full_name = document.getElementById('full_name').value;
+                const email = document.getElementById('email').value;
+                // phone field in the form uses id="phone_number" (textarea), read that value
+                const phoneNumber = (document.getElementById('phone_number') && document.getElementById('phone_number').value) || '';
 
             // Determine target URL. We expect the backend's user-update endpoint.
             let target = form.getAttribute('action') || '/edit-profile';
@@ -242,7 +243,11 @@
                 if (currentId) params.append('user_id', currentId); // Dù backend không dùng nhưng gửi vẫn tốt
                 if (full_name !== null) params.append('full_name', full_name);
                 if (email !== null) params.append('email', email);
-                if (phone !== null) params.append('phone', phone);
+                // send both keys to be compatible with different backend param names
+                if (phoneNumber !== null) {
+                    params.append('phone', phoneNumber);
+                    params.append('phone_number', phoneNumber);
+                }
 
                 const resp = await fetch(target, {
                     method: 'POST',
@@ -281,12 +286,14 @@
                 if(row) {
                     row.querySelector('td[data-label="Họ và tên:"]').textContent = full_name;
                     row.querySelector('td[data-label="Email:"]').textContent = email;
-                    row.querySelector('td[data-label="Số điện thoại:"]').textContent = phone;
+                    row.querySelector('td[data-label="Số điện thoại:"]').textContent = phoneNumber;
                     // Cập nhật lại data attribute cho lần sau
                     const editBtn = row.querySelector('.edit-btn');
-                    editBtn.setAttribute('data-name', full_name);
-                    editBtn.setAttribute('data-email', email);
-                    editBtn.setAttribute('data-phone', phone);
+                    if(editBtn){
+                        editBtn.setAttribute('data-name', full_name);
+                        editBtn.setAttribute('data-email', email);
+                        editBtn.setAttribute('data-phone', phoneNumber);
+                    }
                 }
                 
                 closeModal();
