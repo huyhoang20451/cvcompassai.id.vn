@@ -4,20 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/x-icon" href="../static/favicon.ico">
-  <link rel="stylesheet" href="/static/css/settings.css">
-  <script src="/static/js/theme.js"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=Noto+Sans:wght@400..700&family=Roboto:wght@400..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=upload" />
+
+    <script src="/static/js/theme.js"></script>
+
+    <link rel="stylesheet" href="/static/css/edit-profile.css">
+    
     <title>Cài đặt tài khoản</title>
 </head>
-<body style="background-color: #F6FCFF">
-    <!--Bắt đầu phần header-->
-    <div class="header">
+<body style="background-color: #F6FCFF"> <div class="header">
         <div class="header-logo">
             <img src="/static/images/Screenshot 2025-08-25 150046.png" alt="Logo CV Compass">
         </div>
-        <div class="header-menu"> <!-- Menu lựa chọn -->
-            <ul>
+        <div class="header-menu"> <ul>
                 <li><a method='get' href="/home-logged-in">Trang chủ</a></li>
                 <li><a method="get" href="/aboutus-logged-in">Về chúng tôi</a></li>
                 <li><a method="get" href="/finding-jobs">Tìm việc làm</a></li>
@@ -26,7 +28,6 @@
             </ul>
         </div>
         <div class="header-actions">
-            <!--Chào mừng khi đăng nhập thành công-->
             <p id="welcome-user">Chào mừng, {{user_info.full_name}}!</p>
             <p style="display: flex; align-items: center; background-color: #D1E9F6; padding: 5px 10px; border-radius: 5px;"><img style="width: 20px; height: 20px;" src="/static/images/coin.png" alt="Coin"><strong>{{user_info.coin}}</strong></p>
             
@@ -36,6 +37,7 @@
         </div>
         <script>
             function boxAppear() {
+                // (Mã JS cho popup avatar của bạn giữ nguyên)
                 const box = document.createElement('div');
                 box.style.position = 'absolute';
                 box.style.top = '60px';
@@ -64,22 +66,17 @@
            <p class="cau_hoi">Bạn là nhà tuyển dụng?</p>
            <p><a href="/business-home" target='_blank'>Đăng tin ngay</a></p>
         </div>
-    </div> <!-- kết thúc phần header -->
-
-    <!--Bắt đầu phần introduction-->
-    <div class="introduction">
+    </div> <div class="introduction">
         <div class="background_intro">
-            <!-- <img src="../img_bgr.png" alt="Introduction Image"> -->
-        </div>
+            </div>
         <div class="content-introduction">
             <div class="title_content">
                 <h1>Cài đặt</h1>
             </div>
         </div>
-    </div> <!-- kết thúc phần introduction -->
-    <div class="container">
+    </div> <div class="container">
         <aside class="sidebar">
-            <button class="back-btn">← Quay lại</button>
+            <button class="back-btn" onclick="history.back()">← Quay lại</button>
             <h2>Cài đặt</h2>
             <ul class="menu">
                 <li class="active"><a style="text-decoration: none;" href="/edit-profile">Thông tin cá nhân</a></li>
@@ -89,7 +86,7 @@
                 <li><a style="text-decoration: none;" href="/system-settings">Cài đặt hệ thống</a></li>
             </ul>
         </aside>
-        <!--Main content-->
+        
         <main class="main">
             <h1>Cài đặt</h1>
             <h3>Thông tin cá nhân</h3>
@@ -103,103 +100,93 @@
 
             <p class="note">(*) Các thông tin bắt buộc</p>
 
-  <div class="container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Họ và tên:</th>
-                    <th>Email:</th>
-                    <th>Số điện thoại:</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{ user_info.full_name }}</td>
-                    <td>{{ user_info.email }}</td>
-                    <td>{{ user_info.phone }}</td>
-                    <td>
-                        <button type="button" class="badge blue edit-btn"
-                            data-id="{{ user_info.id }}"
-                            data-name="{{ user_info.full_name | e }}"
-                            data-email="{{ user_info.email | e }}"
-                            data-phone="{{ user_info.phone | e }}">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <style>
-        /* Modal styles */
-        .modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
-        .modal-content { background: white; padding: 20px; border-radius: 8px; width: 480px; max-width: 90%; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
-        .modal-content h2 { margin-top: 0; }
-        .modal-content label { display:block; margin-top: 8px; font-weight:600; }
-        .modal-content input[type="text"], .modal-content textarea { width:100%; padding:8px; margin-top:6px; border:1px solid #ddd; border-radius:6px; }
-        .modal-content textarea { min-height: 100px; resize: vertical; }
-        .close { float: right; font-size: 22px; cursor: pointer; }
-        .edit-btn { border:none; background:transparent; padding:8px 12px; cursor:pointer; border-radius:6px; }
-        .edit-btn i { margin-right:6px; }
-        </style>
-        <!-- Modal for editing a service -->
-        <div id="editModal" class="modal" style="display:none;">
-            <div class="modal-content">
-                <span class="close" title="Đóng">&times;</span>
-                <form method="POST" action="/edit-profile" id="editForm">
-                    <h2>Cập nhật thông tin cá nhân</h2>
-                    <label for="full_name">Họ và tên:</label>
-                    <input type="text" id="full_name" name="full_name" required>
-                    <label for="email">Email:</label>
-                    <input type="text" id="email" name="email" required>
-                    <label for="phone">Số điện thoại:</label>
-                    <textarea id="phone" name="phone" required></textarea>
-                    <div style="margin-top:12px; display:flex; gap:8px;">
-                        <button type="submit">Cập nhật</button>
-                        <button type="button" id="cancelBtn">Hủy</button>
-                    </div>
-                </form>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Họ và tên:</th>
+                        <th>Email:</th>
+                        <th>Số điện thoại:</th>
+                        <th></th> </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td data-label="Họ và tên:">{{ user_info.full_name }}</td>
+                        <td data-label="Email:">{{ user_info.email }}</td>
+                        <td data-label="Số điện thoại:">{{ user_info.phone }}</td>
+                        <td>
+                            <button type="button" class="edit-btn"
+                                data-id="{{ user_info.id }}"
+                                data-name="{{ user_info.full_name | e }}"
+                                data-email="{{ user_info.email | e }}"
+                                data-phone="{{ user_info.phone | e }}">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+            </table>
+            
+            <div id="editModal" class="modal" style="display:none;">
+                <div class="modal-content">
+                    <span class="close" title="Đóng">&times;</span>
+                    <form method="POST" action="/edit-profile" id="editForm">
+                        <h2>Cập nhật thông tin cá nhân</h2>
+                        
+                        <label for="full_name">Họ và tên:</label>
+                        <input type="text" id="full_name" name="full_name" required>
+                        
+                        <label for="email">Email:</label>
+                        <input type="text" id="email" name="email" required>
+                        
+                        <label for="phone">Số điện thoại:</label>
+                        <textarea id="phone" name="phone" required></textarea>
+                        
+                        <div style="margin-top:1.5rem; display:flex; gap:0.75rem; justify-content: flex-end;">
+                            <button type="submit">Cập nhật</button>
+                            <button type="button" id="cancelBtn">Hủy</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </div>
         </main>
     </div>
-            <footer class="footer">
+            
+    <footer class="footer">
         <div class="footer-contact">
             <div class="footer-contact-item">
                 <i class="fa fa-phone"></i>
                 <span>0123456789</span>
-    </div>
-    <div class="footer-contact-item">
-      <i class="fa fa-envelope"></i>
-      <span>hexacode@gmail.com</span>
-    </div>
-  </div>
-  <div class="footer-logo">
-    <img src="/static/images/hexacode_logo.png" alt="Hexacode Logo" class="footer-logo-img">
-    <div class="footer-logo-text">HEXACODE</div>
-  </div>
-  <div class="footer-links">
-    <div class="footer-links-group">
-      <div class="footer-links-title">Overview</div>
-      <a href="#">App</a>
-    </div>
-    <div class="footer-links-group">
-      <div class="footer-links-title">Company</div>
-      <a href="home_logged_in.html">Home</a>
-      <a href="aboutus-logged-in.html">About us</a>
-      <a href="pricing-user-loggedin.html">Pricing</a>
-    </div>
-    <div class="footer-links-group">
-      <div class="footer-links-title">Follow us</div>
-      <a href="#"><i class="fa fa-facebook"></i> CVCompass</a>
-      <a href="#"><i class="fa fa-tiktok"></i> CVCompass</a>
-    </div>
-  </div>
-</footer>
+            </div>
+            <div class="footer-contact-item">
+                <i class="fa fa-envelope"></i>
+                <span>hexacode@gmail.com</span>
+            </div>
+        </div>
+        <div class="footer-logo">
+            <img src="/static/images/hexacode_logo.png" alt="Hexacode Logo" class="footer-logo-img">
+            <div class="footer-logo-text">HEXACODE</div>
+        </div>
+        <div class="footer-links">
+            <div class="footer-links-group">
+                <div class="footer-links-title">Overview</div>
+                <a href="#">App</a>
+            </div>
+            <div class="footer-links-group">
+                <div class="footer-links-title">Company</div>
+                <a href="home_logged_in.html">Home</a>
+                <a href="aboutus-logged-in.html">About us</a>
+                <a href="pricing-user-loggedin.html">Pricing</a>
+            </div>
+            <div class="footer-links-group">
+                <div class="footer-links-title">Follow us</div>
+                <a href="#"><i class="fa fa-facebook"></i> CVCompass</a>
+                <a href="#"><i class="fa fa-tiktok"></i> CVCompass</a>
+            </div>
+        </div>
+    </footer>
 
-
-<script>
-  (function(){
+    <script>
+    (function(){
             const modal = document.getElementById('editModal');
             const closeBtn = modal && modal.querySelector('.close');
             const cancelBtn = document.getElementById('cancelBtn');
@@ -219,16 +206,16 @@
         let currentId = null;
         document.querySelectorAll('.edit-btn').forEach(btn => {
             btn.addEventListener('click', function(){
-              // read attributes from button (use data-name as provided in template)
-              currentId = this.getAttribute('data-id');
-              const data = {
-                full_name: this.getAttribute('data-name') || this.getAttribute('data-full_name') || '',
-                email: this.getAttribute('data-email') || '',
-                phone: this.getAttribute('data-phone') || ''
-              };
-              openModal(data);
+                // read attributes from button (use data-name as provided in template)
+                currentId = this.getAttribute('data-id');
+                const data = {
+                    full_name: this.getAttribute('data-name') || this.getAttribute('data-full_name') || '',
+                    email: this.getAttribute('data-email') || '',
+                    phone: this.getAttribute('data-phone') || ''
+                };
+                openModal(data);
             });
-          });
+            });
 
             if (closeBtn) closeBtn.addEventListener('click', closeModal);
             if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
@@ -236,54 +223,77 @@
             // Intercept the modal form submit and send PATCH via fetch
             if (form) {
         form.addEventListener('submit', async function(e){
-          e.preventDefault();
-          const full_name = document.getElementById('full_name').value;
-          const email = document.getElementById('email').value;
-          const phone = document.getElementById('phone').value;
+            e.preventDefault();
+            const full_name = document.getElementById('full_name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
 
-          // Determine target URL. We expect the backend's user-update endpoint.
-          let target = form.getAttribute('action') || '/edit-profile';
+            // Determine target URL. We expect the backend's user-update endpoint.
+            let target = form.getAttribute('action') || '/edit-profile';
 
-          try {
-            // send as form-encoded to match backend Form(...) parameters
-            const params = new URLSearchParams();
-            if (currentId) params.append('user_id', currentId);
-            if (full_name !== null) params.append('full_name', full_name);
-            if (email !== null) params.append('email', email);
-            if (phone !== null) params.append('phone', phone);
+            try {
+                // send as form-encoded to match backend Form(...) parameters
+                const params = new URLSearchParams();
+                if (currentId) params.append('user_id', currentId); // Dù backend không dùng nhưng gửi vẫn tốt
+                if (full_name !== null) params.append('full_name', full_name);
+                if (email !== null) params.append('email', email);
+                if (phone !== null) params.append('phone', phone);
 
-            const resp = await fetch(target, {
-              method: 'POST',
-              credentials: 'same-origin',
-              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-              body: params.toString()
-            });
+                const resp = await fetch(target, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params.toString()
+                });
 
-            if (!resp.ok) {
-              const text = await resp.text();
-              throw new Error('HTTP ' + resp.status + ' - ' + text);
+                if (!resp.ok) {
+                    const text = await resp.text();
+                    let errorMsg = 'HTTP ' + resp.status;
+                    try {
+                        const jsonError = JSON.parse(text);
+                        errorMsg = jsonError.detail || text;
+                    } catch(e) {
+                        errorMsg = text || errorMsg;
+                    }
+                    throw new Error(errorMsg);
+                }
+
+                // parse response if JSON
+                let data = null;
+                const ct = resp.headers.get('content-type') || '';
+                if (ct.includes('application/json')) {
+                    try { data = await resp.json(); } catch(_) { data = null; }
+                }
+
+                alert(data?.message || "Cập nhật thành công!");
+                
+                // Cập nhật UI ngay lập tức
+                const welcome = document.getElementById('welcome-user');
+                if (welcome && full_name) welcome.textContent = 'Chào mừng, ' + full_name + '!';
+                
+                // Cập nhật bảng
+                const row = document.querySelector(`button[data-id="${currentId}"]`).closest('tr');
+                if(row) {
+                    row.querySelector('td[data-label="Họ và tên:"]').textContent = full_name;
+                    row.querySelector('td[data-label="Email:"]').textContent = email;
+                    row.querySelector('td[data-label="Số điện thoại:"]').textContent = phone;
+                    // Cập nhật lại data attribute cho lần sau
+                    const editBtn = row.querySelector('.edit-btn');
+                    editBtn.setAttribute('data-name', full_name);
+                    editBtn.setAttribute('data-email', email);
+                    editBtn.setAttribute('data-phone', phone);
+                }
+                
+                closeModal();
+                // Không cần reload lại trang
+                // setTimeout(() => location.reload(), 600);
+            } catch (err) {
+                console.error('Update failed', err);
+                alert('Lỗi khi cập nhật: ' + (err.message || err));
             }
-
-            // parse response if JSON or show text
-            let data = null;
-            const ct = resp.headers.get('content-type') || '';
-            if (ct.includes('application/json')) {
-              try { data = await resp.json(); } catch(_) { data = null; }
-            }
-
-            // Option: update UI or reload to reflect server-side state
-            const welcome = document.getElementById('welcome-user');
-            if (welcome && full_name) welcome.textContent = 'Chào mừng, ' + full_name + '!';
-            // close modal and reload to ensure data consistency
-            closeModal();
-            setTimeout(() => location.reload(), 600);
-          } catch (err) {
-            console.error('Update failed', err);
-            alert('Lỗi khi cập nhật: ' + (err.message || err));
-          }
         });
             }
         })();
-</script>
+    </script>
 </body>
 </html>
