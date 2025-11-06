@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/x-icon" href="../static/favicon.ico">
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/form-dang-tuyen-ngay.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" defer></script>
@@ -65,14 +65,18 @@
 <body style="background-color: #F6FCFF">
     <!--Bắt đầu phần header-->
     <div class="header">
-        <div class="header-logo">
-            <img src="/static/images/Screenshot 2025-08-25 150046.png" alt="Logo CV Compass">
+        <div class="logo-container">
+           <div class="logo-image">
+              <img src="/static/images/Logo_Final2.png" alt="Logo CV Compass">
+            </div>
+            <div class="logo-text">CV Compass</div>
+            <div class="logo-slogan">Smart Insight - Right Choice - Bright Future</div> 
         </div>
         <div class="header-menu"> <!-- Menu lựa chọn -->
             <ul>
                 <li><a method='get' href="/business-dashboard">Trang chủ</a></li>
                 <li><a method="get" href="/job-storage">Quản lý JD</a></li>
-                <li><a method="get" href="/pricing-business-logged-in">Nâng cấp Premium</a></li>
+                <li><a method="get" href="/pricing-business-logged-in">Dịch vụ</a></li>
             </ul>
         </div>
         <div class="header-actions">
@@ -94,9 +98,9 @@
                 box.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
                 box.style.padding = '10px';
                 box.innerHTML = `
-                    <p><a href="#" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
-                    <p><a href="#" style="text-decoration:none;color:#222;">Lưu trữ JD</a></p>
-                    <p><a href="#" style="text-decoration:none;color:#222;">Cài đặt</a></p>
+                    <p><a href="/business-profile" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
+                    <p><a href="/job-storage" style="text-decoration:none;color:#222;">Lưu trữ JD</a></p>
+                    <p><a href="/system-settings" style="text-decoration:none;color:#222;">Cài đặt</a></p>
                     <p><a href="/business-home" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
                 `;
                 document.body.appendChild(box);
