@@ -208,10 +208,12 @@
             }
 
         let currentId = null;
+        let currentBtn = null; // store clicked button element to find row even if data-id is missing
         document.querySelectorAll('.edit-btn').forEach(btn => {
             btn.addEventListener('click', function(){
                 // read attributes from button (use data-name as provided in template)
                 currentId = this.getAttribute('data-id');
+                currentBtn = this;
                 const data = {
                     full_name: this.getAttribute('data-name') || this.getAttribute('data-full_name') || '',
                     email: this.getAttribute('data-email') || '',
@@ -279,12 +281,22 @@
                 const welcome = document.getElementById('welcome-user');
                 if (welcome && full_name) welcome.textContent = 'Chào mừng, ' + full_name + '!';
                 
-                // Cập nhật bảng
-                const row = document.querySelector(`button[data-id="${currentId}"]`).closest('tr');
-                if(row) {
-                    row.querySelector('td[data-label="Họ và tên:"]').textContent = full_name;
-                    row.querySelector('td[data-label="Email:"]').textContent = email;
-                    row.querySelector('td[data-label="Số điện thoại:"]').textContent = phoneNumber;
+                // Cập nhật bảng: try to find row by data-id first, otherwise use the button that opened the modal
+                let row = null;
+                if (currentId) {
+                    const btnById = document.querySelector(`button[data-id="${currentId}"]`);
+                    if (btnById) row = btnById.closest('tr');
+                }
+                if (!row && currentBtn) {
+                    row = currentBtn.closest('tr');
+                }
+                if (row) {
+                    const tdName = row.querySelector('td[data-label="Họ và tên:"]');
+                    const tdEmail = row.querySelector('td[data-label="Email:"]');
+                    const tdPhone = row.querySelector('td[data-label="Số điện thoại:"]');
+                    if (tdName) tdName.textContent = full_name;
+                    if (tdEmail) tdEmail.textContent = email;
+                    if (tdPhone) tdPhone.textContent = phoneNumber;
                     // Cập nhật lại data attribute cho lần sau
                     const editBtn = row.querySelector('.edit-btn');
                     if(editBtn){
