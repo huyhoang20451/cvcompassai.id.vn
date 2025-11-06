@@ -320,63 +320,44 @@
             {% if job.job_description is string %}
                 {% set jd = job.job_description %}
                 {% if jd and jd.startswith('[') and jd.endswith(']') %}
+                    {# If the description is stored like ["a, b, c"] keep the commas and render as one paragraph #}
                     {% set clean = jd | replace('[', '') | replace(']', '') | replace('"', '') %}
-                    {% if ',' in clean %}
-                        <ul>
-                        {% for item in clean.split(',') %}
-                            <li>{{ item.strip() }}</li>
-                        {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p>{{ clean }}</p>
-                    {% endif %}
+                    <p>{{ clean }}</p>
                 {% else %}
-                    <p>{{ jd.replace('\n', '<br>')|safe }}</p>
+                    {# Replace newlines with spaces so text doesn't forcibly break lines; keep commas intact #}
+                    <p>{{ jd.replace('\n', ' ')|safe }}</p>
                 {% endif %}
             {% else %}
-                <p>{{ job.job_description | join('<br>') | safe }}</p>
+                {# job.job_description provided as a list -> join with commas instead of <br> to avoid line breaks #}
+                <p>{{ job.job_description | join(', ') | safe }}</p>
             {% endif %}
 
             <h3>Yêu cầu</h3>
             {% if job.requirements is string %}
                 {% set rq = job.requirements %}
                 {% if rq and rq.startswith('[') and rq.endswith(']') %}
+                    {# Keep comma-separated requirements on one line #}
                     {% set clean_reqs = rq | replace('[', '') | replace(']', '') | replace('"', '') %}
-                    {% if ',' in clean_reqs %}
-                        <ul>
-                        {% for item in clean_reqs.split(',') %}
-                            <li>{{ item.strip() }}</li>
-                        {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p>{{ clean_reqs }}</p>
-                    {% endif %}
+                    <p>{{ clean_reqs }}</p>
                 {% else %}
-                    <p>{{ rq.replace('\n', '<br>')|safe }}</p>
+                    <p>{{ rq.replace('\n', ' ')|safe }}</p>
                 {% endif %}
             {% else %}
-                <p>{{ job.requirements | join('<br>') | safe }}</p>
+                <p>{{ job.requirements | join(', ') | safe }}</p>
             {% endif %}
 
             <h3>Quyền lợi</h3>
             {% if job.benefits is string %}
                 {% set bf = job.benefits %}
                 {% if bf and bf.startswith('[') and bf.endswith(']') %}
+                    {# Render comma-separated benefits as a single paragraph #}
                     {% set clean_bf = bf | replace('[', '') | replace(']', '') | replace('"', '') %}
-                    {% if ',' in clean_bf %}
-                        <ul>
-                        {% for item in clean_bf.split(',') %}
-                            <li>{{ item.strip() }}</li>
-                        {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p>{{ clean_bf }}</p>
-                    {% endif %}
+                    <p>{{ clean_bf }}</p>
                 {% else %}
-                    <p>{{ bf.replace('\n', '<br>')|safe }}</p>
+                    <p>{{ bf.replace('\n', ' ')|safe }}</p>
                 {% endif %}
             {% else %}
-                <p>{{ job.benefits | join('<br>') | safe }}</p>
+                <p>{{ job.benefits | join(', ') | safe }}</p>
             {% endif %}
 
             <p><b>Thời gian làm việc:</b> {{ job.working_time }}</p>
