@@ -352,13 +352,13 @@
     {% endmacro %}
 
             <h3>Mô tả công việc</h3>
-            {% render_job_text(job.job_description) %}
+            {{ render_job_text(job.job_description) }}
 
             <h3>Yêu cầu</h3>
-            {% render_job_text(job.requirements) %}
+            {{ render_job_text(job.requirements) }}
 
             <h3>Quyền lợi</h3>
-            {% render_job_text(job.benefits) %}
+            {{ render_job_text(job.benefits) }}
 
             <p><b>Thời gian làm việc:</b> {{ job.working_time }}</p>
             <p><b>Cách ứng tuyển:</b> {{ job.application_method }}</p>
