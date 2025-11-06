@@ -316,49 +316,49 @@
 
         <!-- Job Detail Content -->
         <div class="job-content">
-            <h3>Mô tả công việc</h3>
-            {% if job.job_description is string %}
-                {% set jd = job.job_description %}
-                {% if jd and jd.startswith('[') and jd.endswith(']') %}
-                    {# If the description is stored like ["a, b, c"] keep the commas and render as one paragraph #}
-                    {% set clean = jd | replace('[', '') | replace(']', '') | replace('"', '') %}
-                    <p>{{ clean }}</p>
+            {% macro render_job_text(text) %}
+                {% if text %}
+                    {% if text is iterable and text is not string %}
+                        <ul>
+                            {% for item in text %}
+                                <li>{{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        {# Làm sạch chuỗi: xóa các ký tự thừa từ JSON nếu có [ ] " ' #}
+                {% set clean_text = text | replace('[', '') | replace(']', '') | replace('"', '') | replace("'", "") %}
+                
+                {# Kiểm tra xem có ký tự xuống dòng (\n) không. #}
+                {# Lưu ý: Đôi khi xuống dòng trong DB lưu là \r\n hoặc \\n #}
+                {% set lines = clean_text.replace('\\n', '\n').replace('\r\n', '\n').split('\n') %}
+                
+                {% if lines | length > 1 %}
+                    {# Nếu có nhiều hơn 1 dòng -> Hiển thị dạng danh sách UL #}
+                    <ul>
+                        {% for line in lines %}
+                            {% if line.strip() %} {# Chỉ hiển thị nếu dòng đó không phải dòng trống #}
+                                <li>{{ line.strip() }}</li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
                 {% else %}
-                    {# Replace newlines with spaces so text doesn't forcibly break lines; keep commas intact #}
-                    <p>{{ jd.replace('\n', ' ')|safe }}</p>
+                    {# Nếu chỉ có 1 dòng -> Hiển thị dạng đoạn văn P #}
+                    <p>{{ clean_text | safe }}</p>
                 {% endif %}
-            {% else %}
-                {# job.job_description provided as a list -> join with commas instead of <br> to avoid line breaks #}
-                <p>{{ job.job_description | join(', ') | safe }}</p>
             {% endif %}
+        {% else %}
+            <p><em>Đang cập nhật...</em></p>
+        {% endif %}
+    {% endmacro %}
+
+            <h3>Mô tả công việc</h3>
+            {% render_job_text(job.job_description) %}
 
             <h3>Yêu cầu</h3>
-            {% if job.requirements is string %}
-                {% set rq = job.requirements %}
-                {% if rq and rq.startswith('[') and rq.endswith(']') %}
-                    {# Keep comma-separated requirements on one line #}
-                    {% set clean_reqs = rq | replace('[', '') | replace(']', '') | replace('"', '') %}
-                    <p>{{ clean_reqs }}</p>
-                {% else %}
-                    <p>{{ rq.replace('\n', ' ')|safe }}</p>
-                {% endif %}
-            {% else %}
-                <p>{{ job.requirements | join(', ') | safe }}</p>
-            {% endif %}
+            {% render_job_text(job.requirements) %}
 
             <h3>Quyền lợi</h3>
-            {% if job.benefits is string %}
-                {% set bf = job.benefits %}
-                {% if bf and bf.startswith('[') and bf.endswith(']') %}
-                    {# Render comma-separated benefits as a single paragraph #}
-                    {% set clean_bf = bf | replace('[', '') | replace(']', '') | replace('"', '') %}
-                    <p>{{ clean_bf }}</p>
-                {% else %}
-                    <p>{{ bf.replace('\n', ' ')|safe }}</p>
-                {% endif %}
-            {% else %}
-                <p>{{ job.benefits | join(', ') | safe }}</p>
-            {% endif %}
+            {% render_job_text(job.benefits) %}
 
             <p><b>Thời gian làm việc:</b> {{ job.working_time }}</p>
             <p><b>Cách ứng tuyển:</b> {{ job.application_method }}</p>
