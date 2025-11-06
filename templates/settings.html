@@ -143,8 +143,8 @@
                         <label for="email">Email:</label>
                         <input type="text" id="email" name="email" required>
                         
-                        <label for="phone">Số điện thoại:</label>
-                        <textarea id="phone" name="phone" required></textarea>
+                        <label for="phone_number">Số điện thoại:</label>
+                        <textarea id="phone_number" name="phone_number" required></textarea>
                         
                         <div style="margin-top:1.5rem; display:flex; gap:0.75rem; justify-content: flex-end;">
                             <button type="submit">Cập nhật</button>
@@ -200,7 +200,7 @@
             function openModal(data){
                 document.getElementById('full_name').value = data.full_name || '';
                 document.getElementById('email').value = data.email || '';
-                document.getElementById('phone').value = data.phone || '';
+                document.getElementById('phone_number').value = data.phone || '';
                 modal.style.display = 'flex';
             }
 
