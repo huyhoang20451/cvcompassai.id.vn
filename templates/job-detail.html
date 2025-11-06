@@ -316,36 +316,40 @@
 
         <!-- Job Detail Content -->
         <div class="job-content">
-            {% macro render_job_text(text) %}
-                {% if text %}
-                    {% if text is iterable and text is not string %}
-                        <ul>
-                            {% for item in text %}
-                                <li>{{ item }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        {# Làm sạch chuỗi: xóa các ký tự thừa từ JSON nếu có [ ] " ' #}
-                {% set clean_text = text | replace('[', '') | replace(']', '') | replace('"', '') | replace("'", "") %}
-                
-                {# Kiểm tra xem có ký tự xuống dòng (\n) không. #}
-                {# Lưu ý: Đôi khi xuống dòng trong DB lưu là \r\n hoặc \\n #}
-                {% set lines = clean_text.replace('\\n', '\n').replace('\r\n', '\n').split('\n') %}
-                
-                {% if lines | length > 1 %}
-                    {# Nếu có nhiều hơn 1 dòng -> Hiển thị dạng danh sách UL #}
-                    <ul>
-                        {% for line in lines %}
-                            {% if line.strip() %} {# Chỉ hiển thị nếu dòng đó không phải dòng trống #}
-                                <li>{{ line.strip() }}</li>
-                            {% endif %}
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    {# Nếu chỉ có 1 dòng -> Hiển thị dạng đoạn văn P #}
-                    <p>{{ clean_text | safe }}</p>
-                {% endif %}
-            {% endif %}
+            {# --- MACRO MỚI: Xử lý thông minh cả List và String --- #}
+    {% macro render_job_text(text) %}
+        {# TRƯỜNG HỢP 1: Dữ liệu đã là một danh sách thật sự (List Python) #}
+        {% if text is iterable and text is not string %}
+            <ul style="padding-left: 20px; margin-top: 5px;">
+                {% for item in text %}
+                    {% if item and item.strip() %}
+                        <li style="margin-bottom: 5px;">{{ item | replace('"', '') | replace("'", "") }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+
+        {# TRƯỜNG HỢP 2: Dữ liệu là chuỗi (String) nhưng nhìn giống danh sách ["A", "B"] #}
+        {% elif text and text.startswith('[') and text.endswith(']') %}
+            {# Loại bỏ các ký tự thừa: [ ] " ' #}
+            {% set clean_text = text[1:-1].replace('"', '').replace("'", "") %}
+            <ul style="padding-left: 20px; margin-top: 5px;">
+                {# Tách dựa trên dấu phẩy (lưu ý: cách này có thể tách sai nếu trong câu có dấu phẩy) #}
+                {% for item in clean_text.split(',') %}
+                    {% if item and item.strip() %}
+                        <li style="margin-bottom: 5px;">{{ item.strip() }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+
+        {# TRƯỜNG HỢP 3: Dữ liệu là văn bản thuần túy, tách bằng xuống dòng #}
+        {% elif text %}
+             <ul style="padding-left: 20px; margin-top: 5px;">
+                {% for line in text.replace('\r\n', '\n').split('\n') %}
+                    {% if line.strip() %}
+                        <li style="margin-bottom: 5px;">{{ line.strip() }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
         {% else %}
             <p><em>Đang cập nhật...</em></p>
         {% endif %}
