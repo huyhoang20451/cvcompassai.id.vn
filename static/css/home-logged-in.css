@@ -69,7 +69,7 @@ html.theme-dark .jobs-carousel-wrapper .carousel-btn { background: rgba(255,255,
     text-decoration: none;
     color: #000;
     font-weight: 600;
-    font-size: 16px;
+    font-size: 13px;
 }
 
 .header-menu ul li a:hover {
@@ -507,8 +507,10 @@ html.theme-dark .jobs-carousel-wrapper .carousel-btn { background: rgba(255,255,
     margin-right: 8px; /* icon cách text */
 }
 
-/* Logo giữa */
 .footer-logo {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -635,35 +637,7 @@ html.theme-dark .jobs-carousel-wrapper .carousel-btn { background: rgba(255,255,
     gap: 16px; /* khoảng cách giữa header và filter */
 }
 
-/* Header căn giữa trong box */
-/* Box bao cả header + filter */
-.filter-header-box {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    width: 80%;
-    margin: 40px auto; /* cách đều hai phần trên dưới */
-    padding: 20px 30px;
-    
-    /* ✅ phần tạo khung box */
-    background-color: #F8FBFF;  /* màu nền nhạt */
-    border: 2px solid #C8E3F0;  /* viền nhạt */
-    border-radius: 10px;        /* bo góc */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* bóng nhẹ */
-}
 
-
-/* Header căn giữa trong box */
-.header-chance-recruit {
-    text-align: center;
-    font-family: 'Baloo', sans-serif;
-    font-weight: 400;
-    font-size: 48px; /* thu nhỏ để vừa box */
-    line-height: 60px;
-    color: #003B73;
-}
 
 /* Filter */
 .filter-selection {

@@ -146,65 +146,163 @@ html.theme-dark .jobs-carousel-wrapper .carousel-btn { background: rgba(255,255,
     max-width: 1400px;
     justify-items: center;
 }
-/* Header styles */
+/* ==================== HEADER ==================== */
+/* HEADER CSS */
+/* Header tổng */
 .header {
     display: flex;
     align-items: center;
-    justify-content: space-around;
+    justify-content: space-between;
     background-color: white;
-}
-.header img {
-    width: 190px;
-    height: 80px;
-}
-.header-menu ul {
-    display: flex;
-    font-family: Arial, Helvetica, sans-serif;
-}
-.header-menu ul li {
-    list-style: none;
-    margin: 0 10px;
-    padding: 10px 0;
-    cursor: pointer;
+    padding: 10px 50px;
+    font-family: 'Arial', sans-serif;
+    position: relative;
 }
 
-/* Effects change the header menu to blue and underline when mouse selected the menu */
-.header-menu ul li a:hover {
-    text-decoration: underline;
-    color: blue;
+/* Logo và chữ */
+.header-logo {
+    display: flex;
+    align-items: flex-start; /* logo + text sát trên */
+    gap: 10px;
+}
+
+/* Logo */
+.header-logo img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+}
+
+/* Chữ bên cạnh logo */
+.logo-text {
+    margin-top: -4px; /* đẩy chữ lên sát logo */
+}
+
+.logo-text h1 {
+    font-family: 'Anuphan', sans-serif;
+    font-weight: 700;
+    font-size: 36px;
+    margin: 0;
+    color: #000;
+}
+
+.logo-text p {
+    font-family: 'Anuphan', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    margin: 0;
+    color: #000;
+}
+
+/* Menu chính */
+.header-menu ul {
+    display: flex;
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
 .header-menu ul li a {
     text-decoration: none;
-    color: #556FB5;
-    /* underline */
+    color: #000;
+    font-weight: 600;
+    font-size: 13px;
 }
-.header-actions button {
-    background-color: #3674B5;
-    border: none;
-    color: white;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-    border-radius: 12px;
-}
-.header-actions button.btn-login {
-    background-color: #F6FCFF;
-    border-color: #3674B5;
+
+.header-menu ul li a:hover {
+    text-decoration: underline;
     color: #3674B5;
 }
-.header-actions button:hover {
-    background-color: #45a049;
+
+/* Nút đăng nhập / đăng ký và nhà tuyển dụng */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
+
+.header-actions button {
+    border: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+/* Nút đăng nhập */
+.btn-login {
+    background-color: #F6FCFF;
+    color: #3674B5;
+    border: 1px solid #3674B5;
+}
+
+.btn-login:hover {
+    background-color: #E0F0FF;
+}
+
+/* Nút đăng ký */
+.btn-register {
+    background-color: #3674B5;
+    color: white;
+}
+
+.btn-register:hover {
+    background-color: #2b5fa3;
+}
+
+/* Nhà tuyển dụng */
 .header-nhatuyendung {
-    border-radius: 5px;
-    padding: 10px 20px;
-    text-align: center;
-    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: 16px;
+    padding-left: 16px;
+    border-left: 2px solid #ccc;
+}
+
+.header-nhatuyendung p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.header-nhatuyendung a {
+    text-decoration: none;
+    color: #EEC759;
+    font-weight: 600;
+}
+
+.header-nhatuyendung a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive: giảm padding và chữ khi màn hình nhỏ */
+@media screen and (max-width: 1024px) {
+    .header {
+        padding: 10px 30px;
+    }
+    .header-logo {
+        align-items: flex-start;
+    }
+    .logo-text {
+        margin-top: -6px;
+    }
+    .logo-text h1 {
+        font-size: 28px;
+    }
+    .logo-text p {
+        font-size: 14px;
+    }
+    .header-menu ul li a {
+        font-size: 14px;
+    }
+    .header-actions button {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+    .header-nhatuyendung p {
+        font-size: 12px;
+    }
 }
 .background_intro {
     background-image: url('/static/images/img_bgr.png');
@@ -430,15 +528,7 @@ html.theme-dark .jobs-carousel-wrapper .carousel-btn { background: rgba(255,255,
 .filter_selection {
     display: flex; align-items: center; gap: 24px; justify-content: space-between;
 }
-.header-chance-recruit {
-    font-family: Arial, Helvetica, sans-serif;
-    display: flex;
-    align-items: center;
-    color: #3674B5;
-    margin-right: auto;
-    font-weight: bold;
-    font-size: 1.3rem;
-}
+
 .thanh-timkiemvavitri {
     display: flex;
     justify-content: center;
@@ -637,99 +727,101 @@ html.theme-dark .jobs-carousel-wrapper .carousel-btn { background: rgba(255,255,
     color: #555;
     margin-top: 6px;
 }
+/* ==================== FOOTER ==================== */
 .footer {
-  position: relative;
-  background: #f8fafc;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 32px 48px;
-  border-top: 2px solid #e5e7eb;
-  font-family: 'Inter', Arial, sans-serif;
-  font-size: 16px;
-  color: #222;
+    display: flex;
+    justify-content: space-between; /* Footer chia trái – phải */
+    align-items: flex-start;
+    padding: 32px 48px;
+    background: #f8fafc;
+    border-top: 2px solid #e5e7eb;
+    font-family: "Inter", Arial, sans-serif;
+    font-size: 16px;
+    color: #222;
+    position: relative;
 }
 
+/* Contact info trái */
 .footer-contact {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: left;
+    padding-left: 20px; /* căn trái một chút so với cạnh */
 }
 
+/* Số điện thoại và email mỗi cái một dòng */
 .footer-contact-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 15px;
+    display: block; /* mỗi item một dòng */
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 25px;
+    color: #000;
+}
+
+.footer-contact-item i {
+    margin-right: 8px; /* icon cách text */
 }
 
 .footer-logo {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
 }
 
 .footer-logo-img {
-  width: 60px;
-  height: 60px;
-  object-fit: contain;
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
 }
 
 .footer-logo-text {
-  font-weight: 600;
-  font-size: 18px;
-  letter-spacing: 1px;
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: 1px;
 }
 
+/* Links phải */
 .footer-links {
-  flex: 2;
-  display: flex;
-  justify-content: flex-end;
-  gap: 48px;
+    display: flex;
+    justify-content: flex-end; /* cả nhóm nằm sát phải */
+    gap: 60px; /* khoảng cách giữa các cột */
 }
 
+/* Mỗi nhóm cột */
 .footer-links-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 100px;
+    display: flex;
+    flex-direction: column; /* xếp dọc: title + link */
+    gap: 15px;
+    align-items: flex-start; /* text canh trái trong cột */
 }
 
 .footer-links-title {
-  font-weight: 600;
-  margin-bottom: 4px;
-  font-size: 15px;
+    font-family: 'Anuphan', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 31px;
+    color: #000;
 }
 
 .footer-links a {
-  color: #222;
-  text-decoration: none;
-  font-size: 15px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: color 0.2s;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 25px;
+    color: #000;
+    text-decoration: none;
 }
 
 .footer-links a:hover {
-  color: #2563eb;
+    color: #2563eb;
 }
 
-@media (max-width: 900px) {
-  .footer {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 24px 16px;
-    gap: 24px;
-  }
-  .footer-links {
-    justify-content: flex-start;
-    gap: 24px;
-  }
-}
 .introduction-part-aboutus {
     display: flex;
     justify-content: center;
@@ -1410,11 +1502,7 @@ body { background: #F6FCFF; }
   margin-left: 10px;
 }
 
-/* ========== Jobs Page ========== */
-header {
-  text-align: center;
-  margin: 20px 0;
-}
+
 
 .search-box {
   margin-top: 15px;

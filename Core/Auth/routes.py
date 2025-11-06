@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException, requests, status, Request
+from fastapi import APIRouter, Depends, HTTPException, Response, requests, status, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from .services import (authenticate_user, 
@@ -176,7 +176,7 @@ async def register(request: Request, session: Session = Depends(get_session)):
 
 # Đăng xuất
 @router.get("/logout", response_class=RedirectResponse)
-async def register_page(request: Request):
+async def register_page(response: Response):
     response = RedirectResponse(url="/", status_code=303)
     response.delete_cookie(key="access_token", httponly=True)
     return response

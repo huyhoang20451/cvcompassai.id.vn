@@ -230,80 +230,6 @@ html.theme-dark .jobs-carousel-wrapper .carousel-btn { background: rgba(255,255,
     cursor: pointer;
 }
 
-/* Nút đăng nhập */
-.btn-login {
-    background-color: #F6FCFF;
-    color: #3674B5;
-    border: 1px solid #3674B5;
-}
-
-.btn-login:hover {
-    background-color: #E0F0FF;
-}
-
-/* Nút đăng ký */
-.btn-register {
-    background-color: #3674B5;
-    color: white;
-}
-
-.btn-register:hover {
-    background-color: #2b5fa3;
-}
-
-/* Nhà tuyển dụng */
-.header-nhatuyendung {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-left: 16px;
-    padding-left: 16px;
-    border-left: 2px solid #ccc;
-}
-
-.header-nhatuyendung p {
-    margin: 0;
-    font-size: 14px;
-}
-
-.header-nhatuyendung a {
-    text-decoration: none;
-    color: #EEC759;
-    font-weight: 600;
-}
-
-.header-nhatuyendung a:hover {
-    text-decoration: underline;
-}
-
-/* Responsive: giảm padding và chữ khi màn hình nhỏ */
-@media screen and (max-width: 1024px) {
-    .header {
-        padding: 10px 30px;
-    }
-    .header-logo {
-        align-items: flex-start;
-    }
-    .logo-text {
-        margin-top: -6px;
-    }
-    .logo-text h1 {
-        font-size: 28px;
-    }
-    .logo-text p {
-        font-size: 14px;
-    }
-    .header-menu ul li a {
-        font-size: 14px;
-    }
-    .header-actions button {
-        font-size: 12px;
-        padding: 6px 12px;
-    }
-    .header-nhatuyendung p {
-        font-size: 12px;
-    }
-}
 
 
 .background_intro {
@@ -737,7 +663,7 @@ html.theme-dark .jobs-carousel-wrapper .carousel-btn { background: rgba(255,255,
     color: #555;
     margin-top: 6px;
 }
-* ==================== FOOTER ==================== */
+/* ==================== FOOTER ==================== */
 .footer {
     display: flex;
     justify-content: space-between; /* Footer chia trái – phải */
@@ -774,6 +700,7 @@ html.theme-dark .jobs-carousel-wrapper .carousel-btn { background: rgba(255,255,
     margin-right: 8px; /* icon cách text */
 }
 
+/* Logo giữa */
 .footer-logo {
     position: absolute;
     left: 50%;
@@ -831,7 +758,6 @@ html.theme-dark .jobs-carousel-wrapper .carousel-btn { background: rgba(255,255,
 .footer-links a:hover {
     color: #2563eb;
 }
-
 .introduction-part-aboutus {
     display: flex;
     justify-content: center;
