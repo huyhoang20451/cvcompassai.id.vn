@@ -662,7 +662,7 @@ html.theme-dark .jobs-carousel-wrapper .carousel-btn { background: rgba(255,255,
     color: #555;
     margin-top: 6px;
 }
-* ==================== FOOTER ==================== */
+/* ==================== FOOTER ==================== */
 .footer {
     display: flex;
     justify-content: space-between; /* Footer chia trái – phải */

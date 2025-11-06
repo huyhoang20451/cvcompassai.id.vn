@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/x-icon" href="../static/favicon.ico">
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/pricing-user-logged-in.css">
     <script src="/static/js/theme.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=upload" />
@@ -114,61 +114,82 @@
 </style>
 <body style="background-color: #F6FCFF;">
     <!--Bắt đầu phần header-->
-    <div class="header">
-        <div class="header-logo">
-            <img src="/static/images/Screenshot 2025-08-25 150046.png" alt="Logo CV Compass">
+<div class="header">
+    <div class="header-logo">
+        <img src="/static/images/Logo_Final2.png" alt="Logo CV Compass" />
+        <div class="logo-text">
+            <h1>CV Compass</h1>
+            <p>Smart Insight - Right Choice - Bright Future</p>
         </div>
-        <div class="header-menu"> <!-- Menu lựa chọn -->
-            <ul>
-                <li><a href="/home-logged-in">Trang chủ</a></li>
-                <li><a href="/aboutus-logged-in">Về chúng tôi</a></li>
-                <li><a href="/finding-jobs">Tìm việc làm</a></li>
-                <li><a href="/ocr-scan-logged-in">Quét CV bằng OCR</a></li>
-                <li><a href="/pricing-user-logged-in">Gói dịch vụ</a></li>
-            </ul>
-        </div>
-        <div class="header-actions">
-            <!--Chào mừng khi đăng nhập thành công-->
-            <p id="welcome-user">Chào mừng, {{user_info.full_name}}!</p>
-            <p style="display: flex; align-items: center; background-color: #D1E9F6; padding: 5px 10px; border-radius: 5px;"><img style="width: 20px; height: 20px;" src="/static/images/coin.png" alt="Coin"><strong>{{user_info.coin}}</strong></p>
-            
-        </div>
+    </div>
+
+    <div class="header-menu">
+        <ul>
+            <li><a method="get" href="/home-logged-in">Trang chủ</a></li>
+            <li><a method="get" href="/aboutus-logged-in">Về chúng tôi</a></li>
+            <li><a method="get" href="/finding-jobs">Tìm việc làm</a></li>
+            <li><a method="get" href="/ocr-scan-logged-in">Quét CV bằng OCR</a></li>
+            <li><a method="get" href="/pricing-user-logged-in">Gói dịch vụ</a></li>
+        </ul>
+    </div>
+
+    <div class="header-actions">
+        <!-- Nếu đã đăng nhập -->
+        {% if user_info %}
+        <p id="welcome-user">Chào mừng, {{user_info.full_name}}!</p>
+        <p style="display: flex; align-items: center; background-color: #D1E9F6; padding: 5px 10px; border-radius: 5px;">
+            <img style="width: 20px; height: 20px;" src="/static/images/coin.png" alt="Coin">
+            <strong>{{user_info.coin}}</strong>
+        </p>
 
         <div class="user-avatar">
-            <img onclick="boxAppear()" style="width: 40px; height: 40px; border-radius: 50%;" src="/static/images/user_avatar.png" alt="User Avatar">
+            <img onclick="boxAppear()" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;"
+                src="{{user_info.avatar_path or '/static/images/user_avatar.png'}}" alt="User Avatar">
         </div>
-        <script>
-            function boxAppear() {
-                const box = document.createElement('div');
-                box.style.position = 'absolute';
-                box.style.top = '60px';
-                box.style.right = '20px';
-                box.style.backgroundColor = '#fff';
-                box.style.border = '1px solid #ccc';
-                box.style.borderRadius = '5px';
-                box.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
-                box.style.padding = '10px';
-                box.innerHTML = `
-                    <p><a href="/edit-profile" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
-                    <p><a href="/mycv-settings" style="text-decoration:none;color:#222;">CV của tôi</a></p>
-                    <p><a href="/system-settings" style="text-decoration:none;color:#222;">Cài đặt tài khoản</a></p>
-                    <p><a href="/" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
-                `;
-                document.body.appendChild(box);
-                document.addEventListener('click', function handleClickOutside(event) {
-                    if (!box.contains(event.target) && event.target !== document.querySelector('.user-avatar img')) {
-                        box.remove();
-                        document.removeEventListener('click', handleClickOutside);
-                    }
-                });
-            }
-        </script>
+        {% else %}
+        <!-- Nếu chưa đăng nhập -->
+        <button onclick="location.href='/login'" class="btn btn-login">Đăng nhập</button>
+        <button onclick="location.href='/signup'" class="btn btn-register">Đăng ký</button>
+        {% endif %}
 
         <div class="header-nhatuyendung">
-           <p class="cau_hoi">Bạn là nhà tuyển dụng?</p>
-           <p><a href="/business-home" target='_blank'>Đăng tin ngay</a></p>
+            <p class="cau_hoi">Bạn là nhà tuyển dụng?</p>
+            <p><a href="/business-home" target="_blank">Đăng tin ngay</a></p>
         </div>
+    </div>
+
+    <script>
+        function boxAppear() {
+            const box = document.createElement('div');
+            box.style.position = 'absolute';
+            box.style.top = '70px';
+            box.style.right = '20px';
+            box.style.backgroundColor = '#fff';
+            box.style.border = '1px solid #ccc';
+            box.style.borderRadius = '5px';
+            box.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+            box.style.padding = '10px';
+            box.style.zIndex = '1000';
+            box.innerHTML = `
+                <p><a href="/edit-profile" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
+                <p><a href="/mycv-settings" style="text-decoration:none;color:#222;">CV của tôi</a></p>
+                <p><a href="/system-settings" style="text-decoration:none;color:#222;">Cài đặt tài khoản</a></p>
+                <p><a href="/logout" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
+            `;
+            document.body.appendChild(box);
+
+            document.addEventListener('click', function handleClickOutside(event) {
+                if (!box.contains(event.target) && event.target !== document.querySelector('.user-avatar img')) {
+                    box.remove();
+                    document.removeEventListener('click', handleClickOutside);
+                }
+            });
+        }
+    </script>
+</div>
+
     </div> <!-- kết thúc phần header -->
+    
     <div class="introduction"> <!-- Bắt đầu phần tựa đề -->
         <div class="background_intro">
             <!-- <img src="../img_bgr.png" alt="Introduction Image"> -->

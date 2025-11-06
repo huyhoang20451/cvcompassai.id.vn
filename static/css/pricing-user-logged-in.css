@@ -1,0 +1,329 @@
+/* ==================== DARK MODE ==================== */
+html.theme-dark .header { background-color: #071428 !important; }
+html.theme-dark .header-menu ul li a { color: #CFE6FF !important; }
+html.theme-dark .header-actions button.btn-login { background-color: transparent !important; color: #E6EEF8 !important; border-color: #3B82F6 !important; }
+html.theme-dark .job-card { background: #071428 !important; box-shadow: 0 8px 24px rgba(2,6,23,0.6) !important; }
+html.theme-dark .job-card-title, html.theme-dark .job-card-company, html.theme-dark .job-card-category { color: #E6EEF8 !important; }
+html.theme-dark .job-card-tags, html.theme-dark .job-card-company { color: #C9D8EE !important; }
+html.theme-dark .footer, html.theme-dark .footer a { color: #C9D8EE !important; }
+    
+/* ==================== HEADER ==================== */
+/* HEADER CSS */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: white;
+    padding: 10px 50px;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Logo và chữ */
+.header-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-logo img {
+    width: 80px; /* giảm từ 100px */
+    height: 80px; /* giảm từ 100px */
+    object-fit: contain;
+}
+
+.logo-text h1 {
+    font-family: 'Anuphan', sans-serif;
+    font-weight: 700;
+    font-size: 36px; /* giảm từ 48px */
+    margin: 0;
+    color: #000;
+}
+
+.logo-text p {
+    font-family: 'Anuphan', sans-serif;
+    font-weight: 400;
+    font-size: 16px; /* giảm từ 20px */
+    margin: 0;
+    color: #000;
+}
+
+/* Menu chính */
+.header-menu ul {
+    display: flex;
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.header-menu ul li a {
+    text-decoration: none;
+    color: #000;
+    font-weight: 600;
+    font-size: 13px; /* giảm từ 18px */
+}
+
+.header-menu ul li a:hover {
+    text-decoration: underline;
+    color: #3674B5;
+}
+
+/* Nút đăng nhập / đăng ký và nhà tuyển dụng */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px; /* giảm khoảng cách từ 20px */
+}
+
+.header-actions button {
+    border: none;
+    padding: 8px 16px; /* giảm từ 10px 20px */
+    font-size: 14px;   /* giảm từ 16px */
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+/* Nút đăng nhập */
+.btn-login {
+    background-color: #F6FCFF;
+    color: #3674B5;
+    border: 1px solid #3674B5;
+}
+
+.btn-login:hover {
+    background-color: #E0F0FF;
+}
+
+/* Nút đăng ký */
+.btn-register {
+    background-color: #3674B5;
+    color: white;
+}
+
+.btn-register:hover {
+    background-color: #2b5fa3;
+}
+
+/* Nhà tuyển dụng */
+.header-nhatuyendung {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: 16px; /* giảm từ 20px */
+    padding-left: 16px; /* giảm từ 20px */
+    border-left: 2px solid #ccc; /* gạch dọc phân cách */
+}
+
+.header-nhatuyendung p {
+    margin: 0;
+    font-size: 14px; /* giảm từ 16px */
+}
+
+.header-nhatuyendung a {
+    text-decoration: none;
+    color: #EEC759;
+    font-weight: 600;
+}
+
+.header-nhatuyendung a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive: giảm padding và chữ khi màn hình nhỏ */
+@media screen and (max-width: 1024px) {
+    .header {
+        padding: 10px 30px;
+    }
+    .logo-text h1 {
+        font-size: 28px;
+    }
+    .logo-text p {
+        font-size: 14px;
+    }
+    .header-menu ul li a {
+        font-size: 14px;
+    }
+    .header-actions button {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+    .header-nhatuyendung p {
+        font-size: 12px;
+    }
+}
+
+.background_intro { background-image: url("/static/images/img_bgr.png");
+    background-size: cover;
+    height: 300px; }
+
+.content-introduction { padding: 20px;
+    text-align: center;
+    
+    position: relative;
+    top: -200px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    border-radius: 5px; }
+
+/* ==================== FOOTER ==================== */
+.footer {
+    display: flex;
+    justify-content: space-between; /* Footer chia trái – phải */
+    align-items: flex-start;
+    padding: 32px 48px;
+    background: #f8fafc;
+    border-top: 2px solid #e5e7eb;
+    font-family: "Inter", Arial, sans-serif;
+    font-size: 16px;
+    color: #222;
+    position: relative;
+}
+
+/* Contact info trái */
+.footer-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: left;
+    padding-left: 20px; /* căn trái một chút so với cạnh */
+}
+
+/* Số điện thoại và email mỗi cái một dòng */
+.footer-contact-item {
+    display: block; /* mỗi item một dòng */
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 25px;
+    color: #000;
+}
+
+.footer-contact-item i {
+    margin-right: 8px; /* icon cách text */
+}
+
+/* Logo giữa */
+.footer-logo {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.footer-logo-img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+}
+
+.footer-logo-text {
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: 1px;
+}
+
+/* Links phải */
+.footer-links {
+    display: flex;
+    justify-content: flex-end; /* cả nhóm nằm sát phải */
+    gap: 60px; /* khoảng cách giữa các cột */
+}
+
+/* Mỗi nhóm cột */
+.footer-links-group {
+    display: flex;
+    flex-direction: column; /* xếp dọc: title + link */
+    gap: 15px;
+    align-items: flex-start; /* text canh trái trong cột */
+}
+
+.footer-links-title {
+    font-family: 'Anuphan', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 31px;
+    color: #000;
+}
+
+.footer-links a {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 25px;
+    color: #000;
+    text-decoration: none;
+}
+
+.footer-links a:hover {
+    color: #2563eb;
+}
+
+.card-pricing { position: relative;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(33,150,243,0.12);
+    width: 340px;
+    min-height: 420px;
+    text-align: center;
+    z-index: 2;
+    transition: box-shadow 0.2s, transform 0.2s;
+    border: none;
+    margin: 0;
+    padding-bottom: 32px;
+    font-family:Arial, Helvetica, sans-serif; }
+
+.card-pricing-container { display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 48px;
+    margin: 48px 0;
+    position: relative;
+    transform: translateY(-200px); }
+
+.card-header { padding: 28px 0 16px 0;
+    font-size: 1.35rem;
+    font-weight: bold;
+    border-bottom: 2px solid #eee;
+    color: #222;
+    background: none; }
+
+.card-header h2 { margin: 0;
+    font-size: 1.8rem;
+    font-weight: bold; }
+
+.card-body ul { padding: 18px 32px;
+    font-size: 1.08rem;
+    text-align: left;
+    margin: 0;
+    border: none;
+    color: #444; }
+
+.card-pricing .price { font-size: 1.35rem;
+    font-weight: bold;
+    color: #3674B5;
+    margin: 18px 0 8px 0; }
+
+.card-pricing.xu .price { color: #FFD966; }
+
+.card-pricing .buy-btn { display: inline-block;
+    margin-top: 24px;
+    padding: 12px 32px;
+    border-radius: 8px;
+    font-size: 1.08rem;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(33,150,243,0.08);
+    transition: background 0.2s, color 0.2s; }
+
+.card-pricing.premium .buy-btn { background: #4BA3F7;
+    color: #fff; }
+
+.card-pricing.xu .buy-btn { background: #FFD966;
+    color: #222; }
+
+.card-pricing .buy-btn:hover { opacity: 0.85;
+    transform: scale(1.04); }
+
