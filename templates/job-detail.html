@@ -307,7 +307,7 @@
         </div>
             <div class="job-company">
                 <img src="{{ job.company_logo_url or '/static/images/business_avatar.png' }}" alt="{% if job.company_name and job.company_name != 'None' %}{{job.company_name}}{% else %}Công ty{% endif %} Logo">
-                <h2>{{ job.workplace }}</h2>
+                <h2>Loại ngành: {{ job.job_category }}</h2>
                 <p><b>Ngành:</b> {{ job.position }}</p>
                 <p><b>Quy mô:</b> {{ job.scale if job.scale else "Đang cập nhật" }}</p>
                 <p><b>Địa chỉ:</b> {{ job.location }}</p>
