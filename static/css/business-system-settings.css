@@ -1,83 +1,346 @@
-/* business-system-settings.css
-   Moved from inline <style> in business-system-settings.html
-   Provides layout and components styling for system settings page.
-*/
-:root{
-  --bg: #f6fbff;
-  --panel: #ffffff;
-  --muted: #6b7280;
-  --accent: #004aad;
-  --card-shadow: 0 6px 18px rgba(16,24,40,0.06);
-  --radius: 10px;
+/* --- CÀI ĐẶT CHUNG & BIẾN MÀU --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap');
+
+:root {
+    /* Fonts */
+    --font-default: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-noto-sans: 'Noto Sans', sans-serif;
+    --font-roboto: 'Roboto', sans-serif;
+    --font-arial: Arial, sans-serif;
+
+    /* == Light Mode (Default) == */
+    --primary-color: #0A6EBD;
+    --primary-light: #F6FCFF;
+    --bg-light: #FFFFFF;
+    --border-color: #E0E7FF;
+    --text-dark: #222222;
+    --text-secondary: #555555;
+    --footer-bg: #1A202C;
+    --footer-text: #A0AEC0;
+    --footer-text-light: #E2E8F0;
+    
+    /* == Dùng cho JS chuyển đổi == */
+    /* Nền chính */
+    --bg-main: var(--primary-light);
+    /* Nền phụ (card, header) */
+    --bg-secondary: var(--bg-light);
+    /* Chữ chính */
+    --text-main: var(--text-dark);
+    /* Chữ phụ */
+    --text-sub: var(--text-secondary);
+    /* Viền */
+    --border-main: var(--border-color);
 }
-body{ background: var(--bg); font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; color:#0f172a; }
-.container{ max-width: var(--container-max); margin: 0 auto; padding: 24px; }
 
-/* Header */
-.header{ display:flex; align-items:center; justify-content:space-between; gap:16px; padding:18px 24px; background: linear-gradient(90deg, #fff 0%, #f8fbff 100%); box-shadow: var(--shadow); border-radius: 10px; margin:18px 24px; }
-.logo-container{ display:flex; gap:12px; align-items:center; }
-.logo-image img{ width:56px; height:56px; object-fit:cover; border-radius:8px; }
-.logo-text{ font-weight:700; font-size:20px; color:var(--accent); }
-.logo-slogan{ font-size:12px; color:var(--muted); }
-.header-menu ul{ display:flex; gap:10px; list-style:none; margin:0; padding:0; }
-.header-menu a{ text-decoration:none; color:var(--muted); padding:8px 12px; border-radius:8px; transition:all .18s ease; font-weight:600; }
-.header-menu a:hover{ background:#eef6ff; color:var(--accent); }
-.header-actions{ font-size:14px; color:var(--accent); font-weight:600; }
-.user-avatar img{ width:44px; height:44px; border-radius:50%; cursor:pointer; box-shadow:0 4px 12px rgba(2,6,23,0.08); }
+/* === DARK MODE === */
+html[data-theme='dark'] {
+    --bg-main: #1A202C;
+    --bg-secondary: #2D3748;
+    --text-main: #E2E8F0;
+    --text-sub: #A0AEC0;
+    --border-main: #4A5568;
+}
 
-/* Reset and base */
-*{ box-sizing: border-box; }
-body{ background: var(--bg); font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; color:#0b1320; margin:0; }
+/* === FONT SWITCHING === */
+:root {
+    --app-font: var(--font-default); /* Default */
+}
+html[data-font='Noto Sans'] { --app-font: var(--font-noto-sans); }
+html[data-font='Roboto'] { --app-font: var(--font-roboto); }
+html[data-font='Arial'] { --app-font: var(--font-arial); }
 
-/* Layout */
-.page-wrapper{ max-width:1200px; margin:20px auto; padding:0 16px; }
-.container{ display:flex; gap:24px; align-items:flex-start; min-height:70vh; }
 
-/* Sidebar */
-.sidebar{ width:240px; background:#eaf1fb; padding:20px; border-radius:var(--radius); box-shadow:var(--card-shadow); }
-.sidebar .back-btn{ background:none; border:none; font-size:14px; color:#333; cursor:pointer; margin-bottom:12px; }
-.sidebar h2{ margin-bottom:12px; font-size:18px; font-weight:700; color:var(--accent); }
-.sidebar .menu{ list-style:none; padding:0; margin:0; }
-.sidebar .menu li{ padding:10px 8px; border-radius:8px; margin-bottom:6px; font-weight:600; color:#123; }
-.sidebar .menu li a{ color:inherit; text-decoration:none; display:block; }
-.sidebar .menu li.active, .sidebar .menu li:hover{ background:#fff; }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-/* Main */
-.main{ flex:1; padding:26px; background:var(--panel); border-radius:var(--radius); box-shadow:var(--card-shadow); }
-.main h1{ margin-top:0; color:var(--accent); }
-.main h3{ color:var(--accent); margin-bottom:18px; }
+body {
+    font-family: var(--app-font);
+    color: var(--text-main);
+    background-color: var(--bg-main);
+    line-height: 1.6;
+    transition: background-color 0.3s, color 0.3s;
+}
 
-/* Profile / form */
-.profile{ display:flex; justify-content:center; margin-bottom:18px; }
-.avatar img{ width:100px; height:100px; border-radius:50%; object-fit:cover; }
-.upload-btn{ background:#e6e6e6; border:1px solid #d1d5db; padding:8px 12px; border-radius:8px; cursor:pointer; }
-.note{ color:#b91c1c; font-size:14px; margin-bottom:10px; }
-.form{ background:var(--panel); padding:18px; border-radius:8px; width:100%; max-width:480px; margin:0 auto; box-shadow:0 2px 8px rgba(2,6,23,0.04); }
-.form label{ display:block; margin-bottom:6px; font-weight:600; }
-.form input, .form select, .form textarea{ width:100%; padding:10px; margin-bottom:12px; border-radius:8px; border:1px solid #e6eef6; }
-.save-btn{ background:var(--accent); color:#fff; border:none; padding:12px 18px; border-radius:8px; cursor:pointer; font-weight:700; display:block; margin:12px auto 0; }
+/* --- HEADER --- */
+/* Style nhất quán với các trang trước */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2.5rem;
+    background-color: var(--bg-secondary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    border-bottom: 1px solid var(--border-main);
+}
+.logo-container { display: flex; align-items: center; gap: 0.75rem; }
+.logo-image img { height: 40px; width: auto; }
+.logo-text { font-size: 1.5rem; font-weight: 700; color: var(--primary-color); }
+.logo-slogan { font-size: 0.8rem; color: var(--text-sub); border-left: 1px solid var(--border-main); padding-left: 0.75rem; margin-left: 0.5rem; }
+.header-menu { flex-grow: 1; display: flex; justify-content: center; }
+.header-menu ul { display: flex; gap: 0.5rem; list-style: none; }
+.header-menu li a { padding: 0.75rem 1rem; font-weight: 500; color: var(--text-main); border-radius: 8px; transition: all 0.3s ease; text-decoration: none; }
+.header-menu li a:hover { background-color: var(--bg-main); color: var(--primary-color); }
+.header-actions { margin-right: 1rem; }
+.header-actions #welcome-user { margin: 0; font-size: 0.9rem; color: var(--text-sub); }
+.user-avatar img { cursor: pointer; }
+body > div[style*="position: absolute"] { z-index: 1001 !important; } /* Fix z-index cho popup user */
 
-/* Table & CV item */
-.table-responsive{ width:100%; overflow:auto; }
-table{ width:100%; border-collapse:collapse; }
-table th, table td{ padding:10px 12px; text-align:left; border-bottom:1px solid #eef2f7; }
-.edit-btn{ border:none; background:transparent; padding:6px 10px; cursor:pointer; color:var(--accent); }
 
-/* Modal */
-.modal{ position:fixed; z-index:1100; left:0; top:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:rgba(2,6,23,0.45); }
-.modal-content{ background:#fff; padding:18px; border-radius:10px; width:480px; max-width:94%; box-shadow:0 12px 40px rgba(2,6,23,0.12); }
-.modal .close{ float:right; font-size:20px; cursor:pointer; }
-.modal-content h2{ margin-top:0; }
+/* --- INTRODUCTION (Banner) --- */
+.introduction {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-main);
+    padding: 2.5rem 2rem;
+    text-align: center;
+}
+.content-introduction h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0;
+}
 
-/* Settings sections */
-.setting-section{ margin-bottom:18px; }
-.preview-box{ margin-top:8px; padding:12px; border-radius:8px; background:#fbfdff; border:1px solid #eef6ff; color:var(--muted); }
+/* --- LAYOUT CHÍNH (Sidebar + Main) --- */
+.container {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
 
-.actions{ display:flex; gap:12px; margin-top:18px; }
-.reset-btn{ background:#f3f4f6; border:1px solid #e6eef6; padding:10px 14px; border-radius:8px; cursor:pointer; }
+/* --- SIDEBAR --- */
+.sidebar {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-main);
+    border-radius: 12px;
+    padding: 1.5rem;
+    height: fit-content;
+    position: sticky;
+    top: 100px;
+}
 
-/* Responsive */
-@media (max-width:900px){
-  .container{ flex-direction:column; }
-  .sidebar{ width:100%; }
+.back-btn {
+    background: none;
+    border: none;
+    color: var(--text-sub);
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-main);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+.back-btn:hover {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.sidebar h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.menu li {
+    margin-bottom: 0.25rem;
+}
+.menu li a, .menu li {
+    display: block;
+    padding: 0.8rem 1rem;
+    text-decoration: none;
+    color: var(--text-sub);
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+.menu li a:hover {
+    background-color: var(--bg-main);
+    color: var(--primary-color);
+}
+.menu li.active {
+    background-color: var(--primary-color);
+}
+.menu li.active a {
+    color: var(--bg-light); /* Luôn là chữ trắng/sáng trên nền xanh */
+    font-weight: 600;
+}
+
+/* --- MAIN CONTENT --- */
+.main {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-main);
+    border-radius: 12px;
+    padding: 1.5rem 2.5rem;
+}
+
+.main h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-top: 0;
+}
+.main h3 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-sub);
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border-main);
+    padding-bottom: 1rem;
+}
+
+/* Từng khu vực cài đặt */
+.setting-section {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px dashed var(--border-main);
+}
+.setting-section:last-of-type {
+    border-bottom: none;
+}
+
+.setting-section h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 1rem;
+}
+
+/* Tùy chỉnh Radio Buttons */
+.setting-section label {
+    display: block;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--text-sub);
+    display: inline-flex;
+    align-items: center;
+    margin-right: 1rem;
+}
+.setting-section input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-main);
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    transition: all 0.2s;
+    position: relative;
+    top: -1px;
+}
+.setting-section input[type="radio"]:checked {
+    border-color: var(--primary-color);
+    background-color: var(--primary-color);
+}
+.setting-section input[type="radio"]:checked::after {
+    content: '';
+    display: block;
+    width: 8px;
+    height: 8px;
+    background: var(--bg-light);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Tùy chỉnh Select Dropdown */
+.setting-section select {
+    font-family: var(--app-font);
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-main);
+    border-radius: 8px;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    width: 100%;
+    max-width: 300px;
+}
+
+.preview-box {
+    background-color: var(--bg-main);
+    border: 1px dashed var(--border-main);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+    color: var(--text-sub);
+    font-size: 1.1rem;
+    line-height: 1.7;
+    transition: font-family 0.3s;
+}
+
+/* Nút Actions */
+.actions {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1rem;
+}
+.actions button {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+}
+.save-btn {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+.save-btn:hover {
+    background-color: #004a8c;
+}
+.reset-btn {
+    background-color: transparent;
+    color: var(--text-sub);
+    border: 1px solid var(--border-main);
+}
+.reset-btn:hover {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 992px) {
+    .container {
+        grid-template-columns: 1fr; /* Xếp chồng */
+    }
+    .sidebar {
+        position: static;
+    }
+}
+@media (max-width: 767px) {
+    .header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    .logo-slogan { display: none; }
+    .header-menu { width: 100%; overflow-x: auto; }
+    .header-menu ul { justify-content: center; }
+    .header-actions { order: -1; text-align: center; margin-right: 0; }
+    .user-avatar { position: absolute; top: 1rem; right: 1rem; }
+    .container { padding: 0 1rem; margin-top: 1rem; }
+    .main { padding: 1rem 1.5rem; }
+    .actions { flex-direction: column; }
+    .actions button { width: 100%; }
 }

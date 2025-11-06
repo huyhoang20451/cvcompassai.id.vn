@@ -1,229 +1,372 @@
-/* --- Global & Typography (Sử dụng Font 'Inter' hoặc 'Roboto' thay thế cho font mặc định) --- */
+/* --- BIẾN MÀU & CÀI ĐẶT CHUNG --- */
+:root {
+    --primary-color: #0A6EBD;
+    --primary-light: #F6FCFF;
+    --text-dark: #222222;
+    --text-secondary: #555555;
+    --bg-light: #FFFFFF;
+    --border-color: #E0E7FF;
+    --footer-bg: #1A202C;
+    --footer-text: #A0AEC0;
+    --footer-text-light: #E2E8F0;
+    --warning-color: #FFC107;
+    --yellow-light-bg: #FFFBEB; /* Nền cho thẻ stat màu vàng */
+    --blue-light-bg: #F0F7FF;   /* Nền cho thẻ stat màu xanh */
+}
+
 body {
-    font-family: 'Roboto', 'Inter', sans-serif; /* Thêm Inter/Roboto từ CDN nếu cần */
-    background-color: #F8F9FA !important; /* Nền trắng ngà/xám nhạt */
+    background-color: var(--primary-light) !important;
+    font-family: 'Roboto', 'Inter', sans-serif;
+    color: var(--text-dark) !important;
 }
 
-a {
-    text-decoration: none;
-    transition: color 0.3s ease;
+/* --- HEADER (ĐÃ ĐĂNG NHẬP) --- */
+/* Tinh chỉnh header Bootstrap */
+header.shadow-sm {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+    position: sticky;
+    top: 0;
+    z-index: 1020; /* Dưới dropdown (1000) nhưng trên nội dung */
 }
 
-/* --- Header / Nav Cải Tiến --- */
-header {
-    border-bottom: 1px solid #E9ECEF; /* Đường kẻ phân cách nhẹ nhàng */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important; /* Shadow tinh tế hơn */
-}
-
+/* Dùng lại style logo từ file cũ */
 .logo-text {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     font-weight: 700;
-    color: #004D9D; /* Màu xanh đậm thương hiệu */
+    color: var(--primary-color);
+    line-height: 1;
 }
-
 .logo-slogan {
-    font-size: 0.75rem;
-    color: #6C757D; /* Màu xám tinh tế */
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1;
 }
 
-.nav-link {
+header .nav-link {
     font-weight: 500;
-    color: #495057 !important;
-    padding: 0.5rem 1rem;
+    transition: color 0.3s ease;
+    padding: 0.75rem 1rem;
+}
+header .nav-link:hover,
+header .nav-link.active {
+    color: var(--primary-color) !important;
 }
 
-.nav-link:hover {
-    color: #007BFF !important; /* Hover màu xanh dương */
+.user-avatar img {
+    transition: all 0.3s ease;
+}
+.user-avatar:hover img {
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* --- Introduction / Hero Cải Tiến --- */
+/* --- INTRODUCTION (HERO BANNER) --- */
+/* * GHI ĐÈ QUAN TRỌNG: 
+ * File home-business.css có .introduction dùng grid/gradient sáng.
+ * Ta cần reset hoàn toàn và đổi sang style banner tối.
+*/
 .introduction {
     position: relative;
-    padding: 60px 0; /* Tăng padding */
-    background-image: url('/static/images/—Pngtree—cartoon style work space_411946.jpg');
-    /* background: linear-gradient(135deg, #007BFF 0%, #004D9D 100%); Gradient xanh dương */
+    height: 350px;
+    padding: 2rem 0 !important; /* Ghi đè padding cũ */
+    background: none !important; /* Ghi đè gradient cũ */
+    display: flex !important; /* Ghi đè grid cũ */
+    align-items: center;
+    justify-content: center;
     overflow: hidden;
-    border-radius: 0 0 15px 15px; /* Bo góc dưới */
-    margin-bottom: 30px;
+    border-radius: 0 0 20px 20px;
+    margin-bottom: 2.5rem; /* Thêm khoảng cách với main */
 }
 
-.background_intro {
-    display: none; /* Ẩn background cũ nếu có */
+/* Lớp nền ảnh (thay ảnh này bằng ảnh của bạn) */
+.introduction .background_intro {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Bạn nên thay ảnh placeholder này */
+    background: url('https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=2070') center center/cover no-repeat;
+    filter: brightness(0.5); /* Làm tối ảnh để chữ trắng nổi bật */
+    z-index: 1;
 }
 
-.content-introduction {
+/* Lớp nội dung (đè lên trên) */
+.introduction .content-introduction {
     position: relative;
     z-index: 2;
     max-width: 800px;
+    /* Class .text-white đã có trong HTML */
 }
 
-.content-introduction h1 {
-    transform: translateY(200px);
-    font-size: 2rem;
+.introduction .title_content h1 {
+    font-size: 2.5rem;
     font-weight: 700;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
-    /*Căn ra chính giữa*/
-    margin: 0 auto;
+    color: #FFFFFF; /* Bắt buộc dùng chữ trắng ở đây để tương phản */
 }
 
 .btn-upload-cv {
-    background-color: #FFC107; /* Màu vàng nổi bật */
-    color: #212529; /* Chữ đen/xám đậm */
-    font-weight: 600;
-    padding: 10px 25px;
-    border-radius: 50px;
+    background-color: var(--warning-color);
+    color: var(--text-dark);
     border: none;
+    padding: 0.75rem 1.75rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 50px; /* Bo tròn */
     transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(255, 193, 7, 0.4);
-    transform: translateY(200px);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
 }
 
 .btn-upload-cv:hover {
-    background-color: #e0a800;
-    color: #212529;
-    box-shadow: 0 6px 8px rgba(255, 193, 7, 0.6);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
+}
+.btn-upload-cv .material-symbols-outlined {
+    font-size: 1.4rem;
 }
 
-/* --- Featured Jobs & Cards --- */
+/* --- MAIN CONTENT & JOB CARDS --- */
+main.container {
+    max-width: 1200px;
+}
+
 .header-tin-tuyen-dung h2 {
-    font-size: 1.8rem;
     font-weight: 700;
-    color: #343A40;
+    color: var(--text-dark);
 }
 
-.header-tin-tuyen-dung > div {
-    background: #FFC107 !important; /* Thay màu xanh dương bằng màu vàng thương hiệu */
-}
-
-.filter-bar .form-control {
-    max-width: 250px; /* Giới hạn chiều rộng cho input */
-    border-radius: 8px;
-}
-
-.job-card {
-    border: 1px solid #E9ECEF;
+.filter-bar {
+    background: var(--bg-light);
+    padding: 1rem 1.5rem;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Shadow nhẹ nhàng */
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.filter-bar .btn-warning {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+/* Thẻ tin tuyển dụng */
+.job-card {
+    border: 1px solid var(--border-color) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s ease;
 }
 
 .job-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
 .job-card h6 {
     font-weight: 600;
-    color: #007BFF; /* Màu tiêu đề xanh dương */
+    color: var(--text-dark);
+}
+/* Đánh dấu job đang active */
+.job-card h6.active {
+    color: var(--primary-color);
+    font-weight: 700;
 }
 
-.job-info {
-    margin-top: 3px;
-    color: #6C757D;
-    font-size: 0.85rem;
+.job-card .job-info {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.25rem;
+    color: var(--text-secondary);
 }
 
 .job-link {
+    font-size: 0.9rem;
     font-weight: 600;
-    color: #FFC107;
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: all 0.3s ease;
 }
 
 .job-link:hover {
-    color: #e0a800;
+    text-decoration: underline;
+    color: #004a8c;
 }
 
-/* --- Recruitment Stats & Management --- */
+/* --- PAGINATION (Phân trang) --- */
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    z-index: 3;
+}
+.pagination .page-link {
+    color: var(--primary-color);
+}
+.pagination .page-link:hover {
+    color: #004a8c;
+}
+
+/* --- STATS & MANAGEMENT --- */
 .recruitment-title {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     font-weight: 600;
-    color: #343A40;
+    color: var(--text-dark);
 }
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.25rem;
 }
 
 .stat-box {
-    padding: 20px;
+    padding: 1.5rem 1rem;
     border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 500;
-    color: #495057;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease;
+    font-weight: 600;
+    color: var(--text-dark);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
 }
 
 .stat-box:hover {
-    transform: translateY(-3px);
+    transform: translateY(-4px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.06);
 }
 
 .stat-box .icon {
-    font-size: 2rem;
-    margin-bottom: 8px;
-    font-weight: 400;
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+    line-height: 1;
 }
 
 .stat-box.yellow {
-    background-color: #FFF3CD; /* Màu nền vàng nhạt */
-    border: 1px solid #FFC107;
+    background-color: var(--yellow-light-bg);
+    border-color: #FEEFC3;
 }
 
 .stat-box.blue {
-    background-color: #D1E7FD; /* Màu nền xanh dương nhạt */
-    border: 1px solid #007BFF;
+    background-color: var(--blue-light-bg);
+    border-color: #D6E9FF;
 }
 
-/* --- Carousel và Chart --- */
-#carouselExampleDark {
-    border-radius: 12px;
-    background-color: #FFFFFF;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    padding: 20px;
-}
-.carousel-indicators button {
-    background-color: #007BFF !important; /* Màu chỉ báo xanh dương */
+/* --- CHART CAROUSEL --- */
+.carousel .carousel-control-prev-icon,
+.carousel .carousel-control-next-icon {
+    background-color: rgba(0, 0, 0, 0.5); /* Nền mờ */
+    border-radius: 8px;
+    padding: 1.5rem 0.8rem;
+    background-size: 60%;
 }
 
-/* --- Footer --- */
+.carousel .carousel-indicators [data-bs-target] {
+    background-color: var(--primary-color);
+    height: 4px;
+    width: 30px;
+}
+
+/* --- FOOTER --- */
+/* * GHI ĐÈ QUAN TRỌNG: 
+ * File home-business.css có .footer dùng display: grid.
+ * HTML này dùng d-flex. Ta phải reset lại.
+*/
 .footer {
-    background-color: #343A40; /* Màu nền footer tối hơn */
-    color: #E9ECEF;
-    padding-top: 30px;
-    padding-bottom: 30px;
-    border-top: 5px solid #FFC107; /* Đường kẻ vàng nổi bật */
+    display: block !important; /* Tắt grid layout từ file cũ */
+    background-color: var(--footer-bg);
+    color: var(--footer-text);
+    padding: 3rem 0;
+    margin-top: 5rem !important;
+    border-top-right-radius: 0 !important; /* Reset */
+    border-top-left-radius: 0 !important;  /* Reset */
 }
 
-.footer-contact-item, .footer-links a {
-    color: #CED4DA;
-    display: block;
-    margin-bottom: 8px;
-}
-
-.footer-links-title {
-    font-weight: 700;
-    color: #FFFFFF;
-    margin-bottom: 15px;
-    font-size: 1.1rem;
+/* Tinh chỉnh các
+phần tử footer (Bootstrap đã lo layout) */
+.footer-logo-img {
+    height: 50px;
+    width: auto;
 }
 
 .footer-logo-text {
     font-weight: 700;
-    font-size: 1.2rem;
-    color: #FFC107;
+    color: var(--footer-text-light);
 }
 
-.footer-logo-img {
-    height: 40px; /* Điều chỉnh kích thước logo */
+.footer-links-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--footer-text-light);
+    margin-bottom: 1rem;
 }
 
-/* --- Pagination --- */
-.pagination .page-item a {
-    color: #007BFF;
+.footer-links a,
+.footer-contact-item {
+    color: var(--footer-text);
+    text-decoration: none;
+    margin-bottom: 0.6rem;
+    transition: color 0.3s ease;
 }
 
-.pagination .page-item.active .page-link {
-    background-color: #007BFF;
-    border-color: #007BFF;
+.footer-links a {
+    display: block; /* Sửa lại cho đúng */
+}
+
+.footer-links-group a {
+    display: flex; /* Dành riêng cho nhóm "Follow us" */
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.footer-links a:hover {
+    color: var(--primary-color);
+}
+
+
+/* --- RESPONSIVE --- */
+@media (max-width: 767px) {
+    .introduction {
+        height: 300px; /* Thu nhỏ banner */
+    }
+    .introduction .title_content h1 {
+        font-size: 1.8rem;
+    }
+    .filter-bar {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .recruitment-title {
+        font-size: 1.25rem;
+    }
+    .stats-grid {
+        grid-template-columns: 1fr 1fr; /* 2 cột trên di động */
+        gap: 1rem;
+    }
+    .stat-box {
+        padding: 1rem;
+        font-size: 0.85rem;
+    }
+    .stat-box .icon {
+        font-size: 1.8rem;
+    }
+    
+    /* Footer trên di động */
+    .footer .container {
+        text-align: center;
+        justify-content: center;
+    }
+    .footer-contact, .footer-logo, .footer-links {
+        width: 100%;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        text-align: center !important;
+    }
+    .footer-links {
+        display: flex;
+        justify-content: space-around;
+        text-align: left;
+    }
+    .footer-links-group a {
+        justify-content: center;
+    }
 }
