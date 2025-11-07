@@ -115,7 +115,6 @@
     </div>
     <!-- Job Details -->
     <div class="job-detail">
-      <h4>Mô tả công việc</h4>
       <div class="buttons">
         <!--Tạo format chỉnh sửa-->
         <form style="display:inline;">
@@ -197,19 +196,60 @@
 
         document.getElementById('update-modal-overlay').addEventListener('click', closeUpdateFormModal);
       </script>
-      <p>{{ job.job_description }}</p>
+      {% macro render_job_description_text_business(text) %}
+        {# TRƯỜNG HỢP 1: Dữ liệu đã là List Python thật (tốt nhất) #}
+        {% if text is iterable and text is not string %}
+            <ul style="padding-left: 20px; margin-top: 5px;">
+                {% for item in text %}
+                    <li style="margin-bottom: 5px;">{{ item }}</li>
+                {% endfor %}
+            </ul>
+
+        {# TRƯỜNG HỢP 2: Chuỗi JSON ["A", "B, C"] -> Tách bằng cụm [", "] thay vì chỉ [,] #}
+        {% elif text and text.strip().startswith('[') and text.strip().endswith(']') %}
+            <ul style="padding-left: 20px; margin-top: 5px;">
+                {# 1. Bỏ dấu [ và ] ở đầu cuối #}
+                {% set inner = text.strip()[1:-1] %}
+                {# 2. Mẹo quan trọng: Thay thế cụm phân cách `", "` bằng một ký tự đặc biệt hiếm gặp (ví dụ |||) #}
+                {# Chúng ta replace cả 2 trường hợp: có dấu cách và không có dấu cách sau dấu phẩy #}
+                {% set items = inner.replace('", "', '|||').replace('","', '|||').split('|||') %}
+                
+                {% for item in items %}
+                    {# 3. Làm sạch: Cắt bỏ các dấu ngoặc kép " hoặc ' còn sót lại ở đầu/cuối mỗi ý #}
+                    {% set clean_item = item.strip().strip('"').strip("'") %}
+                    {% if clean_item %}
+                        <li style="margin-bottom: 5px;">{{ clean_item }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+
+        {# TRƯỜNG HỢP 3: Văn bản thường, tách bằng xuống dòng (fallback) #}
+        {% elif text %}
+             <ul style="padding-left: 20px; margin-top: 5px;">
+                {% for line in text.replace('\r\n', '\n').split('\n') %}
+                    {% if line.strip() %}
+                        <li style="margin-bottom: 5px;">{{ line.strip() }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p><em>Đang cập nhật...</em></p>
+        {% endif %}
+    {% endmacro %}
+      <h4>Mô tả công việc</h4>
+      <p>{{ render_job_description_text_business(job.job_description) }}</p>
 
       <h4>Yêu cầu công việc</h4>
-      <p>{{ job.requirements }}</p>
+      <p>{{ render_job_description_text_business(job.requirements) }}</p>
 
       <h4>Quyền lợi</h4>
-      <p>{{ job.benefits }}</p>
+      <p>{{ render_job_description_text_business(job.benefits) }}</p>
 
       <h4>Thời gian làm việc</h4>
-      <p>{{ job.working_time }}</p>
+      <p>{{ render_job_description_text_business(job.working_time) }}</p>
 
       <h4>Hình thức ứng tuyển</h4>
-      <p>{{ job.application_method }}</p>
+      <p>{{ render_job_description_text_business(job.application_method) }}</p>
 
   {% else %}
     <div class="job-card-empty">
