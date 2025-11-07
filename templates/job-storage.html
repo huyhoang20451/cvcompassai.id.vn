@@ -22,7 +22,7 @@
             <ul>
                 <li><a href="/business-dashboard">Trang chủ</a></li>
                 <li><a href="/job-storage">Quản lý JD</a></li>
-                <li><a href="/pricing-business-logged-in">Nâng cấp Premium</a></li>
+                <li><a href="/pricing-business-logged-in">Dịch vụ</a></li>
             </ul>
         </div>
         <div class="header-actions">
@@ -100,7 +100,6 @@
       <div class="score">
         <p>Số lượng CV</p>
         <h1>{{ job.cv_count }}</h1>
-        <button>Đề Cử Top 20 CV</button>
       </div>
       <div class="company">
         <p><strong>{{ job.workplace }}</strong></p>
@@ -198,7 +197,7 @@
 
         document.getElementById('update-modal-overlay').addEventListener('click', closeUpdateFormModal);
       </script>
-      <p>{{ job.description }}</p>
+      <p>{{ job.job_description }}</p>
 
       <h4>Yêu cầu công việc</h4>
       <p>{{ job.requirements }}</p>
