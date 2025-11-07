@@ -237,19 +237,19 @@
         {% endif %}
     {% endmacro %}
       <h4>Mô tả công việc</h4>
-      <p>{{ render_job_description_text_business(job.job_description) }}</p>
+      {{ render_job_description_text_business(job.job_description) }}
 
       <h4>Yêu cầu công việc</h4>
-      <p>{{ render_job_description_text_business(job.requirements) }}</p>
+      {{ render_job_description_text_business(job.requirements) }}
 
       <h4>Quyền lợi</h4>
-      <p>{{ render_job_description_text_business(job.benefits) }}</p>
+      {{ render_job_description_text_business(job.benefits) }}
 
       <h4>Thời gian làm việc</h4>
-      <p>{{ render_job_description_text_business(job.working_time) }}</p>
+      {{ render_job_description_text_business(job.working_time) }}
 
       <h4>Hình thức ứng tuyển</h4>
-      <p>{{ render_job_description_text_business(job.application_method) }}</p>
+      {{ render_job_description_text_business(job.application_method) }}
 
   {% else %}
     <div class="job-card-empty">
