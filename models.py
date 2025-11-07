@@ -1,7 +1,7 @@
 # Chứa các models của database
 import uuid
-from sqlalchemy import Column, DateTime, func
-from sqlmodel import JSON, SQLModel, Field, UniqueConstraint
+from sqlalchemy import Column, DateTime, ForeignKey, func
+from sqlmodel import JSON, Integer, Relationship, SQLModel, Field, UniqueConstraint
 from typing import List, Optional, Text
 from datetime import datetime, timezone, date
 import json
@@ -52,7 +52,7 @@ class candidate_CV_db(SQLModel, table=True):
     __tablename__ = "candidate_CV"
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: int = Field(foreign_key="user.id")   # liên kết với bảng users
+    user_id: int = Field(foreign_key="user.id")
     URL: str = Field(max_length=255)
     details: Optional[str] = Field(default=None, max_length=2000)  # đổi sang VARCHAR(2000)
     top10_jds: Optional[List[int]] = Field(default=None, sa_column=Column(JSON))

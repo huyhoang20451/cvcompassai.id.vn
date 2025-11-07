@@ -13,7 +13,9 @@ from .services import (get_orders,
                        get_users as service_get_users,
                        update_user as service_update_user,
                        delete_user_by_username,
-                       update_service_by_id)
+                       update_service_by_id,
+                       create_service as service_create_service,
+                       delete_service_by_id as service_delete_service_by_id)
 from db import get_session
 from Core.Auth.dependencies import templates, authorize_role
 from Core.Auth.schemas import user
@@ -88,6 +90,16 @@ def services(request: Request,
     service_list = get_services(session)
     return templates.TemplateResponse("services.html", {"request": request, "services": service_list})
 
+# Tạo dịch vụ mới
+@router.post("/services", response_class=HTMLResponse)
+def create_service(request: Request,
+                   name: str = Form(...),
+                   description: str = Form(...),
+                   price: float = Form(...),
+                   session: Session = Depends(get_session)):
+    service = service_create_service(session, name, description, price)
+    return RedirectResponse(url="/services", status_code=303)
+
 # Cập nhật dịch vụ
 @router.patch("/services/{service_id}", response_class=HTMLResponse)
 def update_service(request: Request,
@@ -98,6 +110,13 @@ def update_service(request: Request,
                    session: Session = Depends(get_session)):
     service_list = update_service_by_id(session, service_id, name, description, price)
     return templates.TemplateResponse("services.html", {"request": request, "services": service_list})
+
+# Xoá dịch vụ
+@router.post("/services/delete/{service_id}", response_class=HTMLResponse)
+def delete_service(service_id: int,
+                   session: Session = Depends(get_session)):
+    result = service_delete_service_by_id(session, service_id)
+    return RedirectResponse(url="/services", status_code=303)
 
 @router.get("/quality-cv-checker", response_class=HTMLResponse)
 def quality_cv_checker(request: Request):

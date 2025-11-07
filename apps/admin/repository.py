@@ -1,5 +1,5 @@
 from sqlmodel import Session, func, select
-from models import Order_db, User_db, Service_db
+from models import Order_db, User_db, Service_db, candidate_CV_db
 from .schemas import OrderSchema, user, Service, OrderSchemaResponse
 from typing import List
 
@@ -105,11 +105,17 @@ def update_user_by_username(
 
 # Xoá user theo username
 def delete_user_by_username(session: Session, username: str) -> bool:
-    # Lấy user theo username
+    # Lấy user
     user = session.exec(select(User_db).where(User_db.username == username)).first()
     if not user:
-        return False  # user không tồn tại
-    
+        return False
+
+    # Xóa tất cả CV thuộc user này
+    cvs = session.exec(select(candidate_CV_db).where(candidate_CV_db.user_id == user.id)).all()
+    for cv in cvs:
+        session.delete(cv)
+
+    # Sau khi xóa CV, xóa user
     session.delete(user)
     session.commit()
     return True
@@ -148,3 +154,12 @@ def create_service(session: Session,
     session.commit()
     session.refresh(new_service)
     return new_service
+
+def delete_service_by_id(session: Session, id: int) -> bool:
+    service = session.exec(select(Service_db).where(Service_db.id == id)).first()
+    if not service:
+        return False
+
+    session.delete(service)
+    session.commit()
+    return True

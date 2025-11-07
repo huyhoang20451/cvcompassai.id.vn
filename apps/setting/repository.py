@@ -20,7 +20,7 @@ def update_user(session: Session, user_id: int, update_data: dict) -> user:
     db_obj = session.get(User_db, user_id)  # Lấy user từ DB
     if not db_obj:
         raise ValueError(f"User với id={user_id} không tồn tại")
-
+    print("Dữ liệu cập nhật:", update_data)
     # Chỉ cập nhật các field có trong model
     for key, value in update_data.items():
         if hasattr(db_obj, key):

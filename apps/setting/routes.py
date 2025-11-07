@@ -37,7 +37,7 @@ async def update_user(request: Request,
     # Lấy toàn bộ dữ liệu form
     form = await request.form()
     update_data = dict(form)
-
+    
     if not update_data:
         raise HTTPException(status_code=400, detail="Không có dữ liệu form để cập nhật")
     

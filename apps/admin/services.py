@@ -10,7 +10,9 @@ from .repository import (get_paid_orders as repo_get_paid_orders,
                          delete_user_by_username as repo_delete_user_by_username,
                          get_services as repo_get_services,
                          get_orders as repo_get_orders,
-                         update_service_by_id as repo_update_service_by_id)
+                         update_service_by_id as repo_update_service_by_id,
+                         create_service as repo_create_service,
+                         delete_service_by_id as repo_delete_service_by_id)
 from fastapi import Depends
 from typing import Annotated, List
 from .schemas import OrderSchema, Service, user, OrderSchemaResponse
@@ -84,3 +86,15 @@ def update_service_by_id(session: Session,
                                      name,
                                      description,
                                      price)
+
+def create_service(session: Session,
+                   name: str,
+                   description: str,
+                   price: float) -> Service:
+    return repo_create_service(session,
+                               name,
+                               description,
+                               price)
+
+def delete_service_by_id(session: Session, id: int) -> bool:
+    return repo_delete_service_by_id(session, id)
