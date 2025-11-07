@@ -10,6 +10,7 @@ class OrderStatus(str, enum.Enum):
 class packageInfo(BaseModel):
     id: int
     name: str
+    description: str
     price: int
 
     model_config = ConfigDict(from_attributes=True)
