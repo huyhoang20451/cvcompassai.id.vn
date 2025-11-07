@@ -74,6 +74,55 @@
             </div>
         </div>
     </div> <!-- kết thúc phần tựa đề -->
+    
+    {% macro render_features_list(features_data) %}
+            <ul class='pricing-features'>
+            
+            {# TRƯỜNG HỢP 1: Dữ liệu đã là List Python (tốt nhất) #}
+            {% if features_data is iterable and features_data is not string %}
+                {% for item in features_data %}
+                    <li style="display: flex; align-items: flex-start;">
+                        <i class="fa fa-check-circle" style="color: #10b981; margin-right: 8px; margin-top: 4px;"></i> 
+                        <span>{{ item }}</span>
+                    </li>
+                {% endfor %}
+
+            {# TRƯỜNG HỢP 2: Chuỗi JSON ["A", "B, C"] (như trong ảnh) #}
+            {% elif features_data and features_data.strip().startswith('[') and features_data.strip().endswith(']') %}
+                {# 1. Bỏ dấu [ và ] ở đầu cuối #}
+                {% set inner = features_data.strip()[1:-1] %}
+                {# 2. Tách chuỗi. Thay thế các dấu ", " hoặc "," (bên trong dấu ngoặc kép) bằng ||| #}
+                {% set items = inner.replace('", "', '|||').replace('","', '|||').split('|||') %}
+                
+                {% for item in items %}
+                    {# 3. Làm sạch: Bỏ dấu ngoặc kép " hoặc ' còn sót lại ở đầu/cuối #}
+                    {% set clean_item = item.strip().strip('"').strip("'") %}
+                    {% if clean_item %}
+                        <li style="display: flex; align-items: flex-start;">
+                            <i class="fa fa-check-circle" style="color: #10b981; margin-right: 8px; margin-top: 4px;"></i> 
+                            <span>{{ clean_item }}</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+            {# TRƯỜNG HỢP 3: Văn bản thường, tách bằng xuống dòng (fallback) #}
+            {% elif features_data %}
+                 {% for line in features_data.replace('\r\n', '\n').split('\n') %}
+                    {% if line.strip() %}
+                        <li style="display: flex; align-items: flex-start;">
+                            <i class="fa fa-check-circle" style="color: #10b981; margin-right: 8px; margin-top: 4px;"></i> 
+                            <span>{{ line.strip() }}</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            
+            {# TRƯỜNG HỢP 4: Không có dữ liệu #}
+            {% else %}
+                <li style="font-style: italic; color: #6b7280;">Chưa có mô tả chi tiết.</li>
+            {% endif %}
+            </ul>
+    {% endmacro %}
+        {# --- KẾT THÚC MACRO --- #}
 
     <div class="card-pricing-container">
         {% set packages = business_packages if (business_packages is defined and business_packages) else (candidate_packages if (candidate_packages is defined and candidate_packages) else []) %}
@@ -82,12 +131,7 @@
             <div class="card-header">{{ 'Gói Premium Doanh Nghiệp' if package.name == 'business_premium' }}</div>
             <div class="price">{{ package.price }} VNĐ/tháng</div>
             <div class="card-body">
-                <ul class='pricing-features'>
-                    {% if package.name == 'business_premium' %}
-                        <li>Doanh nghiệp có thể sử dụng công cụ lọc CV tự động.</li>
-                        <li>So sánh mức độ tiềm năng của các ứng viên.</li>
-                    {% endif %}
-                </ul>
+                {{ render_features_list(package.description) }}
                 <button class="buy-btn" data-package-name="{{ package.name }}" data-package-price="{{ package.price }}">Mua ngay</button>
             </div>
         </div>
