@@ -75,6 +75,48 @@
 <body>
     <div class="container">
         <h1>Service Management</h1>
+        <button onclick="openAddServiceModal()">Thêm dịch vụ</button>
+        <div id="addServiceModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <span class="close" title="Đóng">&times;</span>
+                <form method="POST" action="/services" id="addForm">
+                    <h2>Thêm dịch vụ mới</h2>
+                    <label for="new_service_name">Service Name:</label>
+                    <input type="text" id="new_service_name" name="name" required>
+                    <label for="new_service_price">Price:</label>
+                    <input type="text" id="new_service_price" name="price" required>
+                    <label for="new_service_description">Description:</label>
+                    <textarea id="new_service_description" name="description" required></textarea>
+                    <div style="margin-top:12px; display:flex; gap:8px;">
+                        <button type="submit">Thêm mới dịch vụ</button>
+                        <button type="button" id="cancelAddBtn">Hủy</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script>
+            // Script cho modal Thêm dịch vụ
+            (function(){
+                const modal = document.getElementById('addServiceModal');
+                const closeBtn = modal && modal.querySelector('.close');
+                const cancelBtn = document.getElementById('cancelAddBtn');
+
+                function openAddServiceModal(){
+                    modal.style.display = 'flex';
+                }
+
+                function closeModal(){
+                    modal.style.display = 'none';
+                }
+
+                // Cần đảm bảo hàm openAddServiceModal được khai báo global
+                window.openAddServiceModal = openAddServiceModal;
+
+                if (closeBtn) closeBtn.addEventListener('click', closeModal);
+                if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+                window.addEventListener('click', function(e){ if (e.target === modal) closeModal(); });
+            })();
+        </script>
         <table>
             <thead>
                 <tr>
@@ -99,6 +141,10 @@
                             data-price="{{ service.price }}"
                             data-description="{{ service.description | e }}">
                             <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button onclick="deleteService(service.id)" type="button" class="badge red delete-btn"
+                            data-id="{{ service.id }}">
+                            <i class="fas fa-trash"></i> Delete
                         </button>
                     </td>
                 </tr>
@@ -241,5 +287,44 @@
                 });
             }
         })();
+        // Hàm cho xóa dịch vụ
+        // Script cho XÓA DỊCH VỤ - Đã bọc trong IIFE và sửa logic để lắng nghe sự kiện
+        (function setupDeleteListeners() {
+            const deleteButtons = document.querySelectorAll('.delete-btn');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', async function(){
+                    const serviceId = this.getAttribute('data-id');
+                    if (!serviceId) return;
+
+                    if (!confirm('Bạn có chắc chắn muốn xóa dịch vụ ID ' + serviceId + ' này không?')) {
+                        return;
+                    }
+
+                    try {
+                        // Gửi request POST đến endpoint /services/delete/{service_id}
+                        const resp = await fetch('/services/delete/' + encodeURIComponent(serviceId), {
+                            method: 'POST',
+                            credentials: 'same-origin'
+                        });
+
+                        if (resp.ok || resp.status === 303) {
+                            // Nếu backend trả về redirect (303), trình duyệt sẽ tự tải lại trang
+                            // Tuy nhiên, vì dùng fetch, ta sẽ tải lại trang thủ công hoặc xóa hàng
+                            // Chọn cách tải lại trang để cập nhật toàn bộ bảng:
+                            alert('Xóa dịch vụ thành công! Trang sẽ được tải lại.');
+                            window.location.reload();
+                        } else {
+                            const text = await resp.text();
+                            throw new Error('HTTP ' + resp.status + ' - ' + text);
+                        }
+                    } catch (err) {
+                        console.error('Delete service failed', err);
+                        alert('Lỗi khi xóa dịch vụ: ' + (err.message || err));
+                    }
+                });
+            });
+        })();
+
     </script>
+</body>
 </html>
