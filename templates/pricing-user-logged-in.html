@@ -212,12 +212,11 @@
                 <div class="card-header">{{ 'Gói Theo Xu' if package.name == 'candidate_xu' else 'Gói Premium' }}</div>
                 <div class="price">{{ package.price }} {{ 'VNĐ/2 xu' if package.name == 'candidate_xu' else 'VNĐ/tháng' }}</div>
                 <div class="card-body">
-                    {% for feature in package.description %}
-                        <li style="display: flex; align-items: center;">
-                          <i class="fa fa-check-circle" style="color: #10b981; margin-right: 8px;"></i> 
-                          {{ feature }}
-                        </li>
-                      {% endfor %}
+                   <li style="display: flex; align-items: center;">
+                       <i class="fa fa-check-circle" style="color: #10b981; margin-right: 8px;"></i> 
+                         {{ package.description }}
+                   </li>
+                      
                     <button onclick="formAppear()" class="buy-btn" data-package-name="{{ package.name }}" data-package-price="{{ package.price }}">Mua ngay</button>
                 </div>
             </div>
