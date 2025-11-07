@@ -97,6 +97,7 @@ def create_service(request: Request,
                    description: str = Form(...),
                    price: float = Form(...),
                    session: Session = Depends(get_session)):
+    print("Creating service:", name, description, price)
     service = service_create_service(session, name, description, price)
     return RedirectResponse(url="/services", status_code=303)
 
