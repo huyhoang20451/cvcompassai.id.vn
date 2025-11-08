@@ -20,7 +20,12 @@
             <p>Smart Insight - Right Choice - Bright Future</p>
         </div>
     </div>
-    <div class="header-menu">
+
+    <button class="hamburger-btn" id="hamburger-btn">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <div class="header-menu desktop-nav">
         <ul>
             <li><a href="/">Trang chủ</a></li>
             <li><a href="/about-us">Về chúng tôi</a></li>
@@ -29,9 +34,27 @@
             <li><a href="/pricing">Gói dịch vụ</a></li>
         </ul>
     </div>
-    <div class="header-actions">
+    <div class="header-actions desktop-nav">
         <button onclick="location.href='/login'" class="btn btn-login">Đăng nhập</button>
         <button onclick="location.href='/signup'" class="btn btn-register">Đăng ký</button>
+        <div class="header-nhatuyendung">
+            <p class="cau_hoi">Bạn là nhà tuyển dụng?</p>
+            <p><a href="/business-home" target="_blank">Đăng tin ngay</a></p>
+        </div>
+    </div>
+
+    <div class="sidenav" id="mobile-sidenav">
+        <a href="javascript:void(0)" class="close-btn" id="close-btn">&times;</a>
+        <a href="/">Trang chủ</a>
+        <a href="/about-us">Về chúng tôi</a>
+        <a href="/login">Tìm việc làm</a>
+        <a href="/login">Quét CV bằng OCR</a>
+        <a href="/pricing">Gói dịch vụ</a>
+    
+        <div class="sidenav-actions">
+            <button onclick="location.href='/login'" class="btn btn-login">Đăng nhập</button>
+            <button onclick="location.href='/signup'" class="btn btn-register">Đăng ký</button>
+        </div>
         <div class="header-nhatuyendung">
             <p class="cau_hoi">Bạn là nhà tuyển dụng?</p>
             <p><a href="/business-home" target="_blank">Đăng tin ngay</a></p>
@@ -46,7 +69,7 @@
 <div class="introduction">
     <div class="background_intro"></div>
     <div class="content-introduction">
-        <h1 class="intro-title">CV Compass</h1>
+        <div class="intro-title">CV Compass</div>
         <h2 class="intro-subtitle">Công cụ giúp bạn hiểu rõ hơn về hồ sơ ứng tuyển của mình</h2>
         <button onclick="location.href='/login'" class="btn-upload-cv">
             Tải CV ngay
@@ -275,3 +298,40 @@
 </footer> 
 </body>
 </html>
+<script>
+    // Đợi cho tất cả nội dung HTML được tải xong
+document.addEventListener("DOMContentLoaded", function() {
+
+    // Lấy các phần tử (elements)
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const closeBtn = document.getElementById('close-btn');
+    const sidenav = document.getElementById('mobile-sidenav');
+    const overlay = document.getElementById('overlay');
+
+    // Hàm để mở menu
+    function openMenu() {
+        sidenav.classList.add('open');
+        overlay.classList.add('show');
+    }
+
+    // Hàm để đóng menu
+    function closeMenu() {
+        sidenav.classList.remove('open');
+        overlay.classList.remove('show');
+    }
+
+    // Gán sự kiện click
+    if (hamburgerBtn) {
+        hamburgerBtn.addEventListener('click', openMenu);
+    }
+    
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeMenu);
+    }
+
+    if (overlay) {
+        // Bấm vào vùng mờ cũng đóng menu
+        overlay.addEventListener('click', closeMenu);
+    }
+});
+</script>
