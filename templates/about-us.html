@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/static/css/about-us.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=upload" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=menu" />
     <title>Về chúng tôi - CV Compass</title>
 </head>
 <body style="background-color: #F6FCFF;">
@@ -20,7 +21,11 @@
         </div>
     </div>
 
-    <div class="header-menu">
+    <button class="hamburger-btn" id="hamburger-btn">
+        <span class="material-symbols-outlined">menu</span>
+    </button>
+
+    <div class="header-menu desktop-nav">
         <ul>
             <li><a method="get" href="/">Trang chủ</a></li>
             <li><a method="get" href="/aboutus">Về chúng tôi</a></li>
@@ -30,7 +35,7 @@
         </ul>
     </div>
 
-    <div class="header-actions">
+    <div class="header-actions desktop-nav">
         <!-- Nếu đã đăng nhập -->
         {% if user_info %}
         <p id="welcome-user">Chào mừng, {{user_info.full_name}}!</p>
@@ -52,6 +57,25 @@
         <div class="header-nhatuyendung">
             <p class="cau_hoi">Bạn là nhà tuyển dụng?</p>
             <p><a href="/business-home" target="_blank">Đăng tin ngay</a></p>
+        </div>
+    </div>
+
+    <div class="header-actions mobile-sidenav" id="mobile-sidenav">
+        <a href="javascript:void(0)" class="close-btn" id="close-btn">&times;</a>
+        <a href="/home-logged-in">Trang chủ</a>
+        <a href="/aboutus-logged-in">Về chúng tôi</a>
+        <a href="/finding-jobs">Tìm việc làm</a>
+        <a href="/ocr-scan-logged-in">Quét CV bằng OCR</a>
+        <a href="/pricing-user-logged-in">Gói dịch vụ</a>
+
+        <div class="sidenav-actions">
+            <button onclick="location.href='/login'" class="btn btn-login-sidenav">Đăng nhập</button>
+            <button onclick="location.href='/signup'" class="btn btn-register-sidenav">Đăng ký</button>
+            
+            <div class="sidenav-nhatuyendung" style="margin-top:10px;">
+                <p class="cau_hoi-sidenav">Bạn là nhà tuyển dụng?</p>
+                <p><a href="/business-home" target="_blank">Đăng tin ngay</a></p>
+            </div>
         </div>
     </div>
 
@@ -120,7 +144,7 @@
 
     <div class="vision">
         <div class="vision-image">
-            <img src="static/images/vision.png" alt="Vision Image">
+            <img src="/static/images/vision.png" alt="Vision Image">
         </div>
         <div class="vision-text">
             <h2>Tầm nhìn</h2>
@@ -129,23 +153,23 @@
     </div>
 </div> <!--Kết thúc phần sứ mệnh và tầm nhìn-->
 
-    <h1 style="transform: translateY(-300px);" class="features_title">Tính năng nổi bật</h1>
-    <div style="transform: translateY(-300px);" class="features_block"> <!--Bắt đầu phần tính năng nổi bật-->
+    <h1 class="features_title">Tính năng nổi bật</h1>
+    <div class="features_block"> <!--Bắt đầu phần tính năng nổi bật-->
         <div class="features_list">
             <div class="feature_item">
-                <img style="width: 100px; height: 100px;" class="feature_icon" src="static/images/features_image/OCR_image.png" alt="Feature 1">
+                <img style="width: 100px; height: 100px;" class="feature_icon" src="/static/images/features_image/OCR_image.png" alt="Feature 1">
                 <h3 class="feature_title">OCR - Quét nội dung từ CV ảnh/PDF</h3>
             </div>
             <div class="feature_item">
-                <img style="width: 100px; height: 100px;" class="feature_icon" src="static/images/features_image/LLM_image.png" alt="Feature 2">
+                <img style="width: 100px; height: 100px;" class="feature_icon" src="/static/images/features_image/LLM_image.png" alt="Feature 2">
                 <h3 class="feature_title">LLM - Phân tích ngữ nghĩa, ngữ cảnh</h3>
             </div>
             <div class="feature_item">
-                <img style="width: 100px; height: 100px;" class="feature_icon" src="static/images/features_image/cv_comparison.png" alt="Feature 3">
+                <img style="width: 100px; height: 100px;" class="feature_icon" src="/static/images/features_image/cv_comparison.png" alt="Feature 3">
                 <h3 class="feature_title">So sánh CV - JD để đánh giá mức độ phù hợp</h3>
             </div>
             <div class="feature_item">
-                <img style="width: 100px; height: 100px;" class="feature_icon" src="static/images/features_image/advicer.png" alt="Feature 4">
+                <img style="width: 100px; height: 100px;" class="feature_icon" src="/static/images/features_image/advicer.png" alt="Feature 4">
                 <h3 class="feature_title">Tư vấn cải thiện - Gợi ý chỉnh CV dễ hiểu</h3>
             </div>
             </div> <!-- kết thúc features_list -->
@@ -173,7 +197,7 @@
     </div>
   </div>
   <div class="footer-logo">
-    <img src="static/images/hexacode_logo.png" alt="Hexacode Logo" class="footer-logo-img">
+    <img src="/static/images/hexacode_logo.png" alt="Hexacode Logo" class="footer-logo-img">
     <div class="footer-logo-text">HEXACODE</div>
   </div>
   <div class="footer-links">
@@ -193,5 +217,42 @@
       <a href="#"><i class="fa fa-tiktok"></i> CVCompass</a>
     </div>
   </div>
-</footer> 
+</footer>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+
+    // Lấy các phần tử (elements)
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const closeBtn = document.getElementById('close-btn');
+    const sidenav = document.getElementById('mobile-sidenav');
+    const overlay = document.getElementById('overlay');
+
+    // Hàm để mở menu
+    function openMenu() {
+        sidenav.classList.add('open');
+        overlay.classList.add('show');
+    }
+
+    // Hàm để đóng menu
+    function closeMenu() {
+        sidenav.classList.remove('open');
+        overlay.classList.remove('show');
+    }
+
+    // Gán sự kiện click
+    if (hamburgerBtn) {
+        hamburgerBtn.addEventListener('click', openMenu);
+    }
+    
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeMenu);
+    }
+
+    if (overlay) {
+        // Bấm vào vùng mờ cũng đóng menu
+        overlay.addEventListener('click', closeMenu);
+    }
+});
+</script>
 </body>
+</html>
