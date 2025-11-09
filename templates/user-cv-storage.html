@@ -69,6 +69,12 @@
         <a href="/finding-jobs">Tìm việc làm</a>
         <a href="/ocr-scan-logged-in">Quét CV bằng OCR</a>
         <a href="/pricing-user-logged-in">Gói dịch vụ</a>
+        <p><strong>Người dùng</strong></p>
+        <a href="/mycv-settings">Cài đặt tài khoản</a>
+        <a href="/edit-profile">Hồ sơ của tôi</a>
+        <a href="/mycv-settings">CV của tôi</a>
+        <a href="/saved-jobs">Công việc/Đã lưu</a>
+        <a href="/enroll-history">Lịch sử ứng tuyển</a>
 
         <div class="sidenav-actions">
           {% if user_info %}
@@ -82,6 +88,7 @@
             <div class="user-avatar-sidenav" style="margin-top:10px;">
               <img onclick="boxAppear()" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;"
                 src="{{user_info.avatar_path or '/static/images/user_avatar.png'}}" alt="User Avatar">
+                <button onclick="location.href='/'" class="btn btn-logout-sidenav">Đăng xuất</button>
             </div>
           {% else %}
             <button onclick="location.href='/login'" class="btn btn-login-sidenav">Đăng nhập</button>
