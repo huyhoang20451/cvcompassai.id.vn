@@ -765,3 +765,253 @@ h1, h2, h3, h4, h5, h6 {
     }
 }
 
+/* =========================================== */
+/* === BẮT ĐẦU CSS GIAO DIỆN TỐI (DARK MODE) === */
+/* =========================================== */
+
+/* Chúng ta dùng .dark-theme (thay vì body.dark-theme) 
+  để khớp với file theme-loader.js 
+*/
+
+/* --- Nền chung & Văn bản --- */
+.dark-theme {
+    background-color: #121212; /* Nền đen nhạt */
+    color: #E0E0E0;            /* Chữ xám nhạt */
+}
+
+/* --- Header, Sidenav, Footer --- */
+.dark-theme .header,
+.dark-theme .sidenav,
+.dark-theme .footer {
+    background-color: #1E1E1E; /* Nền card, hơi sáng hơn nền body */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid #333; /* Thêm đường viền để tách biệt */
+}
+
+.dark-theme .footer {
+    border-bottom: none;
+    border-top: 1px solid #333;
+}
+
+/* --- Chữ & Link trong Header/Sidenav --- */
+.dark-theme .header-logo .logo-text h1,
+.dark-theme .sidenav a {
+    color: #E0E0E0;
+}
+
+.dark-theme .header-logo .logo-text p,
+.dark-theme .header-nhatuyendung .cau_hoi {
+    color: #B0B0B0; /* Văn bản phụ */
+}
+
+.dark-theme .header-menu a {
+    color: #E0E0E0;
+}
+
+.dark-theme .header-menu a:hover,
+.dark-theme .sidenav a:hover {
+    color: var(--primary-color, #0D6EFD); /* Giữ màu xanh chủ đạo khi hover */
+    background-color: #2A2A2A;
+}
+
+/* --- Nút bấm Header --- */
+.dark-theme .btn-login {
+    background-color: #333;
+    color: #E0E0E0;
+    border: 1px solid #555;
+}
+.dark-theme .btn-login:hover {
+    background-color: #444;
+}
+/* Giữ nguyên .btn-register màu xanh làm điểm nhấn */
+
+
+/* --- Section Introduction (Hero) --- */
+.dark-theme .introduction {
+    position: relative;
+    color: #FFFFFF;
+}
+/* Thêm một lớp phủ tối lên ảnh nền/màu nền */
+.dark-theme .background_intro::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Lớp phủ đen 50% */
+    z-index: 1;
+}
+/* Đẩy nội dung lên trên lớp phủ */
+.dark-theme .content-introduction {
+    position: relative;
+    z-index: 2;
+}
+/* Giữ nút "Tải CV ngay" màu xanh lá */
+
+
+/* --- Section "How It Works" --- */
+.dark-theme .how-it-works,
+.dark-theme .how-bg {
+    background-color: #1E1E1E; /* Giống màu header/footer */
+}
+
+.dark-theme .header-instruction h2 {
+    color: #E0E0E0;
+}
+
+.dark-theme .how-step .how-icon {
+    color: var(--primary-color, #0D6EFD); /* Cho icon màu xanh */
+}
+
+.dark-theme .how-step .how-label {
+    color: #B0B0B0;
+}
+
+
+/* --- Thanh tìm kiếm --- */
+.dark-theme .thanh-timkiemvavitri {
+    background-color: #1E1E1E;
+    border-radius: 8px;
+    padding: 1rem; /* Thêm padding cho đẹp hơn */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.dark-theme .thanh-timkiemvavitri input[type="text"] {
+    background-color: #2A2A2A;
+    color: #E0E0E0;
+    border: 1px solid #444;
+    border-radius: 6px;
+}
+
+.dark-theme .thanh-timkiemvavitri input[type="text"]::placeholder {
+    color: #888;
+}
+
+.dark-theme .thanh-timkiemvavitri button[type="submit"] {
+    background-color: var(--primary-color, #0D6EFD);
+    color: var(--light-blue-text, #E0F2FF); /* Dùng màu chữ sáng */
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+
+/* --- Bộ lọc & Tiêu đề Section --- */
+.dark-theme .header-chance-recruit h2,
+.dark-theme .filter-selection label,
+.dark-theme .header-discover h2,
+.dark-theme .chance-concern,
+.dark-theme .features_title {
+    color: #E0E0E0;
+}
+
+.dark-theme .filter-selection select {
+    background-color: #2A2A2A;
+    color: #E0E0E0;
+    border: 1px solid #444;
+    border-radius: 6px;
+}
+
+
+/* --- Job Card (Thẻ Việc làm) --- */
+.dark-theme .job-card {
+    background-color: #1E1E1E;
+    border: 1px solid #333;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.dark-theme .job-listing-grid:hover .job-card,
+.dark-theme .job-card:hover {
+    border-color: var(--primary-color, #0D6EFD); /* Highlight khi hover */
+}
+
+.dark-theme .job-card-title {
+    color: #E0E0E0;
+}
+
+.dark-theme .job-card-company {
+    color: #B0B0B0;
+}
+
+.dark-theme .job-tag {
+    background-color: #333;
+    color: #B0B0B0;
+}
+
+.dark-theme .job-card-fav {
+    background-color: transparent;
+    border: 1px solid #555;
+    color: #B0B0B0;
+}
+
+.dark-theme .job-card-fav:hover {
+    background-color: #333;
+    color: #FFF;
+}
+
+
+/* --- Phân trang (Pagination) --- */
+.dark-theme .sotrang p,
+.dark-theme .pages_number p {
+    background-color: #1E1E1E;
+    color: #B0B0B0;
+    border: 1px solid #333;
+}
+
+.dark-theme .sotrang p:hover,
+.dark-theme .pages_number p:hover {
+    background-color: #2A2A2A;
+}
+
+.dark-theme .sotrang .noibat,
+.dark-theme .pages_number .noibat {
+    background-color: var(--primary-color, #0D6EFD);
+    color: var(--light-blue-text, #E0F2FF);
+    border-color: var(--primary-color, #0D6EFD);
+}
+
+
+/* --- Thẻ Lĩnh vực & Tính năng --- */
+.dark-theme .job-category-detail,
+.dark-theme .feature_item {
+    background-color: #1E1E1E;
+    border: 1px solid #333;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: border-color 0.2s ease;
+}
+
+.dark-theme .job-category-detail:hover,
+.dark-theme .feature_item:hover {
+    border-color: var(--primary-color, #0D6EFD);
+}
+
+.dark-theme .job_name,
+.dark-theme .feature_title {
+    color: #E0E0E0;
+}
+
+.dark-theme .no_of_category {
+    color: #B0B0B0;
+}
+
+.dark-theme .job-category-logo i {
+    color: var(--primary-color, #0D6EFD);
+}
+
+
+/* --- Chữ & Link trong Footer --- */
+.dark-theme .footer-contact-item span,
+.dark-theme .footer-links-group a {
+    color: #B0B0B0;
+}
+
+.dark-theme .footer-links-group a:hover {
+    color: var(--primary-color, #0D6EFD);
+}
+
+.dark-theme .footer-logo-text,
+.dark-theme .footer-links-group .footer-links-title {
+    color: #E0E0E0;
+}
+
+/* ========================================= */
+/* === KẾT THÚC CSS GIAO DIỆN TỐI (DARK MODE) === */
+/* ========================================= */
+

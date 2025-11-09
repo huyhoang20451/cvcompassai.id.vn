@@ -1,0 +1,624 @@
+/* === NỘI DUNG CHO FILE: /static/css/system-settings.css === */
+
+/* --- Cài đặt chung & Kiểu chữ --- */
+:root {
+    --primary-color: #0D6EFD;       /* Màu xanh dương chủ đạo */
+    --primary-hover: #0056b3;     /* Màu xanh dương khi hover */
+    --light-blue-bg: #F6FCFF;    /* Màu nền body (từ HTML của bạn) */
+    --light-blue-text: #E0F2FF;  /* Màu chữ sáng (thay cho màu trắng) */
+    --dark-text: #212529;         /* Màu văn bản chính (đen nhạt) */
+    --secondary-text: #6c757d;   /* Màu văn bản phụ */
+    --white-bg: #FFFFFF;         /* Màu nền của các box (card) */
+    --border-color: #E0E0E0;     /* Màu viền/phân cách */
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Đổ bóng nhẹ */
+    --border-radius: 8px;
+}
+
+body {
+    font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--light-blue-bg);
+    color: var(--dark-text);
+    line-height: 1.6;
+}
+
+/* --- Header (Desktop & Mobile) --- */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: var(--white-bg);
+    box-shadow: var(--shadow);
+    z-index: 1000;
+}
+
+.header-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-logo img {
+    height: 45px;
+    width: auto;
+}
+
+.header-logo .logo-text h1 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--primary-hover);
+}
+
+.header-logo .logo-text p {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--secondary-text);
+}
+
+.header-menu ul {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+}
+
+.header-menu a {
+    text-decoration: none;
+    color: var(--primary-hover);
+    font-weight: 600;
+    padding: 0.5rem 0;
+    transition: color 0.2s ease;
+}
+
+.header-menu a:hover {
+    color: var(--primary-color);
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+#welcome-user {
+    font-weight: 600;
+    color: var(--dark-text);
+}
+
+.header-nhatuyendung {
+    text-align: center;
+    font-size: 0.9rem;
+    line-height: 1.3;
+}
+.header-nhatuyendung .cau_hoi {
+    margin: 0;
+    font-weight: 600;
+}
+.header-nhatuyendung a {
+    color: var(--primary-color);
+    font-weight: bold;
+    text-decoration: none;
+}
+
+/* --- Hamburger & Sidenav (Mobile) --- */
+.hamburger-btn {
+    display: none; /* Ẩn trên desktop */
+    font-size: 1.5rem;
+    color: var(--primary-hover);
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.sidenav {
+    height: 100%;
+    width: 0; /* JS sẽ đổi thành 280px hoặc 100% */
+    max-width: 280px;
+    position: fixed;
+    z-index: 1001;
+    top: 0;
+    left: 0;
+    background-color: var(--white-bg);
+    overflow-x: hidden;
+    transition: 0.3s ease-out;
+    padding-top: 60px;
+    box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+}
+
+.sidenav.open {
+    width: 280px; /* Kích thước khi mở */
+}
+
+.sidenav a {
+    padding: 10px 15px 10px 32px;
+    text-decoration: none;
+    font-size: 1.1rem;
+    color: var(--dark-text);
+    display: block;
+    transition: 0.2s;
+}
+
+.sidenav a:hover {
+    background-color: #f1f1f1;
+}
+
+.sidenav .close-btn {
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    font-size: 36px;
+    line-height: 1;
+}
+
+.sidenav-actions {
+    padding: 20px 32px;
+    border-top: 1px solid var(--border-color);
+    margin-top: 15px;
+}
+.sidenav-actions .btn {
+    width: 100%;
+    margin-bottom: 10px;
+}
+.sidenav-nhatuyendung {
+    font-size: 0.9rem;
+}
+
+/* Lớp phủ mờ khi mở Sidenav */
+#overlay {
+    position: fixed;
+    display: none;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    transition: opacity 0.3s ease;
+}
+
+#overlay.show {
+    display: block;
+    opacity: 1;
+}
+
+
+/* --- Phần Introduction Banner --- */
+.introduction {
+    position: relative;
+    padding: 2rem 1rem;
+    background-color: #E0F2FF; /* Màu xanh nhạt cho banner */
+    text-align: center;
+}
+
+.content-introduction .title_content h1 {
+    margin: 0;
+    font-size: 2rem;
+    color: var(--primary-hover); /* Màu xanh đậm cho tiêu đề */
+}
+
+/* --- Bố cục Container chính (Sidebar + Main) --- */
+.container {
+    display: flex;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    gap: 1.5rem;
+}
+
+aside.sidebar {
+    flex: 1; /* Tỷ lệ 1 */
+    max-width: 280px; /* Cố định chiều rộng sidebar */
+    background: var(--white-bg);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    height: fit-content; /* Chiều cao tự động theo nội dung */
+}
+
+main.main {
+    flex: 3; /* Tỷ lệ 3 */
+    background: var(--white-bg);
+    padding: 1.5rem 2.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+/* --- Sidebar Menu --- */
+.sidebar h2 {
+    font-size: 1.25rem;
+    color: var(--primary-hover);
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 0.5rem;
+    margin-top: 10px;
+    margin-bottom: 1rem;
+}
+
+.sidebar .back-btn {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding: 0;
+}
+.sidebar .back-btn:hover {
+    text-decoration: underline;
+}
+
+.sidebar .menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar .menu li {
+    margin: 0.5rem 0;
+}
+
+.sidebar .menu a {
+    text-decoration: none;
+    color: var(--secondary-text); /* Màu chữ xám */
+    display: block;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.sidebar .menu a:hover {
+    background-color: var(--light-blue-bg);
+    color: var(--primary-hover);
+}
+
+/* Kiểu cho mục đang active */
+.sidebar .menu li.active a {
+    background-color: var(--primary-color);
+    color: var(--light-blue-text); /* Dùng màu xanh nhạt thay vì trắng */
+    font-weight: 600;
+}
+
+/* --- Main Content Styling --- */
+.main h1 {
+    font-size: 2rem;
+    color: var(--dark-text);
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+
+.main h3 {
+    font-size: 1.5rem;
+    color: var(--secondary-text);
+    margin-top: 0;
+    margin-bottom: 2rem;
+    font-weight: 400;
+}
+
+.setting-section {
+    margin-top: 2rem;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1.5rem;
+}
+
+.setting-section h4 {
+    font-size: 1.25rem;
+    margin-bottom: 1.25rem;
+    color: var(--primary-hover);
+}
+
+/* --- Form Elements --- */
+.setting-section label {
+    display: block;
+    margin-bottom: 1rem;
+    color: var(--dark-text);
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.setting-section input[type="radio"] {
+    margin-right: 0.5rem;
+    accent-color: var(--primary-color); /* Tô màu xanh cho radio button */
+    transform: scale(1.1);
+}
+
+.setting-section select {
+    width: 100%;
+    max-width: 350px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-family: 'Noto Sans', sans-serif;
+    border: 1px solid #CCC;
+    border-radius: 6px;
+    background-color: var(--white-bg);
+    color: var(--dark-text);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 16px 16px;
+}
+
+.preview-box {
+    background-color: #f8f9fa;
+    border: 1px dashed #CCC;
+    padding: 1rem 1.5rem;
+    margin-top: 1rem;
+    border-radius: 6px;
+    color: var(--secondary-text);
+    line-height: 1.8;
+    max-width: 350px;
+}
+
+/* --- Nút bấm (Actions) --- */
+.actions {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap; /* Cho phép xuống hàng trên di động */
+}
+
+.actions button {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.save-btn {
+    background-color: var(--primary-color);
+    color: var(--light-blue-text); /* Dùng màu xanh nhạt thay vì trắng */
+}
+
+.save-btn:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+
+.reset-btn {
+    background-color: #E9ECEF; /* Màu xám nhạt */
+    color: var(--dark-text);   /* Màu chữ đen nhạt */
+    border-color: #D6DBDF;
+}
+
+.reset-btn:hover {
+    background-color: #D6DBDF;
+}
+
+/* --- Footer --- */
+.footer {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    background-color: var(--white-bg);
+    color: var(--dark-text);
+    padding: 2.5rem 5%;
+    margin-top: 3rem;
+    border-top: 1px solid var(--border-color);
+    gap: 2rem;
+}
+
+.footer-contact,
+.footer-logo,
+.footer-links {
+    flex: 1;
+    min-width: 220px;
+}
+
+.footer-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+    color: var(--secondary-text);
+}
+
+.footer-contact-item i {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+}
+
+.footer-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.footer-logo-img {
+    height: 50px;
+    margin-bottom: 10px;
+}
+
+.footer-logo-text {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-hover);
+}
+
+.footer-links {
+    display: flex;
+    justify-content: space-around;
+    gap: 1rem;
+}
+
+.footer-links-group .footer-links-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--dark-text);
+}
+
+.footer-links-group a {
+    display: block;
+    text-decoration: none;
+    color: var(--secondary-text);
+    margin-bottom: 0.75rem;
+    transition: color 0.2s;
+}
+
+.footer-links-group a:hover {
+    color: var(--primary-color);
+}
+
+.footer-links-group a i {
+    margin-right: 8px;
+    color: var(--primary-color);
+}
+
+
+/* --- Responsive (Điện thoại & Tablet) --- */
+
+@media (max-width: 992px) {
+    /* Ẩn menu desktop, hiện nút hamburger */
+    .header-menu,
+    .header-actions .desktop-nav {
+        display: none;
+    }
+
+    .hamburger-btn {
+        display: block;
+    }
+
+    /* Đảm bảo logo và nút căn giữa */
+    .header {
+        padding: 1rem 1.5rem;
+    }
+
+    .header-actions {
+        display: none; /* Ẩn toàn bộ actions trên mobile, vì đã có trong sidenav */
+    }
+}
+
+
+@media (min-width: 993px) {
+    /* Ẩn hamburger trên desktop */
+    .hamburger-btn,
+    .sidenav {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Cho container xếp chồng lên nhau */
+    .container {
+        flex-direction: column;
+        margin-top: 1.5rem;
+        gap: 1.5rem;
+    }
+
+    aside.sidebar {
+        max-width: 100%; /* Chiếm toàn bộ chiều rộng */
+    }
+
+    main.main {
+        padding: 1.5rem;
+    }
+
+    .main h1 {
+        font-size: 1.75rem;
+    }
+    .main h3 {
+        font-size: 1.25rem;
+    }
+
+    /* Xếp chồng các nút */
+    .actions {
+        flex-direction: column;
+    }
+
+    .actions button {
+        width: 100%;
+    }
+
+    /* Footer xếp chồng */
+    .footer {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 2rem;
+    }
+
+    .footer-links {
+        flex-direction: column;
+        width: 100%;
+    }
+}
+
+/* --- CSS CHO GIAO DIỆN TỐI (DARK THEME) --- */
+
+/* Đây là những gì sẽ thay đổi khi <body> có class .dark-theme */
+.dark-theme {
+    background-color: #121212; /* Nền đen nhạt */
+    color: #E0E0E0;            /* Chữ xám nhạt */
+}
+
+.dark-theme .header,
+.dark-theme aside.sidebar,
+.dark-theme main.main,
+.dark-theme .footer,
+.dark-theme .sidenav {
+    background-color: #1E1E1E; /* Nền của các card */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .header-logo .logo-text h1,
+.dark-theme .header-menu a,
+.dark-theme .sidebar h2,
+.dark-theme .setting-section h4 {
+    color: #4A90E2; /* Màu xanh nhạt cho tiêu đề */
+}
+
+.dark-theme .header-logo .logo-text p,
+.dark-theme .main h3,
+.dark-theme .sidebar .menu a,
+.dark-theme .footer,
+.dark-theme .footer-links-group a {
+    color: #B0B0B0; /* Màu chữ phụ */
+}
+
+.dark-theme #welcome-user,
+.dark-theme .main h1,
+.dark-theme .setting-section label {
+    color: #E0E0E0; /* Màu chữ chính */
+}
+
+.dark-theme .header-menu a:hover,
+.dark-theme .sidebar .menu a:hover {
+    color: #63A4F0;
+    background-color: #2A2A2A;
+}
+
+/* Nút sidebar active */
+.dark-theme .sidebar .menu li.active a {
+    background-color: var(--primary-color);
+    color: var(--light-blue-text); /* Vẫn dùng màu này */
+}
+
+/* Form elements */
+.dark-theme select,
+.dark-theme .preview-box {
+    background-color: #2A2A2A;
+    color: #E0E0E0;
+    border-color: #444;
+}
+
+.dark-theme .reset-btn {
+    background-color: #333;
+    color: #E0E0E0;
+    border-color: #555;
+}
+.dark-theme .reset-btn:hover {
+    background-color: #444;
+}

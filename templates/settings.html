@@ -1,321 +1,418 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/x-icon" href="../static/favicon.ico">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=Noto+Sans:wght@400..700&family=Roboto:wght@400..700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=upload" />
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" type="image/x-icon" href="../static/favicon.ico">
 
-    <script src="/static/js/theme.js"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=Noto+Sans:wght@400..700&family=Roboto:wght@400..700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=upload" />
 
-    <link rel="stylesheet" href="/static/css/edit-profile.css">
-    
-    <title>Cài đặt tài khoản</title>
-</head>
-<body style="background-color: #F6FCFF"> 
-  <div class="header">
-    <div class="header-logo">
+        <script src="/static/js/theme.js"></script>
+
+        <link rel="stylesheet" href="../static/css/edit-profile.css">
+
+        <title>Cài đặt tài khoản</title>
+    </head>
+    <body>
+        <div class="header-logo">
         <img src="/static/images/Logo_Final2.png" alt="Logo CV Compass" />
         <div class="logo-text">
             <h1>CV Compass</h1>
-            <p>Smart Insight - Right Choice - Bright Future</p>
+            <p>Smart Insight - <br> Right Choice - Bright Future</p>
         </div>
     </div>
-        <div class="header-menu"> <ul>
-                <li><a method='get' href="/home-logged-in">Trang chủ</a></li>
-                <li><a method="get" href="/aboutus-logged-in">Về chúng tôi</a></li>
-                <li><a method="get" href="/finding-jobs">Tìm việc làm</a></li>
-                <li><a method="get" href="/ocr-scan-logged-in">Quét CV bằng OCR</a></li>
-                <li><a method="get" href="/pricing-user-loggedin">Gói dịch vụ</a></li>
-            </ul>
+
+    <button class="hamburger-btn" id="hamburger-btn">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <div class="header-menu desktop-nav">
+        <ul>
+            <li><a method="get" href="/home-logged-in">Trang chủ</a></li>
+            <li><a method="get" href="/aboutus-logged-in">Về chúng tôi</a></li>
+            <li><a method="get" href="/finding-jobs">Tìm việc làm</a></li>
+            <li><a method="get" href="/ocr-scan-logged-in">Quét CV bằng OCR</a></li>
+            <li><a method="get" href="/pricing-user-logged-in">Gói dịch vụ</a></li>
+        </ul>
+    </div>
+
+    <div class="header-actions desktop-nav">
+        <!-- Nếu đã đăng nhập -->
+        {% if user_info %}
+        <div class="welcome-coin" style="display:flex; flex-direction:column; gap:6px; align-items:flex-start;">
+            <p id="welcome-user" style="margin:0;">Chào mừng, {{user_info.full_name}}!</p>
+            <p style="display: flex; align-items: center; background-color: #D1E9F6; padding: 5px 10px; border-radius: 5px; margin:0;">
+                <img style="width: 20px; height: 20px;" src="/static/images/coin.png" alt="Coin">
+                <strong style="margin-left:6px;">{{user_info.coin}}</strong>
+            </p>
         </div>
-        <div class="header-actions">
-            <p id="welcome-user">Chào mừng, {{user_info.full_name}}!</p>
-            <p style="display: flex; align-items: center; background-color: #D1E9F6; padding: 5px 10px; border-radius: 5px;"><img style="width: 20px; height: 20px;" src="/static/images/coin.png" alt="Coin"><strong>{{user_info.coin}}</strong></p>
-            
-        </div>
+
         <div class="user-avatar">
-            <img onclick="boxAppear()" style="width: 40px; height: 40px; border-radius: 50%;" src="/static/images/user_avatar.png" alt="User Avatar">
+            <img onclick="boxAppear()" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;"
+                src="{{user_info.avatar_path or '/static/images/user_avatar.png'}}" alt="User Avatar">
         </div>
-        <script>
-            function boxAppear() {
-                // (Mã JS cho popup avatar của bạn giữ nguyên)
-                const box = document.createElement('div');
-                box.style.position = 'absolute';
-                box.style.top = '60px';
-                box.style.right = '20px';
-                box.style.backgroundColor = '#fff';
-                box.style.border = '1px solid #ccc';
-                box.style.borderRadius = '5px';
-                box.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
-                box.style.padding = '10px';
-                box.innerHTML = `
-                    <p><a href="/edit-profile" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
-                    <p><a href="/mycv-settings" style="text-decoration:none;color:#222;">CV của tôi</a></p>
-                    <p><a href="/system-settings" style="text-decoration:none;color:#222;">Cài đặt tài khoản</a></p>
-                    <p><a href="/" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
-                `;
-                document.body.appendChild(box);
-                document.addEventListener('click', function handleClickOutside(event) {
-                    if (!box.contains(event.target) && event.target !== document.querySelector('.user-avatar img')) {
-                        box.remove();
-                        document.removeEventListener('click', handleClickOutside);
-                    }
-                });
-            }
-        </script>
+        {% else %}
+        <!-- Nếu chưa đăng nhập -->
+        <button onclick="location.href='/login'" class="btn btn-login">Đăng nhập</button>
+        <button onclick="location.href='/signup'" class="btn btn-register">Đăng ký</button>
+        {% endif %}
+
         <div class="header-nhatuyendung">
-           <p class="cau_hoi">Bạn là nhà tuyển dụng?</p>
-           <p><a href="/business-home" target='_blank'>Đăng tin ngay</a></p>
+            <p class="cau_hoi">Bạn là nhà tuyển dụng?</p>
+            <p><a href="/business-home" target="_blank">Đăng tin ngay</a></p>
         </div>
-    </div> <div class="introduction">
-        <div class="background_intro">
-            </div>
-        <div class="content-introduction">
-            <div class="title_content">
-                <h1>Cài đặt</h1>
-            </div>
-        </div>
-    </div> <div class="container">
-        <aside class="sidebar">
-            <button class="back-btn" onclick="history.back()">← Quay lại</button>
-            <h2>Cài đặt</h2>
-            <ul class="menu">
-                <li class="active"><a style="text-decoration: none;" href="/edit-profile">Thông tin cá nhân</a></li>
-                <li><a style="text-decoration: none;" href="/mycv-settings">CV của tôi</a></li>
-                <li><a style="text-decoration: none;" href="/saved-jobs">Công việc/Đã lưu</a></li>
-                <li><a style="text-decoration: none;" href="/applied-cvs">Lịch sử ứng tuyển</a></li>
-                <li><a style="text-decoration: none;" href="/system-settings">Cài đặt hệ thống</a></li>
-            </ul>
-        </aside>
-        
-        <main class="main">
-            <h1>Cài đặt</h1>
-            <h3>Thông tin cá nhân</h3>
-
-            <div class="profile">
-                <div class="avatar">
-                    <img src="/static/images/user_avatar.png" alt="User Avatar">
-                    <button class="upload-btn">Tải ảnh đại diện</button>
-                </div>
-            </div>
-
-            <p class="note">(*) Các thông tin bắt buộc</p>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Họ và tên:</th>
-                        <th>Email:</th>
-                        <th>Số điện thoại:</th>
-                        <th></th> </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td data-label="Họ và tên:">{{ user_info.full_name }}</td>
-                        <td data-label="Email:">{{ user_info.email }}</td>
-                        <td data-label="Số điện thoại:">{{ user_info.phone }}</td>
-                        <td>
-                            <button type="button" class="edit-btn"
-                                data-name="{{ user_info.full_name | e }}"
-                                data-email="{{ user_info.email | e }}"
-                                data-phone="{{ user_info.phone | e }}">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                        </td>
-                    </tr>
-                    </tbody>
-            </table>
-            
-            <div id="editModal" class="modal" style="display:none;">
-                <div class="modal-content">
-                    <span class="close" title="Đóng">&times;</span>
-                    <form method="POST" action="/edit-profile" id="editForm">
-                        <h2>Cập nhật thông tin cá nhân</h2>
-                        
-                        <label for="full_name">Họ và tên:</label>
-                        <input type="text" id="full_name" name="full_name" required>
-                        
-                        <label for="email">Email:</label>
-                        <input type="text" id="email" name="email" required>
-                        
-                        <label for="phone_number">Số điện thoại:</label>
-                        <textarea id="phone_number" name="phone_number" required></textarea>
-                        
-                        <div style="margin-top:1.5rem; display:flex; gap:0.75rem; justify-content: flex-end;">
-                            <button type="submit">Cập nhật</button>
-                            <button type="button" id="cancelBtn">Hủy</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </main>
     </div>
-            
-    <footer class="footer">
-        <div class="footer-contact">
-            <div class="footer-contact-item">
-                <i class="fa fa-phone"></i>
-                <span>0123456789</span>
+
+    <div class="sidenav" id="mobile-sidenav">
+        <a href="javascript:void(0)" class="close-btn" id="close-btn">&times;</a>
+        <a href="/home-logged-in">Trang chủ</a>
+        <a href="/aboutus-logged-in">Về chúng tôi</a>
+        <a href="/finding-jobs">Tìm việc làm</a>
+        <a href="/ocr-scan-logged-in">Quét CV bằng OCR</a>
+        <a href="/pricing-user-logged-in">Gói dịch vụ</a>
+
+        <div class="sidenav-actions">
+            {% if user_info %}
+            <div class="welcome-coin-sidenav" style="display:flex; flex-direction:column; gap:6px; align-items:flex-start;">
+                <p id="welcome-user-sidenav" style="margin:0;">Chào mừng, {{user_info.full_name}}!</p>
+                <p style="display: flex; align-items: center; background-color: #D1E9F6; padding: 5px 10px; border-radius: 5px; margin:0;">
+                    <img style="width: 20px; height: 20px;" src="/static/images/coin.png" alt="Coin">
+                    <strong style="margin-left:6px;">{{user_info.coin}}</strong>
+                </p>
             </div>
-            <div class="footer-contact-item">
-                <i class="fa fa-envelope"></i>
-                <span>hexacode@gmail.com</span>
+            <div class="user-avatar-sidenav" style="margin-top:10px;">
+                <img onclick="boxAppear()" style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer;"
+                    src="{{user_info.avatar_path or '/static/images/user_avatar.png'}}" alt="User Avatar">
             </div>
-        </div>
-        <div class="footer-logo">
-            <img src="/static/images/hexacode_logo.png" alt="Hexacode Logo" class="footer-logo-img">
-            <div class="footer-logo-text">HEXACODE</div>
-        </div>
-        <div class="footer-links">
-            <div class="footer-links-group">
-                <div class="footer-links-title">Overview</div>
-                <a href="#">App</a>
-            </div>
-            <div class="footer-links-group">
-                <div class="footer-links-title">Company</div>
-                <a href="home_logged_in.html">Home</a>
-                <a href="aboutus-logged-in.html">About us</a>
-                <a href="pricing-user-loggedin.html">Pricing</a>
-            </div>
-            <div class="footer-links-group">
-                <div class="footer-links-title">Follow us</div>
-                <a href="#"><i class="fa fa-facebook"></i> CVCompass</a>
-                <a href="#"><i class="fa fa-tiktok"></i> CVCompass</a>
+            {% else %}
+            <button onclick="location.href='/login'" class="btn btn-login-sidenav">Đăng nhập</button>
+            <button onclick="location.href='/signup'" class="btn btn-register-sidenav">Đăng ký</button>
+            {% endif %}
+            <div class="sidenav-nhatuyendung" style="margin-top:10px;">
+                <p class="cau_hoi-sidenav">Bạn là nhà tuyển dụng?</p>
+                <p><a href="/business-home" target="_blank">Đăng tin ngay</a></p>
             </div>
         </div>
-    </footer>
+    </div>
 
     <script>
-    (function(){
-            const modal = document.getElementById('editModal');
-            const closeBtn = modal && modal.querySelector('.close');
-            const cancelBtn = document.getElementById('cancelBtn');
-            const form = document.getElementById('editForm');
+        function boxAppear() {
+            const box = document.createElement('div');
+            box.style.position = 'absolute';
+            box.style.top = '70px';
+            box.style.right = '20px';
+            box.style.backgroundColor = '#fff';
+            box.style.border = '1px solid #ccc';
+            box.style.borderRadius = '5px';
+            box.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+            box.style.padding = '10px';
+            box.style.zIndex = '1000';
+            box.innerHTML = `
+                <p><a href="/edit-profile" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
+                <p><a href="/mycv-settings" style="text-decoration:none;color:#222;">CV của tôi</a></p>
+                <p><a href="/system-settings" style="text-decoration:none;color:#222;">Cài đặt tài khoản</a></p>
+                <p><a href="/logout" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
+            `;
+            document.body.appendChild(box);
 
-            function openModal(data){
-                document.getElementById('full_name').value = data.full_name || '';
-                document.getElementById('email').value = data.email || '';
-                document.getElementById('phone_number').value = data.phone || '';
-                modal.style.display = 'flex';
-            }
-
-            function closeModal(){
-                modal.style.display = 'none';
-            }
-
-        let currentId = null;
-        let currentBtn = null; // store clicked button element to find row even if data-id is missing
-        document.querySelectorAll('.edit-btn').forEach(btn => {
-            btn.addEventListener('click', function(){
-                // read attributes from button (use data-name as provided in template)
-                currentId = this.getAttribute('data-id');
-                currentBtn = this;
-                const data = {
-                    full_name: this.getAttribute('data-name') || this.getAttribute('data-full_name') || '',
-                    email: this.getAttribute('data-email') || '',
-                    phone: this.getAttribute('data-phone') || ''
-                };
-                openModal(data);
+            document.addEventListener('click', function handleClickOutside(event) {
+                if (!box.contains(event.target) && event.target !== document.querySelector('.user-avatar img')) {
+                    box.remove();
+                    document.removeEventListener('click', handleClickOutside);
+                }
             });
-            });
+        }
+                </script>
+            </div>
+        </div>
 
-            if (closeBtn) closeBtn.addEventListener('click', closeModal);
-            if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
-            window.addEventListener('click', function(e){ if (e.target === modal) closeModal(); });
-            // Intercept the modal form submit and send PATCH via fetch
-            if (form) {
-        form.addEventListener('submit', async function(e){
-            e.preventDefault();
-                const full_name = document.getElementById('full_name').value;
-                const email = document.getElementById('email').value;
-                // phone field in the form uses id="phone_number" (textarea), read that value
-                const phoneNumber = (document.getElementById('phone_number') && document.getElementById('phone_number').value) || '';
+            
+        
 
-            // Determine target URL. We expect the backend's user-update endpoint.
-            let target = form.getAttribute('action') || '/edit-profile';
+        <div class="introduction">
+            <div class="background_intro"></div>
+            <div class="content-introduction">
+                <div class="title_content">
+                    <h1>Cài đặt</h1>
+                </div>
+            </div>
+        </div>
 
-            try {
-                // send as form-encoded to match backend Form(...) parameters
-                const params = new URLSearchParams();
-                if (currentId) params.append('user_id', currentId); // Dù backend không dùng nhưng gửi vẫn tốt
-                if (full_name !== null) params.append('full_name', full_name);
-                if (email !== null) params.append('email', email);
-                // send both keys to be compatible with different backend param names
-                if (phoneNumber !== null) {
-                    params.append('phone_number', phoneNumber);
+        <div class="container">
+            <aside class="sidebar">
+                <button class="back-btn" onclick="history.back()">← Quay lại</button>
+                <h2>Cài đặt</h2>
+                <ul class="menu">
+                    <li class="active"><a style="text-decoration: none;" href="/edit-profile">Thông tin cá nhân</a></li>
+                    <li><a style="text-decoration: none;" href="/mycv-settings">CV của tôi</a></li>
+                    <li><a style="text-decoration: none;" href="/saved-jobs">Công việc/Đã lưu</a></li>
+                    <li><a style="text-decoration: none;" href="/applied-cvs">Lịch sử ứng tuyển</a></li>
+                    <li><a style="text-decoration: none;" href="/system-settings">Cài đặt hệ thống</a></li>
+                </ul>
+            </aside>
+
+            <main class="main">
+                <h1>Cài đặt</h1>
+                <h3>Thông tin cá nhân</h3>
+
+                <div class="profile">
+                    <div class="avatar">
+                        <img src="/static/images/user_avatar.png" alt="User Avatar">
+                        <button class="upload-btn">Tải ảnh đại diện</button>
+                    </div>
+                </div>
+
+                <p class="note">(*) Các thông tin bắt buộc</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Họ và tên:</th>
+                            <th>Email:</th>
+                            <th>Số điện thoại:</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td data-label="Họ và tên:">{{ user_info.full_name }}</td>
+                            <td data-label="Email:">{{ user_info.email }}</td>
+                            <td data-label="Số điện thoại:">{{ user_info.phone }}</td>
+                            <td>
+                                <button type="button" class="edit-btn"
+                                    data-name="{{ user_info.full_name | e }}"
+                                    data-email="{{ user_info.email | e }}"
+                                    data-phone="{{ user_info.phone | e }}">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div id="editModal" class="modal" style="display:none;">
+                    <div class="modal-content">
+                        <span class="close" title="Đóng">&times;</span>
+                        <form method="POST" action="/edit-profile" id="editForm">
+                            <h2>Cập nhật thông tin cá nhân</h2>
+
+                            <label for="full_name">Họ và tên:</label>
+                            <input type="text" id="full_name" name="full_name" required>
+
+                            <label for="email">Email:</label>
+                            <input type="text" id="email" name="email" required>
+
+                            <label for="phone_number">Số điện thoại:</label>
+                            <textarea id="phone_number" name="phone_number" required></textarea>
+
+                            <div style="margin-top:1.5rem; display:flex; gap:0.75rem; justify-content: flex-end;">
+                                <button type="submit">Cập nhật</button>
+                                <button type="button" id="cancelBtn">Hủy</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <footer class="footer">
+            <div class="footer-contact">
+                <div class="footer-contact-item">
+                    <i class="fa fa-phone"></i>
+                    <span>0123456789</span>
+                </div>
+                <div class="footer-contact-item">
+                    <i class="fa fa-envelope"></i>
+                    <span>hexacode@gmail.com</span>
+                </div>
+            </div>
+            <div class="footer-logo">
+                <img src="/static/images/hexacode_logo.png" alt="Hexacode Logo" class="footer-logo-img">
+                <div class="footer-logo-text">HEXACODE</div>
+            </div>
+            <div class="footer-links">
+                <div class="footer-links-group">
+                    <div class="footer-links-title">Overview</div>
+                    <a href="#">App</a>
+                </div>
+                <div class="footer-links-group">
+                    <div class="footer-links-title">Company</div>
+                    <a href="home_logged_in.html">Home</a>
+                    <a href="aboutus-logged-in.html">About us</a>
+                    <a href="pricing-user-loggedin.html">Pricing</a>
+                </div>
+                <div class="footer-links-group">
+                    <div class="footer-links-title">Follow us</div>
+                    <a href="#"><i class="fa fa-facebook"></i> CVCompass</a>
+                    <a href="#"><i class="fa fa-tiktok"></i> CVCompass</a>
+                </div>
+            </div>
+        </footer>
+
+        <script>
+            (function(){
+                const modal = document.getElementById('editModal');
+                const closeBtn = modal && modal.querySelector('.close');
+                const cancelBtn = document.getElementById('cancelBtn');
+                const form = document.getElementById('editForm');
+
+                function openModal(data){
+                    document.getElementById('full_name').value = data.full_name || '';
+                    document.getElementById('email').value = data.email || '';
+                    document.getElementById('phone_number').value = data.phone || '';
+                    modal.style.display = 'flex';
                 }
 
-                const resp = await fetch(target, {
-                    method: 'POST',
-                    credentials: 'same-origin',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: params.toString()
+                function closeModal(){
+                    modal.style.display = 'none';
+                }
+
+                let currentId = null;
+                let currentBtn = null; // store clicked button element to find row even if data-id is missing
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', function(){
+                        // read attributes from button (use data-name as provided in template)
+                        currentId = this.getAttribute('data-id');
+                        currentBtn = this;
+                        const data = {
+                            full_name: this.getAttribute('data-name') || this.getAttribute('data-full_name') || '',
+                            email: this.getAttribute('data-email') || '',
+                            phone: this.getAttribute('data-phone') || ''
+                        };
+                        openModal(data);
+                    });
                 });
 
-                if (!resp.ok) {
-                    const text = await resp.text();
-                    let errorMsg = 'HTTP ' + resp.status;
-                    try {
-                        const jsonError = JSON.parse(text);
-                        errorMsg = jsonError.detail || text;
-                    } catch(e) {
-                        errorMsg = text || errorMsg;
-                    }
-                    throw new Error(errorMsg);
-                }
+                if (closeBtn) closeBtn.addEventListener('click', closeModal);
+                if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+                window.addEventListener('click', function(e){ if (e.target === modal) closeModal(); });
 
-                // parse response if JSON
-                let data = null;
-                const ct = resp.headers.get('content-type') || '';
-                if (ct.includes('application/json')) {
-                    try { data = await resp.json(); } catch(_) { data = null; }
-                }
+                // Intercept the modal form submit and send PATCH via fetch
+                if (form) {
+                    form.addEventListener('submit', async function(e){
+                        e.preventDefault();
+                        const full_name = document.getElementById('full_name').value;
+                        const email = document.getElementById('email').value;
+                        // phone field in the form uses id="phone_number" (textarea), read that value
+                        const phoneNumber = (document.getElementById('phone_number') && document.getElementById('phone_number').value) || '';
 
-                alert(data?.message || "Cập nhật thành công!");
-                
-                // Cập nhật UI ngay lập tức
-                const welcome = document.getElementById('welcome-user');
-                if (welcome && full_name) welcome.textContent = 'Chào mừng, ' + full_name + '!';
-                
-                // Cập nhật bảng: try to find row by data-id first, otherwise use the button that opened the modal
-                let row = null;
-                if (currentId) {
-                    const btnById = document.querySelector(`button[data-id="${currentId}"]`);
-                    if (btnById) row = btnById.closest('tr');
+                        // Determine target URL. We expect the backend's user-update endpoint.
+                        let target = form.getAttribute('action') || '/edit-profile';
+
+                        try {
+                            // send as form-encoded to match backend Form(...) parameters
+                            const params = new URLSearchParams();
+                            if (currentId) params.append('user_id', currentId); // Dù backend không dùng nhưng gửi vẫn tốt
+                            if (full_name !== null) params.append('full_name', full_name);
+                            if (email !== null) params.append('email', email);
+                            // send both keys to be compatible with different backend param names
+                            if (phoneNumber !== null) {
+                                params.append('phone_number', phoneNumber);
+                            }
+
+                            const resp = await fetch(target, {
+                                method: 'POST',
+                                credentials: 'same-origin',
+                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                body: params.toString()
+                            });
+
+                            if (!resp.ok) {
+                                const text = await resp.text();
+                                let errorMsg = 'HTTP ' + resp.status;
+                                try {
+                                    const jsonError = JSON.parse(text);
+                                    errorMsg = jsonError.detail || text;
+                                } catch(e) {
+                                    errorMsg = text || errorMsg;
+                                }
+                                throw new Error(errorMsg);
+                            }
+
+                            // parse response if JSON
+                            let data = null;
+                            const ct = resp.headers.get('content-type') || '';
+                            if (ct.includes('application/json')) {
+                                try { data = await resp.json(); } catch(_) { data = null; }
+                            }
+
+                            alert(data?.message || "Cập nhật thành công!");
+
+                            // Cập nhật UI ngay lập tức
+                            const welcome = document.getElementById('welcome-user');
+                            if (welcome && full_name) welcome.textContent = 'Chào mừng, ' + full_name + '!';
+
+                            // Cập nhật bảng: try to find row by data-id first, otherwise use the button that opened the modal
+                            let row = null;
+                            if (currentId) {
+                                const btnById = document.querySelector(`button[data-id="${currentId}"]`);
+                                if (btnById) row = btnById.closest('tr');
+                            }
+                            if (!row && currentBtn) {
+                                row = currentBtn.closest('tr');
+                            }
+                            if (row) {
+                                const tdName = row.querySelector('td[data-label="Họ và tên:"]');
+                                const tdEmail = row.querySelector('td[data-label="Email:"]');
+                                const tdPhone = row.querySelector('td[data-label="Số điện thoại:"]');
+                                if (tdName) tdName.textContent = full_name;
+                                if (tdEmail) tdEmail.textContent = email;
+                                if (tdPhone) tdPhone.textContent = phoneNumber;
+                                // Cập nhật lại data attribute cho lần sau
+                                const editBtn = row.querySelector('.edit-btn');
+                                if(editBtn){
+                                    editBtn.setAttribute('data-name', full_name);
+                                    editBtn.setAttribute('data-email', email);
+                                    editBtn.setAttribute('data-phone', phoneNumber);
+                                }
+                            }
+
+                            closeModal();
+                            // Không cần reload lại trang
+                            // setTimeout(() => location.reload(), 600);
+                        } catch (err) {
+                            console.error('Update failed', err);
+                            alert('Lỗi khi cập nhật: ' + (err.message || err));
+                        }
+                    });
                 }
-                if (!row && currentBtn) {
-                    row = currentBtn.closest('tr');
-                }
-                if (row) {
-                    const tdName = row.querySelector('td[data-label="Họ và tên:"]');
-                    const tdEmail = row.querySelector('td[data-label="Email:"]');
-                    const tdPhone = row.querySelector('td[data-label="Số điện thoại:"]');
-                    if (tdName) tdName.textContent = full_name;
-                    if (tdEmail) tdEmail.textContent = email;
-                    if (tdPhone) tdPhone.textContent = phoneNumber;
-                    // Cập nhật lại data attribute cho lần sau
-                    const editBtn = row.querySelector('.edit-btn');
-                    if(editBtn){
-                        editBtn.setAttribute('data-name', full_name);
-                        editBtn.setAttribute('data-email', email);
-                        editBtn.setAttribute('data-phone', phoneNumber);
-                    }
-                }
-                
-                closeModal();
-                // Không cần reload lại trang
-                // setTimeout(() => location.reload(), 600);
-            } catch (err) {
-                console.error('Update failed', err);
-                alert('Lỗi khi cập nhật: ' + (err.message || err));
-            }
-        });
-            }
-        })();
-    </script>
-</body>
+            })();
+            document.addEventListener("DOMContentLoaded", function() {
+
+    // Lấy các phần tử (elements)
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const closeBtn = document.getElementById('close-btn');
+    const sidenav = document.getElementById('mobile-sidenav');
+    const overlay = document.getElementById('overlay');
+
+    // Hàm để mở menu
+    function openMenu() {
+        sidenav.classList.add('open');
+        overlay.classList.add('show');
+    }
+
+    // Hàm để đóng menu
+    function closeMenu() {
+        sidenav.classList.remove('open');
+        overlay.classList.remove('show');
+    }
+
+    // Gán sự kiện click
+    if (hamburgerBtn) {
+        hamburgerBtn.addEventListener('click', openMenu);
+    }
+    
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeMenu);
+    }
+
+    if (overlay) {
+        // Bấm vào vùng mờ cũng đóng menu
+        overlay.addEventListener('click', closeMenu);
+    }
+});
+        </script>
+    </body>
 </html>
