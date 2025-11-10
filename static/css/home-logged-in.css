@@ -1,22 +1,30 @@
 /* /static/css/home-logged-in.css */
 
-/* --- Cài đặt chung & Reset --- */
-body, html {
+/* --- Cài đặt chung & Kiểu chữ --- */
+:root {
+    --primary-color: #3674B5;
+    --secondary-color: #10b981;
+    --background-color: #F6FCFF;
+    --card-background: #FFFFFF;
+    --text-color: #333;
+    --text-light: #555;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
-    background-color: #F6FCFF;
-    color: #333;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+* {
     box-sizing: border-box;
-}
-
-*, *:before, *:after {
-    box-sizing: inherit;
-}
-
-a {
-    text-decoration: none;
-    color: inherit;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -24,166 +32,110 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
 }
 
-/* --- Header (Đã đăng nhập) --- */
+a {
+    text-decoration: none;
+    color: var(--primary-color);
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* --- Header --- */
+/* (Phần CSS header này chỉ là cơ bản, bạn có thể 
+   tích hợp với CSS header hiện có của bạn) */
 .header {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 15px;
-    padding: 1rem 2%;
-    background-color: #FFFFFF;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    border-bottom: 1px solid #e0e0e0;
+    padding: 1rem 2rem;
+    background-color: var(--card-background);
+    box-shadow: var(--shadow-light);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .header-logo {
     display: flex;
     align-items: center;
     gap: 10px;
-    flex-shrink: 0;
 }
 
 .header-logo img {
-    height: 50px;
+    width: 45px;
+    height: 45px;
 }
 
 .logo-text h1 {
-    margin: 0;
     font-size: 1.25rem;
-    color: #0056b3;
+    margin: 0;
+    color: var(--primary-color);
 }
 
 .logo-text p {
+    font-size: 0.7rem;
     margin: 0;
-    font-size: 0.8rem;
-    color: #555;
-}
-
-/* Wrapper cho menu và actions trên desktop */
-.desktop-nav-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    justify-content: flex-end;
-    flex-grow: 1;
-}
-
-.header-menu {
-    flex-shrink: 0;
+    color: var(--text-light);
+    line-height: 1.3;
 }
 
 .header-menu ul {
-    list-style: none;
     display: flex;
-    gap: 12px;
+    gap: 1.5rem;
+    list-style: none;
     margin: 0;
     padding: 0;
 }
 
 .header-menu a {
-    color: #333;
-    font-weight: bold;
-    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-light);
     transition: color 0.3s ease;
 }
 
-.header-menu a:hover {
-    color: #0D6EFD;
+.header-menu a:hover,
+.header-menu a.active { /* Bạn có thể thêm class 'active' cho trang hiện tại */
+    color: var(--primary-color);
 }
 
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 12px;
-    flex-shrink: 0;
+    gap: 1rem;
 }
-
-/* Các nút (dùng khi chưa đăng nhập) */
-.btn {
-    padding: 10px 18px;
+.header-actions button {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
     border: none;
-    border-radius: 5px;
+    border-radius: var(--border-radius-md);
     cursor: pointer;
-    font-weight: bold;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
+    transition: background-color 0.3s ease;
+}
+.header-actions .btn-login {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+.header-actions .btn-login:hover {
+    background-color: #2a5a8f;
+}
+.header-actions .btn-register {
+    background-color: green;
+    color: var(--text-light);
+}
+.header-actions .btn-register:hover {
+    background-color: #0f9d6e;
 }
 
-.btn-login {
-    background-color: transparent;
-    border: 2px solid #0D6EFD;
-    color: #0D6EFD;
+/* Ẩn các nút điều hướng desktop trên di động */
+@media (max-width: 992px) {
+    .desktop-nav {
+        display: none !important;
+    }
 }
-
-.btn-login:hover {
-    background-color: #e6f0ff;
-}
-
-.btn-register {
-    background-color: #0D6EFD;
-    color: #FFFFFF;
-    border: 2px solid #0D6EFD;
-}
-
-.btn-register:hover {
-    background-color: #0056b3;
-}
-
-/* Style cho thông tin user đã đăng nhập */
-#welcome-user {
-    font-weight: bold;
-    color: #0056b3;
-    margin: 0;
-    font-size: 0.9rem;
-    white-space: nowrap;
-}
-
-.header-actions > p { /* Style cho ô chứa coin */
-    display: flex;
-    align-items: center;
-    background-color: #D1E9F6;
-    padding: 5px 10px;
-    border-radius: 5px;
-    gap: 5px;
-    font-weight: bold;
-    color: #0056b3;
-    margin: 0;
-}
-
-.header-actions > p img {
-    width: 20px;
-    height: 20px;
-}
-
-.user-avatar img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    object-fit: cover;
-    border: 2px solid #0D6EFD;
-}
-
-.header-nhatuyendung {
-    text-align: right;
-    border-left: 1px solid #ccc;
-    padding-left: 15px;
-}
-
-.header-nhatuyendung .cau_hoi {
-    font-size: 0.9rem;
-    color: #777;
-    margin: 0 0 2px 0;
-}
-
-.header-nhatuyendung a {
-    font-weight: bold;
-    color: #E65100;
-    font-size: 0.9rem;
-}
-
-.header-nhatuyendung a:hover {
-    text-decoration: underline;
-}
+/* (Bạn đã có JS cho hamburger-btn và sidenav, 
+   hãy đảm bảo CSS của chúng hoạt động tốt) */
 
 /* --- Introduction Section --- */
 .introduction {
@@ -695,15 +647,14 @@ h1, h2, h3, h4, h5, h6 {
     height: 100%;
     width: 280px;
     position: fixed;
-    z-index: 999;
+    z-index: 1001;
     top: 0;
     left: -280px; /* Ẩn ban đầu */
-    background-color: #FFFFFF;
-    overflow-y: auto; /* Cho phép cuộn nếu menu quá dài */
+    background-color: var(--card-background);
+    overflow-x: hidden; /* Cho phép cuộn nếu menu quá dài */
     transition: left 0.3s ease-in-out;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.2);
-    display: flex;
-    flex-direction: column;
+    padding-top: 20px;
+    box-shadow: 5px 0 15px rgba(0,0,0,0.1);
 }
 
 .sidenav.open {
@@ -783,6 +734,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .sidenav a:hover {
     background-color: #f1f1f1;
+    color: var(--primary-color);
 }
 
 .sidenav a.sidenav-logout {
@@ -831,12 +783,11 @@ h1, h2, h3, h4, h5, h6 {
 /* --- CSS cho Nút Hamburger --- */
 .hamburger-btn {
     display: none; /* Ẩn trên desktop */
+    font-size: 1.5rem;
+    color: var(--text-color);
     background: none;
     border: none;
-    font-size: 1.8rem;
-    color: #333;
     cursor: pointer;
-    padding: 5px;
 }
 .hamburger-btn:hover {
     color: #0D6EFD;
