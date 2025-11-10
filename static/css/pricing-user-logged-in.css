@@ -1,24 +1,60 @@
-/* ==================== DARK MODE ==================== */
-html.theme-dark .header { background-color: #071428 !important; }
-html.theme-dark .header-menu ul li a { color: #CFE6FF !important; }
-html.theme-dark .header-actions button.btn-login { background-color: transparent !important; color: #E6EEF8 !important; border-color: #3B82F6 !important; }
-html.theme-dark .job-card { background: #071428 !important; box-shadow: 0 8px 24px rgba(2,6,23,0.6) !important; }
-html.theme-dark .job-card-title, html.theme-dark .job-card-company, html.theme-dark .job-card-category { color: #E6EEF8 !important; }
-html.theme-dark .job-card-tags, html.theme-dark .job-card-company { color: #C9D8EE !important; }
-html.theme-dark .footer, html.theme-dark .footer a { color: #C9D8EE !important; }
-    
-/* ==================== HEADER ==================== */
-/* HEADER CSS */
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: white;
-    padding: 10px 50px;
-    font-family: 'Arial', sans-serif;
+/* --- Cài đặt chung & Kiểu chữ --- */
+:root {
+    --primary-color: #3674B5;
+    --secondary-color: #10b981;
+    --background-color: #F6FCFF;
+    --card-background: #FFFFFF;
+    --text-color: #333;
+    --text-light: #555;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
-/* Logo và chữ */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 0;
+    font-weight: 600;
+}
+
+a {
+    text-decoration: none;
+    color: var(--primary-color);
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* --- Header --- */
+/* (Phần CSS header này chỉ là cơ bản, bạn có thể 
+   tích hợp với CSS header hiện có của bạn) */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: var(--card-background);
+    box-shadow: var(--shadow-light);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
 .header-logo {
     display: flex;
     align-items: center;
@@ -26,304 +62,481 @@ html.theme-dark .footer, html.theme-dark .footer a { color: #C9D8EE !important; 
 }
 
 .header-logo img {
-    width: 80px; /* giảm từ 100px */
-    height: 80px; /* giảm từ 100px */
-    object-fit: contain;
+    width: 45px;
+    height: 45px;
 }
 
 .logo-text h1 {
-    font-family: 'Anuphan', sans-serif;
-    font-weight: 700;
-    font-size: 36px; /* giảm từ 48px */
+    font-size: 1.25rem;
     margin: 0;
-    color: #000;
+    color: var(--primary-color);
 }
 
 .logo-text p {
-    font-family: 'Anuphan', sans-serif;
-    font-weight: 400;
-    font-size: 16px; /* giảm từ 20px */
+    font-size: 0.7rem;
     margin: 0;
-    color: #000;
+    color: var(--text-light);
+    line-height: 1.3;
 }
 
-/* Menu chính */
 .header-menu ul {
     display: flex;
-    gap: 20px;
+    gap: 1.5rem;
+    list-style: none;
     margin: 0;
     padding: 0;
-    list-style: none;
 }
 
-.header-menu ul li a {
-    text-decoration: none;
-    color: #000;
-    font-weight: 600;
-    font-size: 13px; /* giảm từ 18px */
+.header-menu a {
+    font-weight: 500;
+    color: var(--text-light);
+    transition: color 0.3s ease;
 }
 
-.header-menu ul li a:hover {
-    text-decoration: underline;
-    color: #3674B5;
+.header-menu a:hover,
+.header-menu a.active { /* Bạn có thể thêm class 'active' cho trang hiện tại */
+    color: var(--primary-color);
 }
 
-/* Nút đăng nhập / đăng ký và nhà tuyển dụng */
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 16px; /* giảm khoảng cách từ 20px */
+    gap: 1rem;
+}
+.header-actions button {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.header-actions .btn-login {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+.header-actions .btn-login:hover {
+    background-color: #2a5a8f;
+}
+.header-actions .btn-register {
+    background-color: green;
+    color: var(--text-light);
+}
+.header-actions .btn-register:hover {
+    background-color: #0f9d6e;
 }
 
-.header-actions button {
+/* Ẩn các nút điều hướng desktop trên di động */
+@media (max-width: 992px) {
+    .desktop-nav {
+        display: none !important;
+    }
+}
+/* (Bạn đã có JS cho hamburger-btn và sidenav, 
+   hãy đảm bảo CSS của chúng hoạt động tốt) */
+
+/* --- Phần Giới thiệu (Introduction) --- */
+.introduction {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    background-color: #eaf6ff; /* Một màu xanh nhạt hơn */
+    border-bottom: 1px solid #d1e9f6;
+}
+
+.content-introduction {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.title_content h1 {
+    font-size: 2.25rem; /* Giảm 1 chút so với 2.5rem */
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.title_content p {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    max-width: 650px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* --- Container chứa các Gói giá --- */
+.card-pricing-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem; /* Khoảng cách giữa các thẻ */
+    padding: 3rem 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* --- Thẻ Gói giá (Pricing Card) --- */
+.card-pricing {
+    background-color: var(--card-background);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-light);
+    width: 100%;
+    max-width: 350px; /* Giới hạn độ rộng của thẻ */
+    display: flex;
+    flex-direction: column; /* Sắp xếp nội dung theo chiều dọc */
+    overflow: hidden; /* Đảm bảo bo góc hoạt động cho header */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-top: 4px solid transparent; /* Tạo 1 dải màu ở trên */
+}
+
+.card-pricing:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+/* Phân biệt Gói Ứng viên (Premium) và Gói Doanh nghiệp (Business) */
+.card-pricing.premium {
+    border-top-color: var(--primary-color); /* Dải màu xanh */
+}
+
+.card-pricing.business {
+    border-top-color: var(--secondary-color); /* Dải màu xanh lá */
+}
+
+
+.card-pricing .card-header {
+    font-size: 1.25rem;
+    font-weight: 600;
+    padding: 1rem 1.5rem;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+}
+
+.card-pricing .price {
+    font-size: 2.5rem;
+    font-weight: 700;
+    padding: 1.5rem;
+    text-align: center;
+    color: var(--text-color);
+}
+
+.card-pricing .price span {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--text-light);
+}
+
+/* Gói Premium (ứng viên) */
+.card-pricing.premium .price {
+    color: var(--primary-color);
+}
+
+/* Gói Business */
+.card-pricing.business .price {
+    color: var(--secondary-color);
+}
+
+
+.card-pricing .card-body {
+    padding: 0 1.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Giúp .card-body chiếm hết không gian còn lại */
+}
+
+/* Danh sách Tính năng */
+ul.pricing-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem 0; /* Thêm margin-bottom */
+}
+
+ul.pricing-features li {
+    /* Macro của bạn đã thêm style inline 
+       (display: flex, align-items: flex-start) 
+       nên chúng ta chỉ cần tinh chỉnh thêm */
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+    color: var(--text-light);
+}
+
+ul.pricing-features li i {
+    color: var(--secondary-color) !important; /* Ghi đè màu từ macro */
+    margin-top: 4px !important;
+    margin-right: 10px !important;
+}
+
+/* Nút Mua ngay */
+.buy-btn {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    background-color: #555; /* Màu mặc định */
     border: none;
-    padding: 8px 16px; /* giảm từ 10px 20px */
-    font-size: 14px;   /* giảm từ 16px */
-    border-radius: 12px;
+    border-radius: var(--border-radius-md);
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: auto; /* !! Quan trọng: Đẩy nút xuống dưới cùng */
+}
+
+.buy-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Nút cho gói Premium */
+.card-pricing.premium .buy-btn {
+    background-color: var(--primary-color);
+}
+.card-pricing.premium .buy-btn:hover {
+    background-color: #2a5a8f; /* Màu xanh đậm hơn */
+}
+
+/* Nút cho gói Business */
+.card-pricing.business .buy-btn {
+    background-color: var(--secondary-color);
+}
+.card-pricing.business .buy-btn:hover {
+    background-color: #0f9d6e; /* Màu xanh lá đậm hơn */
+}
+
+/* --- Hộp Thanh toán (Checkout Box) --- */
+.checkout-box {
+    display: none; /* Sẽ được JS bật lên */
+    max-width: 500px;
+    margin: 1rem auto 3rem auto; /* Căn giữa và tạo khoảng cách */
+    padding: 2rem;
+    background-color: var(--card-background);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-hover);
+    border: 1px solid #d1e9f6;
+}
+
+.checkout-box #checkout-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+}
+
+.checkout-box form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.checkout-box label {
+    font-weight: 500;
+    margin-bottom: -0.5rem;
+}
+
+.checkout-box input[type="number"] {
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: var(--border-radius-md);
+    font-size: 1rem;
+    width: 100%;
+}
+
+.checkout-box .btn.btn-primary {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: var(--border-radius-md);
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+}
+
+.checkout-box .btn.btn-primary:hover {
+    background-color: #2a5a8f;
+}
+
+/* --- Footer --- */
+/* (Phần CSS footer này chỉ là cơ bản, bạn có thể 
+   tích hợp với CSS footer hiện có của bạn) */
+.footer {
+    background-color: #0c2b4e; /* Màu nền tối */
+    color: #f0f0f0;
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+}
+/* (Các style chi tiết cho footer... ) */
+.footer img {
+    height: 60px;
+    margin-bottom: 1rem;
+}
+
+
+/* --- Responsive Design --- */
+@media (max-width: 768px) {
+    .header {
+        padding: 1rem;
+    }
+
+    .title_content h1 {
+        font-size: 1.8rem;
+    }
+
+    .title_content p {
+        font-size: 1rem;
+    }
+    
+    .card-pricing-container {
+        flex-direction: column;
+        align-items: center; /* Căn các thẻ vào giữa */
+        gap: 1.5rem;
+        padding: 2rem 1rem;
+    }
+
+    .card-pricing {
+        max-width: 95%; /* Thẻ chiếm gần hết chiều rộng */
+    }
+
+    .checkout-box {
+        width: 90%;
+        padding: 1.5rem;
+    }
+}
+
+/* --- Cập nhật cho Menu Di động (Sidenav & Overlay) --- */
+
+/* Nút Hamburger */
+.hamburger-btn {
+    display: none; /* Ẩn trên desktop */
+    font-size: 1.5rem;
+    color: var(--text-color);
+    background: none;
+    border: none;
     cursor: pointer;
 }
 
-/* Nút đăng nhập */
-.btn-login {
-    background-color: #F6FCFF;
-    color: #3674B5;
-    border: 1px solid #3674B5;
+/* Thanh Sidenav (Menu trượt) */
+.sidenav {
+    height: 100%;
+    width: 280px; /* Độ rộng của menu */
+    position: fixed;
+    z-index: 1001; /* Phải cao hơn overlay và header */
+    top: 0;
+    left: -280px; /* Ẩn về phía bên trái */
+    background-color: var(--card-background);
+    overflow-x: hidden;
+    transition: left 0.3s ease-in-out;
+    padding-top: 20px;
+    box-shadow: 5px 0 15px rgba(0,0,0,0.1);
 }
 
-.btn-login:hover {
-    background-color: #E0F0FF;
+.sidenav.open {
+    left: 0; /* Hiện ra khi có class 'open' (từ JS) */
 }
 
-/* Nút đăng ký */
-.btn-register {
-    background-color: #3674B5;
+.sidenav a,
+.sidenav p {
+    padding: 10px 15px 10px 20px;
+    text-decoration: none;
+    font-size: 1rem;
+    color: var(--text-light);
+    display: block;
+    transition: 0.2s;
+}
+
+.sidenav p {
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0;
+}
+
+.sidenav a:hover {
+    background-color: #f1f1f1;
+    color: var(--primary-color);
+}
+
+.sidenav .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 2rem;
+}
+
+/* Style cho các nút và thông tin trong Sidenav */
+.sidenav-actions {
+    padding: 0 20px;
+    margin-top: 1rem;
+    border-top: 1px solid #eee;
+    padding-top: 1rem;
+}
+
+.btn-login-sidenav, .btn-register-sidenav {
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+    border: none;
+    border-radius: var(--border-radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+.btn-login-sidenav {
+    background-color: var(--primary-color);
     color: white;
 }
-
-.btn-register:hover {
-    background-color: #2b5fa3;
+.btn-register-sidenav {
+    background-color: #eee;
+    color: var(--text-light);
+}
+.btn-logout-sidenav {
+     background-color: #f44336; /* Màu đỏ */
+     color: white;
+     width: 100%;
+     padding: 10px;
+     border: none;
+     border-radius: var(--border-radius-md);
+     font-weight: 600;
+     cursor: pointer;
+     margin-top: 10px;
 }
 
-/* Nhà tuyển dụng */
-.header-nhatuyendung {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-left: 16px; /* giảm từ 20px */
-    padding-left: 16px; /* giảm từ 20px */
-    border-left: 2px solid #ccc; /* gạch dọc phân cách */
+/* Lớp phủ mờ (Overlay) */
+#overlay {
+    display: none; /* Ẩn mặc định */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000; /* Dưới sidenav, trên header */
+    transition: opacity 0.3s ease;
+    opacity: 0;
 }
 
-.header-nhatuyendung p {
-    margin: 0;
-    font-size: 14px; /* giảm từ 16px */
+#overlay.show {
+    display: block; /* Hiện ra khi có class 'show' (từ JS) */
+    opacity: 1;
 }
 
-.header-nhatuyendung a {
-    text-decoration: none;
-    color: #EEC759;
-    font-weight: 600;
-}
 
-.header-nhatuyendung a:hover {
-    text-decoration: underline;
-}
+/* Kích hoạt Menu Di động (Breakpoint này phải khớp
+   với breakpoint ẩn desktop-nav trong HTML) */
+@media (max-width: 992px) {
+    /* (Đoạn này đã có trong CSS trước, 
+       chỉ cần đảm bảo nó tồn tại) */
+    .header-menu.desktop-nav,
+    .header-actions.desktop-nav {
+        display: none !important; /* Ẩn menu desktop */
+    }
 
-/* Responsive: giảm padding và chữ khi màn hình nhỏ */
-@media screen and (max-width: 1024px) {
-    .header {
-        padding: 10px 30px;
-    }
-    .logo-text h1 {
-        font-size: 28px;
-    }
-    .logo-text p {
-        font-size: 14px;
-    }
-    .header-menu ul li a {
-        font-size: 14px;
-    }
-    .header-actions button {
-        font-size: 12px;
-        padding: 6px 12px;
-    }
-    .header-nhatuyendung p {
-        font-size: 12px;
+    .hamburger-btn {
+        display: block; /* Hiện nút hamburger */
     }
 }
-
-.background_intro { background-image: url("/static/images/img_bgr.png");
-    background-size: cover;
-    height: 300px; }
-
-.content-introduction { padding: 20px;
-    text-align: center;
-    
-    position: relative;
-    top: -200px;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-    border-radius: 5px; }
-
-/* ==================== FOOTER ==================== */
-.footer {
-    display: flex;
-    justify-content: space-between; /* Footer chia trái – phải */
-    align-items: flex-start;
-    padding: 32px 48px;
-    background: #f8fafc;
-    border-top: 2px solid #e5e7eb;
-    font-family: "Inter", Arial, sans-serif;
-    font-size: 16px;
-    color: #222;
-    position: relative;
-}
-
-/* Contact info trái */
-.footer-contact {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    text-align: left;
-    padding-left: 20px; /* căn trái một chút so với cạnh */
-}
-
-/* Số điện thoại và email mỗi cái một dòng */
-.footer-contact-item {
-    display: block; /* mỗi item một dòng */
-    font-family: 'Be Vietnam Pro', sans-serif;
-    font-weight: 500;
-    font-size: 20px;
-    line-height: 25px;
-    color: #000;
-}
-
-.footer-contact-item i {
-    margin-right: 8px; /* icon cách text */
-}
-
-/* Logo giữa */
-.footer-logo {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
-
-.footer-logo-img {
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
-}
-
-.footer-logo-text {
-    font-weight: 600;
-    font-size: 18px;
-    letter-spacing: 1px;
-}
-
-/* Links phải */
-.footer-links {
-    display: flex;
-    justify-content: flex-end; /* cả nhóm nằm sát phải */
-    gap: 60px; /* khoảng cách giữa các cột */
-}
-
-/* Mỗi nhóm cột */
-.footer-links-group {
-    display: flex;
-    flex-direction: column; /* xếp dọc: title + link */
-    gap: 15px;
-    align-items: flex-start; /* text canh trái trong cột */
-}
-
-.footer-links-title {
-    font-family: 'Anuphan', sans-serif;
-    font-weight: 700;
-    font-size: 24px;
-    line-height: 31px;
-    color: #000;
-}
-
-.footer-links a {
-    font-family: 'Be Vietnam Pro', sans-serif;
-    font-weight: 500;
-    font-size: 20px;
-    line-height: 25px;
-    color: #000;
-    text-decoration: none;
-}
-
-.footer-links a:hover {
-    color: #2563eb;
-}
-
-.card-pricing { position: relative;
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 4px 24px rgba(33,150,243,0.12);
-    width: 340px;
-    min-height: 420px;
-    text-align: center;
-    z-index: 2;
-    transition: box-shadow 0.2s, transform 0.2s;
-    border: none;
-    margin: 0;
-    padding-bottom: 32px;
-    font-family:Arial, Helvetica, sans-serif; }
-
-.card-pricing-container { display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 48px;
-    margin: 48px 0;
-    position: relative;
-    transform: translateY(-200px); }
-
-.card-header { padding: 28px 0 16px 0;
-    font-size: 1.35rem;
-    font-weight: bold;
-    border-bottom: 2px solid #eee;
-    color: #222;
-    background: none; }
-
-.card-header h2 { margin: 0;
-    font-size: 1.8rem;
-    font-weight: bold; }
-
-.card-body ul { padding: 18px 32px;
-    font-size: 1.08rem;
-    text-align: left;
-    margin: 0;
-    border: none;
-    color: #444; }
-
-.card-pricing .price { font-size: 1.35rem;
-    font-weight: bold;
-    color: #3674B5;
-    margin: 18px 0 8px 0; }
-
-.card-pricing.xu .price { color: #FFD966; }
-
-.card-pricing .buy-btn { display: inline-block;
-    margin-top: 24px;
-    padding: 12px 32px;
-    border-radius: 8px;
-    font-size: 1.08rem;
-    font-weight: bold;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(33,150,243,0.08);
-    transition: background 0.2s, color 0.2s; }
-
-.card-pricing.premium .buy-btn { background: #4BA3F7;
-    color: #fff; }
-
-.card-pricing.xu .buy-btn { background: #FFD966;
-    color: #222; }
-
-.card-pricing .buy-btn:hover { opacity: 0.85;
-    transform: scale(1.04); }
-
