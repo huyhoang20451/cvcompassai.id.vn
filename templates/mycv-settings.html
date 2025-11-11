@@ -260,7 +260,7 @@
                   <p><strong>Địa chỉ làm việc:</strong> {{ cv.top10_jds_details.location }}</p>
                   <p><strong>Mức lương:</strong> {{ cv.top10_jds_details.min_salary | default('') }} - {{ cv.top10_jds_details.max_salary | default('') }}</p>
                   <p><strong>Yêu cầu công việc:</strong></p>
-                  {{ render_job_text(cv.top10_jds_details.job_descriptions) | default(render_job_text(cv.top10_jds_details.job_description)) | default(render_job_text(cv.top10_jds_details.requirements)) | default('<p><em>Đang cập nhật...</em></p>') | safe }}
+                  {{ render_job_text(cv.top10_jds_details.job_descriptions) | default('<p><em>Đang cập nhật...</em></p>') | safe }}
                 {% else %}
                   {# Otherwise assume it's an iterable/list of JD objects/dicts #}
                   {% for jd in cv.top10_jds_details %}
@@ -269,7 +269,7 @@
                       <p><strong>Địa chỉ làm việc:</strong> {{ jd.location | default(jd.company_location) | default('N/A') }}</p>
                       <p><strong>Mức lương:</strong> {{ jd.min_salary | default(jd.minSalary) | default('') }} - {{ jd.max_salary | default(jd.maxSalary) | default('') }}</p>
                       <p><strong>Yêu cầu công việc:</strong></p>
-                      {{ render_job_text(jd.job_descriptions) | default(render_job_text(jd.job_description)) | default(render_job_text(jd.requirements)) | default('<p><em>Đang cập nhật...</em></p>') | safe }}
+                      {{ render_job_text(jd.job_descriptions) | default('<p><em>Đang cập nhật...</em></p>') | safe }}
                     </div>
                   {% endfor %}
                 {% endif %}
