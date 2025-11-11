@@ -207,7 +207,6 @@
               <a href="{{ cv.URL }}" class="cv-detail">Xem chi tiết ảnh</a>
             </div>
             {% macro render_job_text(text) %}
-    {# Khởi tạo biến để chứa nội dung HTML đầu ra #}
     {% set output_html = '' %}
     {% set text_value = text | default('') %}
     
@@ -223,26 +222,42 @@
     
     {# TRƯỜNG HỢP 2: Dữ liệu là chuỗi và không rỗng #}
     {% elif text_value %}
-        {% set cleaned_text = text_value.strip().strip('[').strip(']').strip('"').strip("'") %}
+        {% set trimmed_text = text_value.strip() %}
         
-        {% if ',' in cleaned_text %}
-            {# Tách chuỗi theo dấu phẩy #}
-            {% set items = cleaned_text.replace('", "', '|||').replace('","', '|||').replace(', ', '|||').replace(',', '|||').split('|||') %}
-        {% else %}
-            {# Tách chuỗi theo xuống dòng #}
-            {% set items = cleaned_text.replace('\r\n', '\n').split('\n') %}
-        {% endif %}
+        {# 2a: Sửa lỗi logic - Chuỗi là mảng JSON (bắt đầu bằng [ và kết thúc bằng ]) #}
+        {% if trimmed_text.startswith('[') and trimmed_text.endswith(']') %}
+            
+            {# Cắt bỏ [ và ] ở hai đầu #}
+            {% set inner_text = trimmed_text[1:-1] %}
+            
+            {# Tách chuỗi theo dấu phẩy và dấu ngoặc kép #}
+            {% set items = inner_text.replace('", "', '|||').replace('","', '|||').split('|||') %}
+            
+            {% set output_html %}
+                <ul style="padding-left: 20px; margin-top: 5px; font-size: 0.95rem;">
+                {% for item in items %}
+                    {# Làm sạch từng item (bỏ dấu " hoặc ' ở đầu/cuối) #}
+                    {% set clean_item = item.strip().strip('"').strip("'") %} 
+                    {% if clean_item %}
+                        <li style="margin-bottom: 5px;">{{ clean_item }}</li>
+                    {% endif %}
+                {% endfor %}
+                </ul>
+            {% endset %}
 
-        {% set output_html %}
-            <ul style="padding-left: 20px; margin-top: 5px; font-size: 0.95rem;">
-            {% for item in items %}
-                {% set clean_item = item.strip().strip('"').strip("'") %}
-                {% if clean_item %}
-                    <li style="margin-bottom: 5px;">{{ clean_item }}</li>
-                {% endif %}
-            {% endfor %}
-            </ul>
-        {% endset %}
+        {# 2b: Chuỗi là văn bản thường (tách bằng xuống dòng) #}
+        {% else %}
+            {% set items = trimmed_text.replace('\r\n', '\n').split('\n') %}
+            {% set output_html %}
+                <ul style="padding-left: 20px; margin-top: 5px; font-size: 0.95rem;">
+                {% for item in items %}
+                    {% if item.strip() %}
+                        <li style="margin-bottom: 5px;">{{ item.strip() }}</li>
+                    {% endif %}
+                {% endfor %}
+                </ul>
+            {% endset %}
+        {% endif %}
     
     {# TRƯỜNG HỢP 3: Rỗng #}
     {% else %}
