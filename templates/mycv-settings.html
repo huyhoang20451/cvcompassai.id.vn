@@ -206,6 +206,46 @@
               </p>
               <a href="{{ cv.URL }}" class="cv-detail">Xem chi tiết ảnh</a>
             </div>
+            {% macro render_job_text(text) %}
+        {# TRƯỜNG HỢP 1: Dữ liệu đã là List Python thật (tốt nhất) #}
+        {% if text is iterable and text is not string %}
+            <ul style="padding-left: 20px; margin-top: 5px;">
+                {% for item in text %}
+                    <li style="margin-bottom: 5px;">{{ item }}</li>
+                {% endfor %}
+            </ul>
+
+        {# TRƯỜNG HỢP 2: Chuỗi JSON ["A", "B, C"] -> Tách bằng cụm [", "] thay vì chỉ [,] #}
+        {% elif text and text.strip().startswith('[') and text.strip().endswith(']') %}
+            <ul style="padding-left: 20px; margin-top: 5px;">
+                {# 1. Bỏ dấu [ và ] ở đầu cuối #}
+                {% set inner = text.strip()[1:-1] %}
+                {# 2. Mẹo quan trọng: Thay thế cụm phân cách `", "` bằng một ký tự đặc biệt hiếm gặp (ví dụ |||) #}
+                {# Chúng ta replace cả 2 trường hợp: có dấu cách và không có dấu cách sau dấu phẩy #}
+                {% set items = inner.replace('", "', '|||').replace('","', '|||').split('|||') %}
+                
+                {% for item in items %}
+                    {# 3. Làm sạch: Cắt bỏ các dấu ngoặc kép " hoặc ' còn sót lại ở đầu/cuối mỗi ý #}
+                    {% set clean_item = item.strip().strip('"').strip("'") %}
+                    {% if clean_item %}
+                        <li style="margin-bottom: 5px;">{{ clean_item }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+
+        {# TRƯỜNG HỢP 3: Văn bản thường, tách bằng xuống dòng (fallback) #}
+        {% elif text %}
+             <ul style="padding-left: 20px; margin-top: 5px;">
+                {% for line in text.replace('\r\n', '\n').split('\n') %}
+                    {% if line.strip() %}
+                        <li style="margin-bottom: 5px;">{{ line.strip() }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p><em>Đang cập nhật...</em></p>
+        {% endif %}
+    {% endmacro %}
             <div class="cv-details collapse" id="collapseExample{{ cv.id | default(loop.index) }}">
               <h4>Chi tiết CV #{{ cv.id | default(loop.index) }}</h4>
               {% if cv.top10_jds_details %}
@@ -214,7 +254,7 @@
                   <p><strong>Tên vị trí tuyển dụng:</strong> {{ cv.top10_jds_details.title }}</p>
                   <p><strong>Địa chỉ làm việc:</strong> {{ cv.top10_jds_details.location }}</p>
                   <p><strong>Mức lương:</strong> {{ cv.top10_jds_details.min_salary | default('') }} - {{ cv.top10_jds_details.max_salary | default('') }}</p>
-                  <p><strong>Yêu cầu công việc:</strong> {{ cv.top10_jds_details.job_descriptions | default(cv.top10_jds_details.job_description) | default(cv.top10_jds_details.requirements) | default('') }}</p>
+                  <p><strong>Yêu cầu công việc:</strong> {{ render_job_text(cv.top10_jds_details.job_descriptions) | default(render_job_text(cv.top10_jds_details.job_description)) | default(render_job_text(cv.top10_jds_details.requirements)) | default('') }}</p>
                 {% else %}
                   {# Otherwise assume it's an iterable/list of JD objects/dicts #}
                   {% for jd in cv.top10_jds_details %}
@@ -222,7 +262,7 @@
                       <p><strong>Tên vị trí tuyển dụng:</strong> {{ jd.title | default(jd.job_title) | default('N/A') }}</p>
                       <p><strong>Địa chỉ làm việc:</strong> {{ jd.location | default(jd.company_location) | default('N/A') }}</p>
                       <p><strong>Mức lương:</strong> {{ jd.min_salary | default(jd.minSalary) | default('') }} - {{ jd.max_salary | default(jd.maxSalary) | default('') }}</p>
-                      <p><strong>Yêu cầu công việc:</strong> {{ jd.job_descriptions | default(jd.job_description) | default(jd.requirements) | default('N/A') }}</p>
+                      <p><strong>Yêu cầu công việc:</strong> {{ render_job_text(jd.job_descriptions) | default(render_job_text(jd.job_description)) | default(render_job_text(jd.requirements)) | default('N/A') }}</p>
                     </div>
                   {% endfor %}
                 {% endif %}
