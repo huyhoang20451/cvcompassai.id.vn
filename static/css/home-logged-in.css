@@ -1,3 +1,27 @@
+/* =========================================
+   THEME BLOCK (from about-us-loggedin.css)
+   Shared brand tokens and core header/footer styles
+   ========================================= */
+:root {
+    --primary-color: #3674B5;
+    --accent-color: #FFC107;
+    --background-color: #F6FCFF;
+    --card-background: #FFFFFF;
+    --text-color: #333;
+    --text-light: #6C757D;
+    --shadow-light: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+body { font-family: 'Roboto', sans-serif; background-color: var(--background-color); color: var(--text-color); margin:0; }
+
+.header { display:flex; justify-content:space-between; align-items:center; padding:10px 40px; background:#fff; box-shadow:var(--shadow-light); position:sticky; top:0; z-index:1000; }
+.logo-text h1 { color:var(--primary-color); margin:0; }
+.header-menu a:hover { color:var(--primary-color); }
+.header-menu a::after { content:''; position:absolute; width:0; height:3px; background:var(--primary-color); left:0; bottom:0; transition:width .3s }
+.header-menu a:hover::after { width:100%; }
+
+/* End theme block */
+
 /* /static/css/home-logged-in.css */
 
 /* --- Cài đặt chung & Kiểu chữ --- */
@@ -124,8 +148,69 @@ img {
     background-color: green;
     color: var(--text-light);
 }
+.btn-logout-sidenav {
+    background-color: #f44336;
+    color: white;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: var(--border-radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+}
+.btn-logout-sidenav:hover {
+    background-color: #d32f2f;
+}
+
+.btn-login-sidenav {
+    background-color: var(--primary-color);
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+    border: none;
+    border-radius: var(--border-radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+.btn-login-sidenav:hover {
+    background-color: #2a5a8f;
+}
+
+.btn-register-sidenav {
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+    border: none;
+    border-radius: var(--border-radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text-light);
+}
+.btn-register-sidenav:hover {
+    background-color: #0f9d6e;
+}
 .header-actions .btn-register:hover {
     background-color: #0f9d6e;
+}
+/* Lớp phủ mờ (Overlay) */
+#overlay {
+    display: none; /* Ẩn mặc định */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000; /* Dưới sidenav, trên header */
+    transition: opacity 0.3s ease;
+    opacity: 0;
+}
+
+#overlay.show {
+    display: block; /* Hiện ra khi có class 'show' (từ JS) */
+    opacity: 1;
 }
 
 /* Ẩn các nút điều hướng desktop trên di động */
@@ -623,113 +708,41 @@ img {
 /* --- CSS CHO MOBILE SIDENAV & RESPONSIVE --- */
 /* ========================================= */
 
-/* Lớp phủ mờ toàn màn hình */
-.overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 998;
-    display: none; /* Ẩn ban đầu */
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-}
-
-.overlay.show {
-    display: block;
-    opacity: 1;
-}
-
-/* Menu trượt bên trái */
+/* Thanh Sidenav (Menu trượt) */
 .sidenav {
     height: 100%;
-    width: 280px;
+    width: 280px; /* Độ rộng của menu */
     position: fixed;
-    z-index: 1001;
+    z-index: 1001; /* Phải cao hơn overlay và header */
     top: 0;
-    left: -280px; /* Ẩn ban đầu */
+    left: -280px; /* Ẩn về phía bên trái */
     background-color: var(--card-background);
-    overflow-x: hidden; /* Cho phép cuộn nếu menu quá dài */
+    overflow-x: hidden;
     transition: left 0.3s ease-in-out;
     padding-top: 20px;
     box-shadow: 5px 0 15px rgba(0,0,0,0.1);
 }
 
 .sidenav.open {
-    left: 0;
+    left: 0; /* Hiện ra khi có class 'open' (từ JS) */
 }
 
-/* Nút đóng (X) */
-.sidenav .close-btn {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 36px;
-    padding: 0;
-    color: #888;
-    line-height: 1; /* Căn chỉnh nút X */
-}
-.sidenav .close-btn:hover {
-    background-color: transparent;
-    color: #333;
-}
-
-/* Thông tin user trong Sidenav */
-.sidenav-user-info {
-    padding: 20px 32px;
-    text-align: center;
-    border-bottom: 1px solid #eee;
-    margin-top: 40px; /* Thêm khoảng trống cho nút đóng */
-}
-
-.sidenav-avatar {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    margin-bottom: 10px;
-    object-fit: cover;
-}
-
-.sidenav-user-info strong {
-    font-size: 1.1rem;
-    color: #333;
-    display: block;
-    margin-bottom: 5px;
-}
-
-.sidenav-coin {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    background-color: #D1E9F6;
-    padding: 3px 8px;
-    border-radius: 5px;
-    font-weight: bold;
-    color: #0056b3;
-}
-
-.sidenav-coin img {
-    width: 16px;
-    height: 16px;
-}
-
-/* Vạch kẻ ngang */
-.sidenav-divider {
-    border: 0;
-    border-top: 1px solid #eee;
-    margin: 5px 0;
-}
-
-/* Các link trong Sidenav */
-.sidenav a {
-    padding: 12px 15px 12px 32px;
+.sidenav a,
+.sidenav p {
+    padding: 10px 15px 10px 20px;
     text-decoration: none;
-    font-size: 1.05rem;
-    color: #333;
+    font-size: 1rem;
+    color: var(--text-light);
     display: block;
-    transition: 0.3s;
+    transition: 0.2s;
+}
+
+.sidenav p {
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0;
 }
 
 .sidenav a:hover {
@@ -737,24 +750,68 @@ img {
     color: var(--primary-color);
 }
 
-.sidenav a.sidenav-logout {
-    color: #D9534F; /* Màu đỏ cho Đăng xuất */
-}
-.sidenav a.sidenav-logout:hover {
-    background-color: #fbeaea;
+.sidenav .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 2rem;
 }
 
-/* Các nút Đăng nhập/Đăng ký (nếu có) */
+/* Style cho các nút và thông tin trong Sidenav */
 .sidenav-actions {
-    padding: 20px 32px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    padding: 0 20px;
+    margin-top: 1rem;
+    border-top: 1px solid #eee;
+    padding-top: 1rem;
 }
 
-.sidenav-actions .btn {
+.btn-login-sidenav, .btn-register-sidenav {
     width: 100%;
+    padding: 10px;
     text-align: center;
+    border: none;
+    border-radius: var(--border-radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+.btn-login-sidenav {
+    background-color: var(--primary-color);
+    color: white;
+}
+.btn-register-sidenav {
+    background-color: #eee;
+    color: var(--text-light);
+}
+.btn-logout-sidenav {
+     background-color: #f44336; /* Màu đỏ */
+     color: white;
+     width: 100%;
+     padding: 10px;
+     border: none;
+     border-radius: var(--border-radius-md);
+     font-weight: 600;
+     cursor: pointer;
+     margin-top: 10px;
+}
+
+/* Lớp phủ mờ (Overlay) */
+#overlay {
+    display: none; /* Ẩn mặc định */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000; /* Dưới sidenav, trên header */
+    transition: opacity 0.3s ease;
+    opacity: 0;
+}
+
+#overlay.show {
+    display: block; /* Hiện ra khi có class 'show' (từ JS) */
+    opacity: 1;
 }
 
 /* Phần "Nhà tuyển dụng" trong Sidenav */

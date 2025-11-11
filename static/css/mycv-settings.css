@@ -1,13 +1,14 @@
-/* --- BIẾN CHUNG & THIẾT LẬP CƠ BẢN --- */
+/* --- BIẾN CHUNG & THIẾT LẬP CƠ BẢN (THEME ALIGN) --- */
 :root {
-    --primary-color: #0056b3; /* Màu xanh dương chính */
+    --primary-color: #3674B5; /* Brand blue */
+    --accent-color: #FFC107; /* Brand yellow */
     --primary-light: #e6f0ff;
     --text-color: #333;
-    --text-light: #555;
+    --text-light: #6C757D;
     --border-color: #ddd;
-    --background-light: #f4f7f6;
+    --background-light: #F6FCFF;
     --white: #fff;
-    --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
 html {

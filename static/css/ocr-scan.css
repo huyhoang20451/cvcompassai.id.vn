@@ -1,8 +1,28 @@
 /* =========================================
-   CSS cho trang Quét CV (ocr-scan.css)
-   Bao gồm cả Responsive cho Mobile
+   THEME BLOCK (from about-us-loggedin.css)
+   Shared brand tokens and core header/footer styles
    ========================================= */
+:root {
+    --primary-color: #3674B5;
+    --accent-color: #FFC107;
+    --background-color: #F6FCFF;
+    --card-background: #FFFFFF;
+    --text-color: #333;
+    --text-light: #6C757D;
+    --shadow-light: 0 4px 15px rgba(0,0,0,0.08);
+}
 
+body { font-family: 'Roboto', sans-serif; background-color: var(--background-color); color: var(--text-color); margin:0; }
+
+.header { display:flex; justify-content:space-between; align-items:center; padding:10px 40px; background:#fff; box-shadow:var(--shadow-light); position:sticky; top:0; z-index:1000; }
+.logo-text h1 { color:var(--primary-color); margin:0; }
+.header-menu a:hover { color:var(--primary-color); }
+.header-menu a::after { content:''; position:absolute; width:0; height:3px; background:var(--primary-color); left:0; bottom:0; transition:width .3s }
+.header-menu a:hover::after { width:100%; }
+
+/* End theme block */
+
+/* OCR scan page styles */
 /* --- Biến màu và Cài đặt chung --- */
 :root {
     --primary-color: #0056b3;
