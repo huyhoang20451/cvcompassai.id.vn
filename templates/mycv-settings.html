@@ -207,52 +207,49 @@
               <a href="{{ cv.URL }}" class="cv-detail">Xem chi tiết ảnh</a>
             </div>
             {% macro render_job_text(text) %}
-    {# 1. Khởi tạo một biến chứa văn bản đã làm sạch #}
-    {% set cleaned_text = text | default('') %}
+    {# Khởi tạo biến để chứa nội dung HTML đầu ra #}
+    {% set output_html = '' %}
+    {% set text_value = text | default('') %}
     
-    {# Chuyển đối tượng List Python thành chuỗi để xử lý nhất quán (Ví dụ: ['item'] -> 'item') #}
-    {% if cleaned_text is iterable and cleaned_text is not string %}
-        {# Nếu là List/Tuple thật, hiển thị trực tiếp bằng <ul>/<li> #}
-        <ul style="padding-left: 20px; margin-top: 5px; font-size: 0.95rem;">
-            {% for item in cleaned_text %}
+    {# TRƯỜNG HỢP 1: Dữ liệu là List Python thật #}
+    {% if text_value is iterable and text_value is not string %}
+        {% set output_html %}
+            <ul style="padding-left: 20px; margin-top: 5px; font-size: 0.95rem;">
+            {% for item in text_value %}
                 <li style="margin-bottom: 5px;">{{ item }}</li>
             {% endfor %}
-        </ul>
-        {% return %}
-    {% endif %}
-
-    {# 2. Nếu là chuỗi, loại bỏ triệt để các ký tự bao quanh không mong muốn #}
-    {% if cleaned_text %}
-        {# Bỏ ngoặc vuông và ngoặc kép ở đầu và cuối chuỗi #}
-        {% set cleaned_text = cleaned_text.strip().strip('[').strip(']').strip('"').strip("'") %}
+            </ul>
+        {% endset %}
+    
+    {# TRƯỜNG HỢP 2: Dữ liệu là chuỗi và không rỗng #}
+    {% elif text_value %}
+        {% set cleaned_text = text_value.strip().strip('[').strip(']').strip('"').strip("'") %}
         
-        {# Nếu sau khi strip vẫn có dấu phẩy, coi là list string, tiến hành tách #}
         {% if ',' in cleaned_text %}
-            <ul style="padding-left: 20px; margin-top: 5px; font-size: 0.95rem;">
-                {% set items = cleaned_text.replace('", "', '|||').replace('","', '|||').replace(', ', '|||').replace(',', '|||').split('|||') %}
-                
-                {% for item in items %}
-                    {% set clean_item = item.strip().strip('"').strip("'") %}
-                    {% if clean_item %}
-                        <li style="margin-bottom: 5px;">{{ clean_item }}</li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-        
-        {# Nếu không có dấu phẩy, coi là văn bản thường, tách bằng xuống dòng #}
+            {# Tách chuỗi theo dấu phẩy #}
+            {% set items = cleaned_text.replace('", "', '|||').replace('","', '|||').replace(', ', '|||').replace(',', '|||').split('|||') %}
         {% else %}
-            <ul style="padding-left: 20px; margin-top: 5px; font-size: 0.95rem;">
-                {% for line in cleaned_text.replace('\r\n', '\n').split('\n') %}
-                    {% if line.strip() %}
-                        <li style="margin-bottom: 5px;">{{ line.strip() }}</li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
+            {# Tách chuỗi theo xuống dòng #}
+            {% set items = cleaned_text.replace('\r\n', '\n').split('\n') %}
         {% endif %}
 
+        {% set output_html %}
+            <ul style="padding-left: 20px; margin-top: 5px; font-size: 0.95rem;">
+            {% for item in items %}
+                {% set clean_item = item.strip().strip('"').strip("'") %}
+                {% if clean_item %}
+                    <li style="margin-bottom: 5px;">{{ clean_item }}</li>
+                {% endif %}
+            {% endfor %}
+            </ul>
+        {% endset %}
+    
+    {# TRƯỜNG HỢP 3: Rỗng #}
     {% else %}
-        <p style="font-size: 0.95rem;"><em>Đang cập nhật...</em></p>
+        {% set output_html = '<p style="font-size: 0.95rem;"><em>Đang cập nhật...</em></p>' %}
     {% endif %}
+
+    {{ output_html | safe }}
 {% endmacro %}
             <div class="cv-details collapse" id="collapseExample{{ cv.id | default(loop.index) }}">
               <h4>Chi tiết CV #{{ cv.id | default(loop.index) }}</h4>
