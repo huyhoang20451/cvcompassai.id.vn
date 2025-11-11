@@ -162,6 +162,62 @@
         <h1>Cài đặt</h1>
         <h3>CV của tôi</h3>
 
+        {# Macro to render job text (handles lists, JSON arrays, or newline-separated text) #}
+        {% macro render_job_text(text) %}
+          {% set output_html = '' %}
+          {% set text_value = text | default('') %}
+
+          {# Case 1: actual Python iterable (list) #}
+          {% if text_value is iterable and text_value is not string %}
+            {% set output_html %}
+              <ul style="padding-left: 20px; margin-top: 5px; font-size: 0.95rem;">
+              {% for item in text_value %}
+                <li style="margin-bottom: 5px;">{{ item }}</li>
+              {% endfor %}
+              </ul>
+            {% endset %}
+
+          {# Case 2: string-like content #}
+          {% elif text_value %}
+            {% set trimmed_text = text_value.strip() %}
+
+            {# 2a: JSON-like array string (starts with [ and ends with ]) #}
+            {% if trimmed_text.startswith('[') and trimmed_text.endswith(']') %}
+              {% set inner_text = trimmed_text[1:-1] %}
+              {% set items = inner_text.replace('", "', '|||').replace('","', '|||').split('|||') %}
+              {% set output_html %}
+                <ul style="padding-left: 20px; margin-top: 5px; font-size: 0.95rem;">
+                {% for item in items %}
+                  {% set clean_item = item.strip().strip('"').strip("'") %}
+                  {% if clean_item %}
+                    <li style="margin-bottom: 5px;">{{ clean_item }}</li>
+                  {% endif %}
+                {% endfor %}
+                </ul>
+              {% endset %}
+
+            {# 2b: plain text -> split by newline #}
+            {% else %}
+              {% set items = trimmed_text.replace('\r\n', '\n').split('\n') %}
+              {% set output_html %}
+                <ul style="padding-left: 20px; margin-top: 5px; font-size: 0.95rem;">
+                {% for item in items %}
+                  {% if item.strip() %}
+                    <li style="margin-bottom: 5px;">{{ item.strip() }}</li>
+                  {% endif %}
+                {% endfor %}
+                </ul>
+              {% endset %}
+            {% endif %}
+
+          {# Case 3: empty #}
+          {% else %}
+            {% set output_html = '<p style="font-size: 0.95rem;"><em>Đang cập nhật...</em></p>' %}
+          {% endif %}
+
+          {{ output_html | safe }}
+        {% endmacro %}
+
         {% for cv in cvs %}
           <div class="cv-item">
             <div class="cv-file">
@@ -184,15 +240,7 @@
                               <p><strong>Tên vị trí tuyển dụng:</strong> {{ cv.top10_jds_details.title }}</p>
                               <p><strong>Địa chỉ làm việc:</strong> {{ cv.top10_jds_details.location }}</p>
                               <p><strong>Mức lương:</strong> {% if cv.top10_jds_details.min_salary is not none and cv.top10_jds_details.max_salary is not none %}{{ "{:,.0f}".format(cv.top10_jds_details.min_salary) }} - {{ "{:,.0f}".format(cv.top10_jds_details.max_salary) }} VNĐ{% else %}Liên hệ{% endif %}</p>
-                              <p><strong>Yêu cầu công việc:</strong>
-                                {% set requirement_text = (cv.top10_jds_details.job_descriptions | default(cv.top10_jds_details.job_description) | default(cv.top10_jds_details.requirements)) %}
-                                {% for jd in requirement_text %}
-                                <ul>
-                                  {% for jd in requirement_text %}
-                                    <li>{{ jd }}</li>
-                                  {% endfor %}
-                                </ul>
-                              </p>
+                              <p><strong>Yêu cầu công việc:</strong> {{ cv.top10_jds_details.job_descriptions | default(cv.top10_jds_details.job_description) | default(cv.top10_jds_details.requirements) | default('') }}</p>
                             </div>
                           {% else %}
                             {% for jd in cv.top10_jds_details[:10] %}
@@ -200,72 +248,18 @@
                                 <p><strong>Tên vị trí tuyển dụng:</strong> {{ jd.title | default(jd.job_title) | default('N/A') }}</p>
                                 <p><strong>Địa chỉ làm việc:</strong> {{ jd.location | default(jd.company_location) | default('N/A') }}</p>
                                 <p><strong>Mức lương:</strong> {% if jd.min_salary is not none and jd.max_salary is not none %}{{ "{:,.0f}".format(jd.min_salary) }} - {{ "{:,.0f}".format(jd.max_salary) }} VNĐ{% else %}Liên hệ{% endif %}</p>
-                                <p><strong>Yêu cầu công việc:</strong>
-                                  {% set requirements_text = (cv.top10_jds_details.job_descriptions or cv.top10_jds_details.job_description or cv.top10_jds_details.requirements) | default('') | string | trim %}
-                                  {% if requirements_text %}
-                                      {% set cleaned_text = requirements_text.strip('"').strip("'").strip() %}
-                                      {% if cleaned_text.startswith('[') and cleaned_text.endswith(']') %}
-                                          {% set inner_text = cleaned_text[1:-1] %}
-                                          {% set items = inner_text.replace('", "', '|||').replace('","', '|||').split('|||') %}
-                                          <ul style="padding-left: 20px; margin-top: 5px; font-size: 0.95rem;">
-                                          {% for item in items %}
-                                              {% set clean_item = item.strip().strip('"').strip("'") %} 
-                                              {% if clean_item %}<li style="margin-bottom: 5px;">{{ clean_item }}</li>{% endif %}
-                                          {% endfor %}
-                                          </ul>
-                                      {% else %}
-                                          <ul style="padding-left: 20px; margin-top: 5px; font-size: 0.95rem;">
-                                          {% for item in cleaned_text.replace('\r\n', '\n').split('\n') %}
-                                              {% if item.strip() %}<li style="margin-bottom: 5px;">{{ item.strip() }}</li>{% endif %}
-                                          {% endfor %}
-                                          </ul>
-                                      {% endif %}
-                                  {% else %}
-                                      <p style="font-size: 0.95rem;"><em>Đang cập nhật...</em></p>
-                                  {% endif %}
-                                                              </div>
-                          {% else %}
-                            {% for jd in cv.top10_jds_details[:10] %}
-                              <div class="jd-detail" style="margin-bottom:12px;padding:8px;border-radius:6px;background:#f5f7fa;">
-                                <p><strong>Tên vị trí tuyển dụng:</strong> {{ jd.title | default(jd.job_title) | default('N/A') }}</p>
-                                <p><strong>Địa chỉ làm việc:</strong> {{ jd.location | default(jd.company_location) | default('N/A') }}</p>
-                                <p><strong>Mức lương:</strong> {% if jd.min_salary is not none and jd.max_salary is not none %}{{ "{:,.0f}".format(jd.min_salary) }} - {{ "{:,.0f}".format(jd.max_salary) }} VNĐ{% else %}Liên hệ{% endif %}</p>
-                                
-                                                                      <p style="margin-bottom: 5px;"><strong>Yêu cầu công việc:</strong></p>
-                                      {% set requirements_text = (jd.job_descriptions or jd.job_description or jd.requirements) | default('') | string | trim %}
-                                      {% if requirements_text %}
-                                          {% set cleaned_text = requirements_text.strip('"').strip("'").strip() %}
-                                          {% if cleaned_text.startswith('[') and cleaned_text.endswith(']') %}
-                                              {% set inner_text = cleaned_text[1:-1] %}
-                                              {% set items = inner_text.replace('", "', '|||').replace('","', '|||').split('|||') %}
-                                              <ul style="padding-left: 20px; margin-top: 5px; font-size: 0.95rem;">
-                                              {% for item in items %}
-                                                  {% set clean_item = item.strip().strip('"').strip("'") %} 
-                                                  {% if clean_item %}<li style="margin-bottom: 5px;">{{ clean_item }}</li>{% endif %}
-                                              {% endfor %}
-                                              </ul>
-                                          {% else %}
-                                              <ul style="padding-left: 20px; margin-top: 5px; font-size: 0.95rem;">
-                                              {% for item in cleaned_text.replace('\r\n', '\n').split('\n') %}
-                                                  {% if item.strip() %}<li style="margin-bottom: 5px;">{{ item.strip() }}</li>{% endif %}
-                                              {% endfor %}
-                                              </ul>
-                                          {% endif %}
-                                      {% else %}
-                                          <p style="font-size: 0.95rem;"><em>Đang cập nhật...</em></p>
-                                      {% endif %}
-                                                                    </div>
-                            {% endfor %}
-                            {% endif %}
-                        {% endfor %}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                {% else %}
-                 <span> Không có JD đã quét cho CV này.</span>
-                {% endif %}
-              </p>
+                                <p><strong>Yêu cầu công việc:</strong> {{ jd.job_descriptions | default(jd.job_description) | default(jd.requirements) | default('N/A') }}</p>
+                              </div>
+                            {% endfor %}
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {% else %}
+                  <span> Không có JD đã quét cho CV này.</span>
+                {% endif %}
+              </p>
         <a href="{{ cv.URL }}" class="cv-detail">Xem chi tiết ảnh</a>
       </div>
       <div class="cv-details collapse" id="collapseExample{{ cv.id | default(loop.index) }}">
