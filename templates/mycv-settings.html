@@ -162,62 +162,6 @@
         <h1>Cài đặt</h1>
         <h3>CV của tôi</h3>
 
-        {# Macro to render job text (handles lists, JSON arrays, or newline-separated text) #}
-        {% macro render_job_text(text) %}
-          {% set output_html = '' %}
-          {% set text_value = text | default('') %}
-
-          {# Case 1: actual Python iterable (list) #}
-          {% if text_value is iterable and text_value is not string %}
-            {% set output_html %}
-              <ul style="padding-left: 20px; margin-top: 5px; font-size: 0.95rem;">
-              {% for item in text_value %}
-                <li style="margin-bottom: 5px;">{{ item }}</li>
-              {% endfor %}
-              </ul>
-            {% endset %}
-
-          {# Case 2: string-like content #}
-          {% elif text_value %}
-            {% set trimmed_text = text_value.strip() %}
-
-            {# 2a: JSON-like array string (starts with [ and ends with ]) #}
-            {% if trimmed_text.startswith('[') and trimmed_text.endswith(']') %}
-              {% set inner_text = trimmed_text[1:-1] %}
-              {% set items = inner_text.replace('", "', '|||').replace('","', '|||').split('|||') %}
-              {% set output_html %}
-                <ul style="padding-left: 20px; margin-top: 5px; font-size: 0.95rem;">
-                {% for item in items %}
-                  {% set clean_item = item.strip().strip('"').strip("'") %}
-                  {% if clean_item %}
-                    <li style="margin-bottom: 5px;">{{ clean_item }}</li>
-                  {% endif %}
-                {% endfor %}
-                </ul>
-              {% endset %}
-
-            {# 2b: plain text -> split by newline #}
-            {% else %}
-              {% set items = trimmed_text.replace('\r\n', '\n').split('\n') %}
-              {% set output_html %}
-                <ul style="padding-left: 20px; margin-top: 5px; font-size: 0.95rem;">
-                {% for item in items %}
-                  {% if item.strip() %}
-                    <li style="margin-bottom: 5px;">{{ item.strip() }}</li>
-                  {% endif %}
-                {% endfor %}
-                </ul>
-              {% endset %}
-            {% endif %}
-
-          {# Case 3: empty #}
-          {% else %}
-            {% set output_html = '<p style="font-size: 0.95rem;"><em>Đang cập nhật...</em></p>' %}
-          {% endif %}
-
-          {{ output_html | safe }}
-        {% endmacro %}
-
         {% for cv in cvs %}
           <div class="cv-item">
             <div class="cv-file">
@@ -248,7 +192,14 @@
                                 <p><strong>Tên vị trí tuyển dụng:</strong> {{ jd.title | default(jd.job_title) | default('N/A') }}</p>
                                 <p><strong>Địa chỉ làm việc:</strong> {{ jd.location | default(jd.company_location) | default('N/A') }}</p>
                                 <p><strong>Mức lương:</strong> {% if jd.min_salary is not none and jd.max_salary is not none %}{{ "{:,.0f}".format(jd.min_salary) }} - {{ "{:,.0f}".format(jd.max_salary) }} VNĐ{% else %}Liên hệ{% endif %}</p>
-                                <p><strong>Yêu cầu công việc:</strong> {{ jd.job_descriptions | default(jd.job_description) | default(jd.requirements) | default('N/A') }}</p>
+                                <p><strong>Yêu cầu công việc:</strong>
+                                  {% for jd in jd.job_descriptions | default(jd.job_description) | default(jd.requirements) %}
+                                  <ul>
+                                    {% for jd in jd.job_descriptions | default(jd.job_description) | default(jd.requirements) %}
+                                      <li>{{ jd }}</li>
+                                    {% endfor %}
+                                  </ul>
+                                </p>
                               </div>
                             {% endfor %}
                           {% endif %}
