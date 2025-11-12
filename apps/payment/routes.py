@@ -32,7 +32,6 @@ async def payment(request: Request,
     total_money = amount_package * price
     order_desc = f"{user_info.id}"
     order_code = int(datetime.now().timestamp())
-
     # Tạo OrderSchema từ dữ liệu form
     order = OrderSchema(
         id=order_code,              # sinh id
