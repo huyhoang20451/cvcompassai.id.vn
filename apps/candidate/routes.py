@@ -282,36 +282,9 @@ async def top10_best_jd(request: Request,
     thread.start()
     print(cv.id)
     # Trả về giao diện HTML hiển thị tiến trình
-    html = f"""
-    <html>
-    <body>
-    <h3>Đang xử lý CV...</h3>
-    <progress id="bar" value="0" max="10" style="width:300px;"></progress>
-    <div id="status">Bắt đầu xử lý...</div>
-
-    <script>
-        const cv_id = {cv.id};  // ✅ đã có cv_id sẵn
-        async function checkProgress() {{
-            const res = await fetch(`/progress`);
-            const data = await res.json();
-            document.getElementById('bar').value = data.progress;
-            document.getElementById('status').innerText = 
-                data.done ? "✅ Hoàn tất! Chuyển hướng tới kết quả..." :
-                `Đã xử lý ${{data.progress}} / ${{data.total}} JD...`;
-
-            if (!data.done) {{
-                setTimeout(checkProgress, 5000);
-            }} else {{
-                // ✅ dùng biến cv_id đã gắn sẵn
-                window.location.href = `/result?cv_id=${{cv_id}}`;
-            }}
-        }}
-        checkProgress();
-    </script>
-    </body>
-    </html>
-    """
-    return HTMLResponse(content=html)
+    return templates.TemplateResponse("progress-scancv-user.html", {"request": request,
+                                                                    "user_info": user_info,
+                                                                    "cv_id": cv.id})
 
 # --- Route cho client polling ---
 @router.get("/progress")
