@@ -167,7 +167,7 @@
                     document.getElementById('status').innerText = "❌ Lỗi: CV ID không hợp lệ.";
                     return;
                 }
-                const res = await fetch('/progress');
+                const res = await fetch(`/progress/${cv_id}`);
                 const all_progress_data = await res.json();
                 const my_data = all_progress_data[cv_id];
 
@@ -187,7 +187,7 @@
                 if (!my_data.done) {
                     setTimeout(checkProgress, 2000); // Giảm thời gian chờ xuống 2s
                 } else {
-                    window.location.href = `/result?cv_id=${cv_id}`;
+                    window.location.href = `/result/${cv_id}`;
                 }
             }
             checkProgress();
