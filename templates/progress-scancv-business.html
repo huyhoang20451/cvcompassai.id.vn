@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>Dashboard - Doanh nghiệp (CV Compass)</title>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/static/css/home-business.css">
+    <link rel="stylesheet" href="/static/css/business_dashboard.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=upload" />
+    <script src="/static/js/theme.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" defer></script>
+  </head>
+  <body style="background-color: #F6FCFF">
+
+    <!-- Header / Nav -->
+    <header class="bg-white shadow-sm">
+      <div class="container d-flex align-items-center justify-content-between py-3">
+        <div class="d-flex align-items-center gap-3">
+          <div class="logo-image">
+            <a href="/business-dashboard"><img src="/static/images/Logo_Final2.png" alt="Logo CV Compass" height="48"></a>
+          </div>
+          <div>
+            <div class="logo-text">CV Compass</div>
+            <div class="logo-slogan">Smart Insight - Right Choice - Bright Future</div>
+          </div>
+        </div>
+
+        <nav class="d-none d-md-block">
+          <ul class="nav">
+            <li class="nav-item"><a class="nav-link text-muted" href="/business-dashboard">Trang chủ</a></li>
+            <li class="nav-item"><a class="nav-link text-muted" href="/job-storage">Quản lý JD</a></li>
+            <li class="nav-item"><a class="nav-link text-muted" href="/pricing-business-logged-in">Dịch vụ</a></li>
+          </ul>
+        </nav>
+
+        <div class="d-flex align-items-center gap-3">
+          <div class="me-2 text-end d-none d-md-block">
+            <div id="welcome-user" class="small text-muted">Xin chào, {{ user_info.company_name or 'Doanh nghiệp' }}</div>
+          </div>
+          <div class="dropdown">
+            <a class="d-inline-block user-avatar" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="/static/images/business_avatar.png" alt="avatar" width="44" height="44" class="rounded-circle border">
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="/business-profile">Hồ sơ của tôi</a></li>
+              <li><a class="dropdown-item" href="/job-storage">Lưu trữ JD</a></li>
+              <li><a class="dropdown-item" href="#">Cài đặt</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/business-home">Đăng xuất</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </header>
+    <div class="progress-container">
+        <h3>Đang so sánh CVs với JD ID {jd_id}...</h3>
+      <progress id="bar" value="0" max="10" style="width:300px;"></progress>
+      <div id="status">Bắt đầu xử lý...</div>
+
+      <script>
+        const jd_id = {jd_id};
+        async function checkProgress() {{
+            const res = await fetch(`/compare_progress`);
+            const data = await res.json();
+            document.getElementById('bar').value = data.progress;
+            document.getElementById('status').innerText = 
+                data.done ? "✅ Hoàn tất! Chuyển hướng tới kết quả..." :
+                `Đã xử lý ${{data.progress}} / ${{data.total}} CV...`;
+
+            if (!data.done) {{
+                setTimeout(checkProgress, 5000);
+            }} else {{
+                window.location.href = `/compare_cv_vs_jd/result?jd_id=${{jd_id}}`;
+            }}
+        }}
+        checkProgress();
+      </script>
+    </div>
+</body>
+</html>
+<style>
+    .progress-container {
+        text-align: center;
+        display: flex;
+        margin-top: 100px;
+        flex-direction: column;
+        align-items: center;
+    }
+    .progress-container h3 {
+        margin-bottom: 20px;
+        font-size: 24px;
+        color: #333;
+    }
+    .progress-container progress {
+        width: 300px;
+        height: 25px;
+    }
+</style>
