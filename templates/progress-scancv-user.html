@@ -161,19 +161,32 @@
         </script>
         {% endif %}
 
-        {# Wrap the JS that contains template literals/braces in a raw block so Jinja doesn't parse it #}
-        {% raw %}
         <script>
             async function checkProgress() {
+                if (cv_id === null) {
+                    document.getElementById('status').innerText = "❌ Lỗi: CV ID không hợp lệ.";
+                    return;
+                }
                 const res = await fetch('/progress');
-                const data = await res.json();
-                document.getElementById('bar').value = data.progress;
-                document.getElementById('status').innerText = data.done ? "✅ Hoàn tất! Chuyển hướng tới kết quả..." : `Đã xử lý ${data.progress} / ${data.total} JD...`;
+                const all_progress_data = await res.json();
+                const my_data = all_progress_data[cv_id];
 
-                if (!data.done) {
-                    setTimeout(checkProgress, 5000);
+                if (!my_data) {
+                    document.getElementById('status').innerText = "Đang xử lý ...";
+                    setTimeout(checkProgress, 2000);
+                    return;
+                }
+                document.getElementById('bar').max = my_data.total; // Cập nhật max
+                document.getElementById('bar').value = my_data.progress;
+
+                const statusText = my_data.done 
+                    ? "✅ Hoàn tất! Chuyển hướng tới kết quả..." 
+                    : `Đã xử lý ${my_data.progress} / ${my_data.total} JD...`;
+                document.getElementById('status').innerText = statusText;
+
+                if (!my_data.done) {
+                    setTimeout(checkProgress, 2000); // Giảm thời gian chờ xuống 2s
                 } else {
-                    // use the cv_id variable emitted by the template above
                     window.location.href = `/result?cv_id=${cv_id}`;
                 }
             }

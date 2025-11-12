@@ -181,7 +181,7 @@
             <!--Top 6-10 JD hiển thị bình thường-->
             {% for job in job_descriptions[5:10] %}
             <div onclick="goToJob({{ job.id }})" class="jd-item">
-                <div class="jd-rank">#{{ job.id }}</div>
+                <div class="jd-rank">#{{ loop.index + 5 }}</div>
                 <div class="jd-info">
                     <div class="jd-name">{{ job.title }}</div>
                     <div class="jd-company">{{ job.company_name }}</div>
