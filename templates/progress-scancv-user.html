@@ -150,25 +150,36 @@
             <progress id="bar" value="0" max="10" style="width:300px;"></progress>
             <div id="status">Bắt đầu xử lý...</div>
 
+        {# Emit cv_id safely, fall back to null when not available #}
+        {% if cv is defined and cv.id is defined %}
         <script>
-            const cv_id = {cv.id};  // ✅ đã có cv_id sẵn
-            async function checkProgress() {{
-                const res = await fetch(`/progress`);
+            const cv_id = {{ cv.id }};
+        </script>
+        {% else %}
+        <script>
+            const cv_id = null;
+        </script>
+        {% endif %}
+
+        {# Wrap the JS that contains template literals/braces in a raw block so Jinja doesn't parse it #}
+        {% raw %}
+        <script>
+            async function checkProgress() {
+                const res = await fetch('/progress');
                 const data = await res.json();
                 document.getElementById('bar').value = data.progress;
-                document.getElementById('status').innerText = 
-                    data.done ? "✅ Hoàn tất! Chuyển hướng tới kết quả..." :
-                    `Đã xử lý ${{data.progress}} / ${{data.total}} JD...`;
+                document.getElementById('status').innerText = data.done ? "✅ Hoàn tất! Chuyển hướng tới kết quả..." : `Đã xử lý ${data.progress} / ${data.total} JD...`;
 
-                if (!data.done) {{
+                if (!data.done) {
                     setTimeout(checkProgress, 5000);
-                }} else {{
-                    // ✅ dùng biến cv_id đã gắn sẵn
-                    window.location.href = `/result?cv_id=${{cv_id}}`;
-                }}
-            }}
+                } else {
+                    // use the cv_id variable emitted by the template above
+                    window.location.href = `/result?cv_id=${cv_id}`;
+                }
+            }
             checkProgress();
         </script>
+        {% endraw %}
     </div>
 
 </body>

@@ -60,28 +60,39 @@
       </div>
     </header>
     <div class="progress-container">
-        <h3>Đang so sánh CVs với JD ID {jd_id}...</h3>
+        <h3>Đang so sánh CVs với JD ID {% if jd_id is defined %}{{ jd_id }}{% else %}N/A{% endif %}...</h3>
       <progress id="bar" value="0" max="10" style="width:300px;"></progress>
       <div id="status">Bắt đầu xử lý...</div>
 
+      {# Emit jd_id safely for JS (number) or null when not provided #}
+      {% if jd_id is defined %}
       <script>
-        const jd_id = {jd_id};
-        async function checkProgress() {{
-            const res = await fetch(`/compare_progress`);
+        const jd_id = {{ jd_id }};
+      </script>
+      {% else %}
+      <script>
+        const jd_id = null;
+      </script>
+      {% endif %}
+
+      {# Prevent Jinja from parsing JS template literals / braces by using raw block #}
+      {% raw %}
+      <script>
+        async function checkProgress() {
+            const res = await fetch('/compare_progress');
             const data = await res.json();
             document.getElementById('bar').value = data.progress;
-            document.getElementById('status').innerText = 
-                data.done ? "✅ Hoàn tất! Chuyển hướng tới kết quả..." :
-                `Đã xử lý ${{data.progress}} / ${{data.total}} CV...`;
+            document.getElementById('status').innerText = data.done ? "✅ Hoàn tất! Chuyển hướng tới kết quả..." : `Đã xử lý ${data.progress} / ${data.total} CV...`;
 
-            if (!data.done) {{
+            if (!data.done) {
                 setTimeout(checkProgress, 5000);
-            }} else {{
-                window.location.href = `/compare_cv_vs_jd/result?jd_id=${{jd_id}}`;
-            }}
-        }}
+            } else {
+                window.location.href = `/compare_cv_vs_jd/result?jd_id=${jd_id}`;
+            }
+        }
         checkProgress();
       </script>
+      {% endraw %}
     </div>
 </body>
 </html>
