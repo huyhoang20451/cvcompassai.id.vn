@@ -10,6 +10,8 @@ DATABASE_URL = f"mysql+mysqldb://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYS
 
 engine = create_engine(DATABASE_URL, echo=True)
 
+SessionLocal = lambda: Session(engine)
+
 # Hàm khởi tạo DB (tạo bảng)
 def init_db():
     # Import toàn bộ models trước khi tạo bảng

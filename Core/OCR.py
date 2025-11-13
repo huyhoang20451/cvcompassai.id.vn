@@ -185,7 +185,7 @@ Return the result in JSON format.
 """
     # ---------- ƯU TIÊN GỌI GEMINI ----------
     try:
-        genai.configure(api_key="AIzaSyDA5_iLT6Xsldc99gTfbe1WI-6cNyNPlvM")
+        genai.configure(api_key="AIzaSyAUM6bbMv7wWiutpxwc8Ry6nkBvFEXUNtY")
         gemini = genai.GenerativeModel(model_name="models/gemini-2.5-flash")
 
         response = gemini.generate_content(prompt)
