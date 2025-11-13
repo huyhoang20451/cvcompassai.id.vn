@@ -275,22 +275,22 @@ async def top10_best_jd(request: Request,
     html = f"""
     <html>
     <style>
-        .progress-container {
+        .progress-container {{
             text-align: center;
             display: flex;
             margin-top: 100px;
             flex-direction: column;
             align-items: center;
-        }
-        .progress-container h3 {
+        }}
+        .progress-container h3 {{
             margin-bottom: 20px;
             font-size: 24px;
             color: #333;
-        }
-        .progress-container progress {
+        }}
+        .progress-container progress {{
             width: 300px;
             height: 25px;
-        }
+        }}
     </style>
     <body>
       <div class="progress-container">
