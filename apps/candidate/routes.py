@@ -1,8 +1,7 @@
 # Chứa API
 from threading import Thread
-import threading
 from time import time
-from typing import Annotated, Any, Dict, List, Optional
+from typing import Annotated, List, Optional
 from urllib import request
 import uuid
 from fastapi import APIRouter, Depends, HTTPException, Request, Cookie, File, UploadFile, Form
@@ -22,8 +21,7 @@ from .services import (jd_to_str, search_jobs,
                        get_job_categories,
                        get_saved_jobs_by_user,
                        update_candidate_cv,
-                       get_cvs_with_top10_jds,
-                       get_applied_cvs)
+                       get_cvs_with_top10_jds)
 from db import get_session, engine
 from Core.Auth.schemas import user
 from .schemas import CVData, JobResponse, JobSearchRequest, candidate_CV, jd
@@ -216,15 +214,6 @@ async def pricing_user_logged_in(request: Request,
     return templates.TemplateResponse("pricing-user-loggedin.html", {"request": request, 
                                                                      "user_info": user_info})
 
-@router.get("/saved-jobs", response_class=HTMLResponse)
-async def saved_jobs(request: Request,
-                     user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
-                     session: Session = Depends(get_session)):
-    save_jds = get_saved_jobs_by_user(session, user_info.id)
-    return templates.TemplateResponse("user-cv-storage.html", {"request": request,
-                                                               "user_info": user_info,
-                                                               "jds": save_jds})
-
 # Lưu công việc vào danh sách yêu thích
 @router.post("/save-jd/{jd_id}", response_class=HTMLResponse)
 async def save_jd(request: Request,
@@ -237,163 +226,127 @@ async def save_jd(request: Request,
     
     return JSONResponse(content={"success": True, "msg": "Đã lưu công việc thành công!"})
 
-# --- Bộ nhớ lưu tiến độ và kết quả (theo cv_id để hỗ trợ đa người dùng) ---
-progress_store: Dict[int, Dict[str, Any]] = {}  # {cv_id: {"progress": int, "total": int, "done": bool, "error": str}}
-result_store: Dict[int, List[Dict[str, Any]]] = {}  # {cv_id: [{"jd": jd, "Ratio": float}, ...]}
-store_lock = threading.Lock()  # Bảo vệ truy cập đồng thời
+# --- Bộ nhớ lưu tiến độ công việc ---
+progress_store = {}  # {"progress": int, "total": int, "done": bool}
+result_store = []  # [{"jd": jd, "Ratio": float}, ...]
 
 # --- Giả lập xử lý JD ---
-def process_cv(cv_id: int, cv_str: str, session_factory):
-    session = session_factory()
-    try:
+def process_cv(cv_str: str):
+    with Session(engine) as session:
+        global progress_store, result_store
         jds = get_jds(session)
-        total = len(jds)
-
-        # Khởi tạo tiến độ
-        with store_lock:
-            progress_store[cv_id] = {"progress": 0, "total": total, "done": False, "error": None}
-            result_store[cv_id] = []
+        progress_store = {"progress": 0, "total": len(jds), "done": False}
+        result_store = []
 
         for i, jd in enumerate(jds):
             try:
                 result = compare_qwen(jd_to_str(jd), cv_str)
-                ratio = result.get("Ratio", 0.0)
-                print(f"✅ [CV {cv_id}] JD ID: {jd.id} | Ratio: {ratio:.2f}")
-
-                with store_lock:
-                    result_store[cv_id].append({"jd": jd, "Ratio": ratio})
-                    progress_store[cv_id]["progress"] = i + 1
-
+                ratio = result.get("Ratio", 0)
+                print(f"✅ JD ID: {jd.id} | Ratio: {ratio}")
+                result_store.append({"jd": jd, "Ratio": ratio})
             except Exception as e:
-                print(f"❌ [CV {cv_id}] Lỗi khi xử lý JD ID {jd.id}: {e}")
-                # Ghi lỗi nhưng tiếp tục xử lý JD khác
-                continue
-
-        # Hoàn tất: sắp xếp và đánh dấu done
-        with store_lock:
-            if cv_id in result_store:
-                result_store[cv_id].sort(key=lambda x: x["Ratio"], reverse=True)
-            progress_store[cv_id]["done"] = True
-            progress_store[cv_id]["progress"] = total
-
-        print(f"✅ [CV {cv_id}] Đã xử lý xong {total} JD.")
-
-    except Exception as e:
-        with store_lock:
-            progress_store[cv_id] = {
-                "progress": 0,
-                "total": 0,
-                "done": True,
-                "error": f"Lỗi hệ thống: {str(e)}"
-            }
-        print(f"❌ [CV {cv_id}] Lỗi nghiêm trọng trong process_cv: {e}")
-    finally:
-        session.close()
-
+                print(f"❌ Lỗi khi xử lý JD ID {jd.id}: {e}")
+            progress_store["progress"] = i + 1
+            print(f"✅ Đã xử lý JD {i}/{len(jds)}")
+        
+        progress_store["done"] = True
 
 # --- Route upload CV ---
 @router.post("/top10-best-jd", response_class=HTMLResponse)
-async def top10_best_jd(
-    request: Request,
-    file: UploadFile = File(...),
-    user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
-    session: Session = Depends(get_session)
-):
-    # Upload và xử lý file
+async def top10_best_jd(request: Request, 
+                    file: UploadFile = File(...),
+                    user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
+                    session: Session = Depends(get_session)):
     file_path, cv = await service_upload_cv(file, user_info.id, session)
-
-    # Đọc nội dung CV
-    try:
-        if file.content_type == "application/pdf" or file.filename.lower().endswith(".pdf"):
-            from Core.OCR import scan_pdf
-            cv_str = scan_pdf(file.file)
-        elif file.content_type.startswith("image/") or file.filename.lower().endswith((".jpg", ".jpeg", ".png")):
-            from Core.OCR import run_vintern
-            cv_str = run_vintern(file_path)
-        else:
-            raise HTTPException(status_code=400, detail="Chỉ hỗ trợ file PDF hoặc ảnh (JPG, PNG).")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Lỗi đọc file: {str(e)}")
-
-    # Xóa dữ liệu cũ nếu có (tránh trùng)
-    with store_lock:
-        progress_store.pop(cv.id, None)
-        result_store.pop(cv.id, None)
-
-    # Chạy nền
-    thread = threading.Thread(
-        target=process_cv,
-        args=(cv.id, cv_str, get_session),  # get_session là callable
-        daemon=True
-    )
+    if file.content_type == "application/pdf" or file.filename.lower().endswith(".pdf"):
+        from Core.OCR import scan_pdf  # hàm đọc PDF
+        cv_str = scan_pdf(file.file)
+    elif file.content_type.startswith("image/") or file.filename.lower().endswith((".jpg", ".jpeg", ".png")):
+        from Core.OCR import run_vintern  # hàm OCR
+        cv_str = run_vintern(file_path)
+    else:
+        raise HTTPException(status_code=400, detail="Unsupported file type. Please upload a PDF or image file.")
+        
+    # Chạy luồng nền
+    thread = Thread(target=process_cv, args=(cv_str,))
     thread.start()
 
-    return templates.TemplateResponse(
-        "progress-scancv-user.html",
-        {
-            "request": request,
-            "user_info": user_info,
-            "cv_id": cv.id
+    # Trả về giao diện HTML hiển thị tiến trình
+    html = f"""
+    <html>
+    <style>
+        .progress-container {
+            text-align: center;
+            display: flex;
+            margin-top: 100px;
+            flex-direction: column;
+            align-items: center;
         }
-    )
-
-
-# --- Route polling tiến độ ---
-@router.get("/progress/{cv_id}")
-async def get_progress(cv_id: int):
-    with store_lock:
-        progress = progress_store.get(cv_id, {"progress": 0, "total": 0, "done": True, "error": "Không tìm thấy tiến độ."})
-    return JSONResponse(progress)
-
-
-# --- Route hiển thị kết quả ---
-@router.get("/result/{cv_id}", response_class=HTMLResponse)
-async def result_page(
-    request: Request,
-    cv_id: int,
-    user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
-    session: Session = Depends(get_session)
-):
-    with store_lock:
-        if cv_id not in result_store or cv_id not in progress_store:
-            raise HTTPException(status_code=404, detail="Kết quả chưa sẵn sàng hoặc không tồn tại.")
-        
-        if not progress_store[cv_id]["done"]:
-            raise HTTPException(status_code=425, detail="Đang xử lý, vui lòng chờ...")
-
-        if progress_store[cv_id].get("error"):
-            raise HTTPException(status_code=500, detail=progress_store[cv_id]["error"])
-
-        results = result_store[cv_id]
-
-    if not results:
-        top_10 = []
-    else:
-        top_10 = results[:10]
-
-    top_10_jd_ids = [item["jd"].id for item in top_10]
-
-    # Cập nhật DB
-    update_candidate_cv(
-        session=session,
-        cv_id=cv_id,
-        top10_jds=top_10_jd_ids
-    )
-
-    return templates.TemplateResponse(
-        "top10-best-jd.html",
-        {
-            "request": request,
-            "cv_id": cv_id,
-            "job_descriptions": [item["jd"] for item in top_10],
-            "ratios": [item["Ratio"] for item in top_10],
-            "user_info": user_info
+        .progress-container h3 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
         }
-    )
+        .progress-container progress {
+            width: 300px;
+            height: 25px;
+        }
+    </style>
+    <body>
+      <div class="progress-container">
+        <h3>Đang xử lý CV...</h3>
+        <progress id="bar" value="0" max="10" style="width:300px;"></progress>
+        <div id="status">Bắt đầu xử lý...</div>
+
+        <script>
+            const cv_id = {cv.id};  // 👈 gắn ID vào đây
+            async function checkProgress() {{
+                const res = await fetch(`/progress`);
+                const data = await res.json();
+                document.getElementById('bar').value = data.progress;
+                document.getElementById('status').innerText = 
+                    data.done ? "✅ Hoàn tất! Chuyển hướng tới kết quả..." :
+                `Đã xử lý ${{data.progress}} / ${{data.total}} JD...`;
+
+                if (!data.done) {{
+                    setTimeout(checkProgress, 5000);
+                }} else {{
+                    // khi hoàn tất → chuyển tới trang kết quả
+                    window.location.href = `/result?cv_id=${{data.cv_id}}`;
+                }}
+            }}
+        checkProgress();
+        </script>
+    </div>
+    
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=html)
+
+# --- Route cho client polling ---
+@router.get("/progress")
+async def get_progress():
+    return JSONResponse(progress_store)
+
+# --- Route kết quả ---
+@router.get("/result", response_class=HTMLResponse)
+async def result_page(request: Request,
+                      cv_id: int,
+                      user_info: user = Depends(authorize_role(["candidate", "candidate_premium"]))):
+    result_store.sort(key=lambda x: x["Ratio"], reverse=True)
+    top_10 = result_store[:10]
+    top_10jd_ids = [item['jd'].id for item in top_10]
+    update_candidate_cv(session=Depends(get_session),
+                        cv_id=cv_id,
+                        top10_jds=top_10jd_ids)
+    return templates.TemplateResponse("top10-best-jd.html", {"request": request,
+                                                             "cv_id": cv_id,
+                                                             "job_descriptions": [jd['jd'] for jd in top_10],
+                                                             "user_info": user_info})
 
 @router.post("/create_cv")
-async def create_cv(request: Request,
-                    cv_data: CVData,
+async def create_cv(cv_data: CVData,
                     user_info=Depends(authorize_role(["candidate", "candidate_premium"])),
                     session: Session = Depends(get_session)):
     # Ví dụ: lưu vào DB, hoặc tạm thời chỉ in ra console
@@ -401,13 +354,3 @@ async def create_cv(request: Request,
 
     
     return JSONResponse({"status": "ok", "name": cv_data.name, "skills_count": len(cv_data.skills)})
-
-@router.get("/applied-cvs")
-async def get_applied_cvs_endpoint(request: Request,
-                                   user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
-                                   session: Session = Depends(get_session)):
-    cvs = get_applied_cvs(session, user_info.id)
-
-    return templates.TemplateResponse("applied_cvs.html", {"request": request,
-                                                             "user_info": user_info,
-                                                             "cvs": cvs})

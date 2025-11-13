@@ -176,9 +176,55 @@ def compare_cv_vs_jd_start(request: Request,
     thread = Thread(target=process_compare_cv_vs_jd, args=(jd_id,))
     thread.start()
 
-    return templates.TemplateResponse("progress-scancv-business.html", {"request": request,
-                                                                    "user_info": user_info,
-                                                                    "jd_id": jd_id})
+    html = f"""
+    <html>
+    <style>
+        .progress-container {
+        text-align: center;
+        display: flex;
+        margin-top: 100px;
+        flex-direction: column;
+        align-items: center;
+    }
+    .progress-container h3 {
+        margin-bottom: 20px;
+        font-size: 24px;
+        color: #333;
+    }
+    .progress-container progress {
+        width: 300px;
+        height: 25px;
+    }
+    </style>
+    <body>
+      <div class="progress-container">
+        <h3>Đang so sánh CVs với JD ID {jd_id}...</h3>
+        <progress id="bar" value="0" max="10" style="width:300px;"></progress>
+        <div id="status">Bắt đầu xử lý...</div>
+      </div>
+
+      <script>
+        const jd_id = {jd_id};
+        async function checkProgress() {{
+            const res = await fetch(`/compare_progress`);
+            const data = await res.json();
+            document.getElementById('bar').value = data.progress;
+            document.getElementById('status').innerText = 
+                data.done ? "✅ Hoàn tất! Chuyển hướng tới kết quả..." :
+                `Đã xử lý ${{data.progress}} / ${{data.total}} CV...`;
+
+            if (!data.done) {{
+                setTimeout(checkProgress, 5000);
+            }} else {{
+                window.location.href = `/compare_cv_vs_jd/result?jd_id=${{jd_id}}`;
+            }}
+        }}
+        checkProgress();
+      </script>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=html)
 
 @router.get("/compare_progress")
 async def get_compare_progress():
