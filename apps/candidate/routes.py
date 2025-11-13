@@ -21,8 +21,7 @@ from .services import (jd_to_str, search_jobs,
                        get_job_categories,
                        get_saved_jobs_by_user,
                        update_candidate_cv,
-                       get_cvs_with_top10_jds,
-                       get_applied_cvs)
+                       get_cvs_with_top10_jds)
 from db import get_session, engine
 from Core.Auth.schemas import user
 from .schemas import CVData, JobResponse, JobSearchRequest, candidate_CV, jd
@@ -215,15 +214,6 @@ async def pricing_user_logged_in(request: Request,
     return templates.TemplateResponse("pricing-user-loggedin.html", {"request": request, 
                                                                      "user_info": user_info})
 
-@router.get("/saved-jobs", response_class=HTMLResponse)
-async def saved_jobs(request: Request,
-                     user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
-                     session: Session = Depends(get_session)):
-    save_jds = get_saved_jobs_by_user(session, user_info.id)
-    return templates.TemplateResponse("user-cv-storage.html", {"request": request,
-                                                               "user_info": user_info,
-                                                               "jds": save_jds})
-
 # Lưu công việc vào danh sách yêu thích
 @router.post("/save-jd/{jd_id}", response_class=HTMLResponse)
 async def save_jd(request: Request,
@@ -280,34 +270,55 @@ async def top10_best_jd(request: Request,
     # Chạy luồng nền
     thread = Thread(target=process_cv, args=(cv_str,))
     thread.start()
-    print(cv.id)
+
     # Trả về giao diện HTML hiển thị tiến trình
     html = f"""
     <html>
+    <style>
+        .progress-container {
+            text-align: center;
+            display: flex;
+            margin-top: 100px;
+            flex-direction: column;
+            align-items: center;
+        }
+        .progress-container h3 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+        .progress-container progress {
+            width: 300px;
+            height: 25px;
+        }
+    </style>
     <body>
-    <h3>Đang xử lý CV...</h3>
-    <progress id="bar" value="0" max="10" style="width:300px;"></progress>
-    <div id="status">Bắt đầu xử lý...</div>
+      <div class="progress-container">
+        <h3>Đang xử lý CV...</h3>
+        <progress id="bar" value="0" max="10" style="width:300px;"></progress>
+        <div id="status">Bắt đầu xử lý...</div>
 
-    <script>
-        const cv_id = {cv.id};  // ✅ đã có cv_id sẵn
-        async function checkProgress() {{
-            const res = await fetch(`/progress`);
-            const data = await res.json();
-            document.getElementById('bar').value = data.progress;
-            document.getElementById('status').innerText = 
-                data.done ? "✅ Hoàn tất! Chuyển hướng tới kết quả..." :
+        <script>
+            const cv_id = {cv.id};  // 👈 gắn ID vào đây
+            async function checkProgress() {{
+                const res = await fetch(`/progress`);
+                const data = await res.json();
+                document.getElementById('bar').value = data.progress;
+                document.getElementById('status').innerText = 
+                    data.done ? "✅ Hoàn tất! Chuyển hướng tới kết quả..." :
                 `Đã xử lý ${{data.progress}} / ${{data.total}} JD...`;
 
-            if (!data.done) {{
-                setTimeout(checkProgress, 5000);
-            }} else {{
-                // ✅ dùng biến cv_id đã gắn sẵn
-                window.location.href = `/result?cv_id=${{cv_id}}`;
+                if (!data.done) {{
+                    setTimeout(checkProgress, 5000);
+                }} else {{
+                    // khi hoàn tất → chuyển tới trang kết quả
+                    window.location.href = `/result?cv_id=${{data.cv_id}}`;
+                }}
             }}
-        }}
         checkProgress();
-    </script>
+        </script>
+    </div>
+    
     </body>
     </html>
     """
@@ -336,8 +347,7 @@ async def result_page(request: Request,
                                                              "user_info": user_info})
 
 @router.post("/create_cv")
-async def create_cv(request: Request,
-                    cv_data: CVData,
+async def create_cv(cv_data: CVData,
                     user_info=Depends(authorize_role(["candidate", "candidate_premium"])),
                     session: Session = Depends(get_session)):
     # Ví dụ: lưu vào DB, hoặc tạm thời chỉ in ra console
@@ -345,13 +355,3 @@ async def create_cv(request: Request,
 
     
     return JSONResponse({"status": "ok", "name": cv_data.name, "skills_count": len(cv_data.skills)})
-
-@router.get("/applied-cvs")
-async def get_applied_cvs_endpoint(request: Request,
-                                   user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
-                                   session: Session = Depends(get_session)):
-    cvs = get_applied_cvs(session, user_info.id)
-
-    return templates.TemplateResponse("applied_cvs.html", {"request": request,
-                                                             "user_info": user_info,
-                                                             "cvs": cvs})
