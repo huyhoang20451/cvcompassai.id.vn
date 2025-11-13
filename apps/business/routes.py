@@ -180,21 +180,21 @@ def compare_cv_vs_jd_start(request: Request,
     <html>
     <style>
         .progress-container {{
-            text-align: center;
-            display: flex;
-            margin-top: 100px;
-            flex-direction: column;
-            align-items: center;
-        }}
-        .progress-container h3 {{
-            margin-bottom: 20px;
-            font-size: 24px;
-            color: #333;
-        }}
-        .progress-container progress {{
-            width: 300px;
-            height: 25px;
-        }}
+        text-align: center;
+        display: flex;
+        margin-top: 100px;
+        flex-direction: column;
+        align-items: center;
+    }}
+    .progress-container h3 {{
+        margin-bottom: 20px;
+        font-size: 24px;
+        color: #333;
+    }}
+    .progress-container progress {{
+        width: 300px;
+        height: 25px;
+    }}
     </style>
     <body>
       <div class="progress-container">
