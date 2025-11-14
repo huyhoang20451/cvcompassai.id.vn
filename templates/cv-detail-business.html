@@ -133,7 +133,9 @@
     // track currently selected CV and JD id (if jd_id present in query params)
     var currentSelectedIdx = null;
     var currentCvId = '';
-    var currentJdId = "{{ request.query_params.get('jd_id','') }}";
+    var currentJdId = {{ request.query_params.get('jd_id','') | tojson }};
+    // RESULTS serialized from backend 'results' variable (array of {met, not_met, cv_url, candidate_id, ...})
+    var RESULTS = {{ results | default([]) | tojson }};
 
         function approveCV() {
             // Approve action will be handled by approveCV() below which calls /approve-cv
@@ -279,40 +281,76 @@
       <div><a href="#">Facebook</a></div>
     </footer>
     <script>
+        // Show details for a selected CV (by index into RESULTS)
         function showDetail(idx){
-            <!-- Interview/email form removed per request -->
-            if(candField) candField.value = currentCvId;
-            // also prefill candidate email if available in dataset (best-effort)
-            const candEmailField = document.getElementById('candidate-email');
-            if(candEmailField && selectedEl.dataset.candidateEmail) candEmailField.value = selectedEl.dataset.candidateEmail;
-        }
+            // Deselect previous
+            document.querySelectorAll('.cv-items.selected').forEach(e=>e.classList.remove('selected'));
+            const selectedEl = document.querySelector('.cv-items[data-idx="'+idx+'"]');
+            if(selectedEl) selectedEl.classList.add('selected');
 
-        const adv = document.getElementById('advantages-list');
-        const dis = document.getElementById('disadvantages-list');
-        if(Array.isArray(RESULTS) && RESULTS[idx]){
-            const r = RESULTS[idx];
-            if(adv){
+            currentSelectedIdx = idx;
+            currentCvId = (selectedEl && selectedEl.dataset.cvId) ? selectedEl.dataset.cvId : '';
+
+            const adv = document.getElementById('advantages-list');
+            const dis = document.getElementById('disadvantages-list');
+
+            const r = (Array.isArray(RESULTS) && RESULTS[idx]) ? RESULTS[idx] : null;
+            if(r && adv){
                 if(r.met && r.met.length){
                     adv.innerHTML = '';
                     r.met.forEach(i=>{ const li=document.createElement('li'); li.textContent = i; adv.appendChild(li); });
                 } else {
                     adv.innerHTML = '<li>Không có dữ liệu.</li>';
                 }
+            } else if(adv) {
+                adv.innerHTML = '<li>Không có dữ liệu.</li>';
             }
-            if(dis){
+
+            if(r && dis){
                 if(r.not_met && r.not_met.length){
                     dis.innerHTML = '';
                     r.not_met.forEach(i=>{ const li=document.createElement('li'); li.textContent = i; dis.appendChild(li); });
                 } else {
                     dis.innerHTML = '<li>Không có dữ liệu.</li>';
                 }
+            } else if(dis) {
+                dis.innerHTML = '<li>Không có dữ liệu.</li>';
             }
-        } else {
-            if(adv) adv.innerHTML = '<li>Không có dữ liệu.</li>';
-            if(dis) dis.innerHTML = '<li>Không có dữ liệu.</li>';
+
+            // update preview elements if present
+            try{
+                const url = (selectedEl && selectedEl.dataset.cvUrl) || (r && (r.cv_url || r.cvUrl)) || '';
+                const img = document.getElementById('cv-image');
+                const iframe = document.getElementById('cv-iframe');
+                const fallback = document.getElementById('cv-fallback');
+                if(url){
+                    if(img) img.src = url;
+                    if(iframe) iframe.src = url;
+                    if(fallback){ const a = fallback.querySelector('a'); if(a) a.href = url; }
+
+                    const lower = url.split('?')[0].toLowerCase();
+                    if(lower.match(/\.(jpg|jpeg|png|gif|webp|bmp)$/)){
+                        if(img){ img.style.display='block'; }
+                        if(iframe) iframe.style.display='none';
+                        if(fallback) fallback.style.display='none';
+                    } else if(lower.match(/\.pdf$/)){
+                        if(iframe){ iframe.style.display='block'; }
+                        if(img) img.style.display='none';
+                        if(fallback) fallback.style.display='none';
+                    } else {
+                        if(iframe){ iframe.style.display='block'; }
+                        if(img) img.style.display='none';
+                        if(fallback) fallback.style.display='none';
+                        setTimeout(()=>{ if(iframe && (iframe.clientHeight===0 || iframe.offsetHeight===0)){ iframe.style.display='none'; if(fallback) fallback.style.display='block'; } }, 800);
+                    }
+                } else {
+                    if(img) img.style.display='none';
+                    if(iframe) iframe.style.display='none';
+                    if(fallback) fallback.style.display='block';
+                }
+            }catch(e){ console.debug('preview update error', e); }
         }
-    }
-</script>
+    </script>
 <script>
     // On page load, try to display the preview for the first CV (if exists)
     document.addEventListener('DOMContentLoaded', function(){
@@ -350,6 +388,10 @@
         } catch(e){
             // nothing critical; leave preview hidden
             console.debug('preview init error', e);
+        }
+        // show first CV details automatically if available
+        if(Array.isArray(RESULTS) && RESULTS.length){
+            showDetail(0);
         }
     });
 </script>
