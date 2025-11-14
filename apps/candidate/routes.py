@@ -4,7 +4,7 @@ from time import time
 from typing import Annotated, List, Optional
 from urllib import request
 import uuid
-from fastapi import APIRouter, Depends, HTTPException, Request, Cookie, File, UploadFile, Form
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Cookie, File, UploadFile, Form
 from fastapi.responses import HTMLResponse, JSONResponse
 from sqlmodel import Session
 from .services import (jd_to_str, search_jobs, 
@@ -26,8 +26,9 @@ from db import get_session, engine
 from Core.Auth.schemas import user
 from .schemas import CVData, JobResponse, JobSearchRequest, candidate_CV, jd
 from Core.Auth.dependencies import templates, get_current_user, decode_token, authorize_role
-from Core.OCR import compare_qwen, run_vintern
+from Core.OCR import compare_qwen, run_vintern, scan_pdf
 from ..payment.services import get_packages
+from threading import Lock
 
 router = APIRouter(tags=["candidate"])
 
@@ -226,125 +227,186 @@ async def save_jd(request: Request,
     
     return JSONResponse(content={"success": True, "msg": "Đã lưu công việc thành công!"})
 
+progress_lock = Lock()
+result_lock = Lock()
 # --- Bộ nhớ lưu tiến độ công việc ---
 progress_store = {}  # {"progress": int, "total": int, "done": bool}
 result_store = []  # [{"jd": jd, "Ratio": float}, ...]
 
-# --- Giả lập xử lý JD ---
-def process_cv(cv_str: str):
+# === Hàm xử lý CV trong nền ===
+def process_cv(cv_str: str, cv_id: int, user_id: int):
+    # Tạo session RIÊNG trong thread
     with Session(engine) as session:
-        global progress_store, result_store
         jds = get_jds(session)
-        progress_store = {"progress": 0, "total": len(jds), "done": False}
-        result_store = []
 
+        # Reset tiến độ & kết quả
+        with progress_lock:
+            progress_store.clear()
+            progress_store.update({
+                "progress": 0,
+                "total": len(jds),
+                "done": False
+            })
+        with result_lock:
+            result_store.clear()
+
+        # Xử lý từng JD
         for i, jd in enumerate(jds):
             try:
                 result = compare_qwen(jd_to_str(jd), cv_str)
-                ratio = result.get("Ratio", 0)
-                print(f"✅ JD ID: {jd.id} | Ratio: {ratio}")
-                result_store.append({"jd": jd, "Ratio": ratio})
-            except Exception as e:
-                print(f"❌ Lỗi khi xử lý JD ID {jd.id}: {e}")
-            progress_store["progress"] = i + 1
-            print(f"✅ Đã xử lý JD {i}/{len(jds)}")
-        
-        progress_store["done"] = True
+                ratio = result.get("Ratio", 0.0)
+                print(f"JD ID: {jd.id} | Ratio: {ratio}")
 
-# --- Route upload CV ---
+                with result_lock:
+                    result_store.append({"jd": jd, "Ratio": ratio})
+
+            except Exception as e:
+                print(f"Lỗi khi xử lý JD ID {jd.id}: {e}")
+
+            # Cập nhật tiến độ
+            with progress_lock:
+                progress_store["progress"] = i + 1
+            print(f"Đã xử lý JD {i+1}/{len(jds)}")
+
+        # Hoàn tất
+        with progress_lock:
+            progress_store["done"] = True
+
+        # Cập nhật top 10 JD vào DB
+        top_10 = sorted(result_store, key=lambda x: x["Ratio"], reverse=True)[:10]
+        top10_jd_ids = [item["jd"].id for item in top_10]
+        update_candidate_cv(session, cv_id=cv_id, top10_jds=top10_jd_ids)
+        session.commit()
+
+
+# === Route: Upload CV + Bắt đầu xử lý ===
 @router.post("/top10-best-jd", response_class=HTMLResponse)
-async def top10_best_jd(request: Request, 
-                    file: UploadFile = File(...),
-                    user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
-                    session: Session = Depends(get_session)):
+async def top10_best_jd(
+    request: Request,
+    background_tasks: BackgroundTasks,  # <-- ĐƯA LÊN TRƯỚC
+    file: UploadFile = File(...),
+    user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
+    session: Session = Depends(get_session)
+):
+    # Upload CV
     file_path, cv = await service_upload_cv(file, user_info.id, session)
+
+    # OCR: Đọc nội dung CV
     if file.content_type == "application/pdf" or file.filename.lower().endswith(".pdf"):
-        from Core.OCR import scan_pdf  # hàm đọc PDF
         cv_str = scan_pdf(file.file)
     elif file.content_type.startswith("image/") or file.filename.lower().endswith((".jpg", ".jpeg", ".png")):
-        from Core.OCR import run_vintern  # hàm OCR
         cv_str = run_vintern(file_path)
     else:
-        raise HTTPException(status_code=400, detail="Unsupported file type. Please upload a PDF or image file.")
-        
-    # Chạy luồng nền
-    thread = Thread(target=process_cv, args=(cv_str,))
-    thread.start()
+        raise HTTPException(status_code=400, detail="Chỉ hỗ trợ PDF hoặc ảnh (JPG, PNG).")
 
-    # Trả về giao diện HTML hiển thị tiến trình
-    html = f"""
+    # Chạy xử lý nền (an toàn với FastAPI)
+    background_tasks.add_task(process_cv, cv_str, cv.id, user_info.id)
+
+    # Trả về trang loading
+    html_content = f"""
+    <!DOCTYPE html>
     <html>
-    <style>
-        .progress-container {{
-            text-align: center;
-            display: flex;
-            margin-top: 100px;
-            flex-direction: column;
-            align-items: center;
-        }}
-        .progress-container h3 {{
-            margin-bottom: 20px;
-            font-size: 24px;
-            color: #333;
-        }}
-        .progress-container progress {{
-            width: 300px;
-            height: 25px;
-        }}
-    </style>
+    <head>
+        <meta charset="UTF-8">
+        <title>Đang xử lý CV...</title>
+        <style>
+            .progress-container {{
+                text-align: center;
+                margin-top: 100px;
+                font-family: Arial, sans-serif;
+            }}
+            h3 {{
+                color: #333;
+                margin-bottom: 20px;
+            }}
+            progress {{
+                width: 400px;
+                height: 30px;
+            }}
+            #status {{
+                margin-top: 15px;
+                font-size: 18px;
+            }}
+        </style>
+    </head>
     <body>
-      <div class="progress-container">
-        <h3>Đang xử lý CV...</h3>
-        <progress id="bar" value="0" max="10" style="width:300px;"></progress>
-        <div id="status">Bắt đầu xử lý...</div>
+        <div class="progress-container">
+            <h3>Đang phân tích CV của bạn...</h3>
+            <progress id="bar" value="0" max="100"></progress>
+            <div id="status">Bắt đầu xử lý...</div>
+        </div>
 
         <script>
-            const cv_id = {cv.id};  // 👈 gắn ID vào đây
+            const cv_id = {cv.id};
             async function checkProgress() {{
-                const res = await fetch(`/progress`);
-                const data = await res.json();
-                document.getElementById('bar').value = data.progress;
-                document.getElementById('status').innerText = 
-                    data.done ? "✅ Hoàn tất! Chuyển hướng tới kết quả..." :
-                `Đã xử lý ${{data.progress}} / ${{data.total}} JD...`;
+                try {{
+                    const res = await fetch('/progress');
+                    const data = await res.json();
+                    const percent = data.total > 0 ? (data.progress / data.total) * 100 : 0;
+                    document.getElementById('bar').value = percent;
+                    document.getElementById('status').innerText = 
+                        data.done 
+                            ? "Hoàn tất! Đang chuyển hướng..." 
+                            : `Đã xử lý ${{data.progress}} / ${{data.total}} công việc...`;
 
-                if (!data.done) {{
+                    if (!data.done) {{
+                        setTimeout(checkProgress, 3000);
+                    }} else {{
+                        setTimeout(() => {{
+                            window.location.href = `/result?cv_id=${{cv_id}}`;
+                        }}, 1000);
+                    }}
+                }} catch (e) {{
+                    console.error("Lỗi kiểm tra tiến độ:", e);
                     setTimeout(checkProgress, 5000);
-                }} else {{
-                    // khi hoàn tất → chuyển tới trang kết quả
-                    window.location.href = `/result?cv_id=${{data.cv_id}}`;
                 }}
             }}
-        checkProgress();
+            checkProgress();
         </script>
-    </div>
-    
     </body>
     </html>
     """
-    return HTMLResponse(content=html)
+    return HTMLResponse(content=html_content)
 
-# --- Route cho client polling ---
+
+# === Route: Lấy tiến độ ===
 @router.get("/progress")
 async def get_progress():
-    return JSONResponse(progress_store)
+    with progress_lock:
+        return JSONResponse(progress_store.copy())
 
-# --- Route kết quả ---
+
+# === Route: Hiển thị kết quả top 10 JD ===
 @router.get("/result", response_class=HTMLResponse)
-async def result_page(request: Request,
-                      cv_id: int,
-                      user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
-                      session: Session = Depends(get_session)):
-    result_store.sort(key=lambda x: x["Ratio"], reverse=True)
-    top_10 = result_store[:10]
-    top_10jd_ids = [item['jd'].id for item in top_10]
-    update_candidate_cv(session,
-                        cv_id=cv_id,
-                        top10_jds=top_10jd_ids)
-    return templates.TemplateResponse("top10-best-jd.html", {"request": request,
-                                                             "cv_id": cv_id,
-                                                             "job_descriptions": [jd['jd'] for jd in top_10],
-                                                             "user_info": user_info})
+async def result_page(
+    request: Request,
+    cv_id: int,
+    user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
+    session: Session = Depends(get_session)
+):
+    # Kiểm tra xem xử lý đã xong chưa
+    with progress_lock:
+        if not progress_store.get("done", False):
+            raise HTTPException(status_code=400, detail="CV đang được xử lý, vui lòng đợi...")
+
+    # Lấy kết quả từ bộ nhớ
+    with result_lock:
+        if not result_store:
+            raise HTTPException(status_code=404, detail="Không tìm thấy kết quả.")
+
+        result_store.sort(key=lambda x: x["Ratio"], reverse=True)
+        top_10 = result_store[:10]
+        job_descriptions = [item["jd"] for item in top_10]
+
+    return templates.TemplateResponse(
+        "top10-best-jd.html",
+        {
+            "request": request,
+            "cv_id": cv_id,
+            "job_descriptions": job_descriptions,
+            "user_info": user_info
+        }
+    )
 
 @router.post("/create_cv")
 async def create_cv(cv_data: CVData,
