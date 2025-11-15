@@ -188,31 +188,45 @@
     async function approveCV(){
         const checked = getCheckedCvElements();
         if(checked.length === 0){
-            alert('Vui lòng chọn 1 CV để duyệt.');
+            alert('Vui lòng chọn ít nhất 1 CV để duyệt.');
             return;
         }
-        if(checked.length > 1){
-            alert('Vui lòng chỉ chọn 1 CV để duyệt (chỉ hỗ trợ 1 ứng viên cho gửi email mời phỏng vấn).');
-            return;
-        }
-        const cvEl = checked[0];
-        const cvId = cvEl.dataset.cvId;
-        if(!cvId){ alert('CV không có id hợp lệ.'); return; }
-            try{
-                const data = await sendApprovalRequest(cvId, true);
-                alert(data.message || 'CV approved successfully');
-                // update selection state and mark item as approved
-                currentCvId = cvId;
-                currentSelectedIdx = cvEl.dataset.cvIdx || currentSelectedIdx;
-                const item = document.querySelector('.cv-items[data-idx="'+currentSelectedIdx+'"]');
-                if(item){
-                    item.classList.add('approved');
-                    const cb = item.querySelector('.cv-select'); if(cb) cb.disabled = true;
+
+        if(!confirm(`Bạn chắc chắn muốn duyệt ${checked.length} CV đã chọn?`)) return;
+
+        const cvIds = checked.map(el => el.dataset.cvId).filter(Boolean);
+        if(cvIds.length === 0){ alert('Không tìm thấy ID hợp lệ cho CV được chọn.'); return; }
+
+        try{
+            // send approvals in parallel
+            const promises = cvIds.map(id => sendApprovalRequest(id, true));
+            const results = await Promise.allSettled(promises);
+
+            let successCount = 0;
+            results.forEach((res, idx) => {
+                if(res.status === 'fulfilled'){
+                    successCount += 1;
+                    // mark corresponding item as approved
+                    const id = cvIds[idx];
+                    const item = document.querySelector('.cv-items[data-cv-id="'+id+'"]');
+                    if(item){
+                        item.classList.add('approved');
+                        const cb = item.querySelector('.cv-select'); if(cb){ cb.disabled = true; cb.checked = false; }
+                    }
+                } else {
+                    console.error('Approve failed for', cvIds[idx], res.reason);
                 }
-            }catch(err){
-                console.error(err);
-                alert('Lỗi khi gọi approve: ' + err.message);
-            }
+            });
+
+            alert(`${successCount} / ${cvIds.length} CV đã được duyệt.`);
+            // clear right lists if no items remain selected
+            document.getElementById('advantages-list').innerHTML = '<li>Không có dữ liệu.</li>';
+            document.getElementById('disadvantages-list').innerHTML = '<li>Không có dữ liệu.</li>';
+            currentSelectedIdx = null; currentCvId = '';
+        } catch(err){
+            console.error(err);
+            alert('Có lỗi xảy ra khi duyệt CV: ' + (err.message || err));
+        }
     }
 
     async function rejectCV(){
@@ -221,31 +235,35 @@
             alert('Vui lòng chọn ít nhất 1 CV để loại.');
             return;
         }
-        if(!currentJdId){
-            alert('Không xác định JD ID. Vui lòng mở trang với tham số jd_id để thực hiện thao tác này.');
-            return;
-        }
-        if(!confirm('Bạn chắc chắn muốn loại CV đã chọn khỏi JD?')) return;
+        // confirm action
+        if(!confirm('Bạn chắc chắn muốn loại CV đã chọn?')) return;
         const cvIds = checked.map(el=>el.dataset.cvId).filter(Boolean);
         if(cvIds.length === 0){ alert('Không tìm thấy ID hợp lệ cho CV được chọn.'); return; }
         try{
-            // send approve=false requests in parallel
+            // send approve=false requests in parallel and handle per-result
             const promises = cvIds.map(id => sendApprovalRequest(id, false));
-            const results = await Promise.all(promises);
-            // success: remove elements from DOM
-            checked.forEach(el=>{
-                const idx = el.dataset.cvIdx;
-                const item = document.querySelector('.cv-items[data-idx="'+idx+'"]');
-                if(item) item.remove();
+            const results = await Promise.allSettled(promises);
+
+            let successCount = 0;
+            results.forEach((res, idx) => {
+                if(res.status === 'fulfilled'){
+                    successCount += 1;
+                    const id = cvIds[idx];
+                    const item = document.querySelector('.cv-items[data-cv-id="'+id+'"]');
+                    if(item) item.remove();
+                } else {
+                    console.error('Reject failed for', cvIds[idx], res.reason);
+                }
             });
-            // clear right lists
+
+            // clear right lists if nothing selected
             document.getElementById('advantages-list').innerHTML = '<li>Không có dữ liệu.</li>';
             document.getElementById('disadvantages-list').innerHTML = '<li>Không có dữ liệu.</li>';
             currentSelectedIdx = null; currentCvId = '';
-            alert('Đã loại CV đã chọn thành công.');
+            alert(`${successCount} / ${cvIds.length} CV đã được loại.`);
         } catch(err){
             console.error(err);
-            alert('Có lỗi xảy ra khi loại CV: ' + err.message);
+            alert('Có lỗi xảy ra khi loại CV: ' + (err.message || err));
         }
     }
 </script>
