@@ -147,6 +147,12 @@
             <p class="ocr-desc">Tải lên CV của bạn, chúng tôi tự động quét và trích xuất thông tin để so sánh với JD (Job Description)</p>
             <div class="ocr-btn-group">
                 <form id="ocrForm" enctype="multipart/form-data" action="/top10-best-jd" method="POST">
+                    <select id="job_category" name="job_category" required>
+                        <option value="" disabled selected>Chọn ngành nghề</option>
+                        {% for job in job_categories %}
+                            <option value="{{ job.job_category }}">{{ job.job_category }}</option>
+                        {% endfor %}
+                    </select>
                     <label>Upload file ảnh CV:</label><br>
                     <input type="file" id="file" name="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"><br>
                     <div style="margin-top:8px; display:flex; gap:8px;">
