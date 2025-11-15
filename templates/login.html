@@ -61,13 +61,22 @@
           </label>
         </div>
         <div style="margin-bottom:12px; margin-top:8px;">
-          <label for="google-role" style="font-size:13px; color:#444; margin-right:8px;">Vai trò:</label>
-          <select id="google-role" style="padding:6px 8px; border-radius:6px; border:1px solid #ccc;">
-            <option value="candidate">Ứng viên</option>
-            <option value="business">Nhà tuyển dụng</option>
-          </select>
-        </div>
-  <div id="g_id_signin"></div>
+                <label for="google-role" style="font-size:13px; color:#444; margin-right:8px;">Vai trò:</label>
+                <select id="google-role" name="google_role" style="padding:6px 8px; border-radius:6px; border:1px solid #ccc;">
+                  <option value="candidate">Ứng viên</option>
+                  <option value="business">Nhà tuyển dụng</option>
+                </select>
+              </div>
+
+              <!-- Visible fallback Google button (used when GSI can't render immediately).
+                   When the GSI client becomes available we render the official button into
+                   #g_id_signin and hide this fallback. -->
+              <div class="google-btn" role="button" aria-label="Sign in with Google" title="Đăng nhập bằng Google" style="display:flex; align-items:center; gap:10px;">
+                <img src="/static/images/google-logo.png" alt="Google" style="width:20px; height:20px;">
+                <span style="font-weight:700;">Đăng nhập bằng Google</span>
+              </div>
+
+              <div id="g_id_signin" style="display:none;" aria-hidden="true"></div>
         <div class="actions">
           <button onclick="location.href='/signup'" type="button" class="btn-register">Đăng ký</button>
           <button method='post' type="submit" class="btn-login">Đăng nhập</button>
@@ -84,6 +93,7 @@
 {% endif %}
 
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <div id="g_id_onload"></div>
   <script>
     (function(){
       const googleBtn = document.querySelector('.google-btn');
@@ -95,35 +105,57 @@
       function disableGoogle(reason){
         console.warn('Google Sign-In disabled:', reason);
         if (googleBtn){
+          // keep the fallback UI, but make it non-functional and informative
           googleBtn.addEventListener('click', function(){
             alert('Google Sign-In không khả dụng: ' + reason);
           });
           googleBtn.classList.add('disabled');
           googleBtn.style.opacity = '0.6';
+          googleBtn.style.pointerEvents = 'auto';
         }
         const gdiv = document.getElementById('g_id_signin');
         if (gdiv) gdiv.style.display = 'none';
       }
 
-      function handleCredentialResponse(response) {
+      async function handleCredentialResponse(response) {
         console.log('GSI credential response', response);
-        const id_token = response.credential;
+        const id_token = response && response.credential;
         const role = (roleSelect && roleSelect.value) ? roleSelect.value : 'candidate';
 
-        fetch('/google-login', {
-          method: 'POST',
-          credentials: 'same-origin',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id_token: id_token, role: role })
-        }).then(async (res) => {
-          if (res.redirected) { window.location.href = res.url; return; }
-          if (res.ok) { window.location.reload(); return; }
-          const t = await res.text();
-          alert('Đăng nhập Google thất bại');
-        }).catch(e => {
-          console.error(e);
+        if (!id_token) {
+          console.error('No credential returned by GSI', response);
+          alert('Đăng nhập Google thất bại: không nhận được token.');
+          return;
+        }
+
+        try {
+          const res = await fetch('/google-login', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_token: id_token, role: role })
+          });
+
+          // helpful logging for debugging server responses
+          const text = await res.text();
+          if (res.redirected) {
+            // server asked for redirect (e.g., to dashboard)
+            window.location.href = res.url;
+            return;
+          }
+          if (res.ok) {
+            // Some servers return HTML or JSON; simply reload to pick up session
+            window.location.reload();
+            return;
+          }
+
+          console.error('Google login failed', { status: res.status, body: text });
+          // show server-provided message when possible
+          alert('Đăng nhập Google thất bại: ' + (text || res.statusText || res.status));
+        } catch (err) {
+          console.error('Network or parsing error during Google login', err);
           alert('Lỗi mạng khi đăng nhập bằng Google');
-        });
+        }
       }
 
       // If server didn't provide clientId, disable the Google button with a message
@@ -140,10 +172,29 @@
             google.accounts.id.initialize({ client_id: clientId, callback: handleCredentialResponse });
             const renderTarget = document.getElementById('g_id_signin');
             if (renderTarget) {
+              // show the official rendered button and hide the fallback
+              renderTarget.style.display = 'block';
               google.accounts.id.renderButton(renderTarget, { theme: 'outline', size: 'large' });
+              if (googleBtn) {
+                googleBtn.style.display = 'none';
+              }
             }
+
+            // Keep a fallback click handler on the visible fallback (if still shown)
             if (googleBtn) {
-              googleBtn.addEventListener('click', function(){ google.accounts.id.prompt(); });
+              googleBtn.addEventListener('click', function(){
+                try {
+                  // Prompt One Tap / sign-in dialog if available
+                  if (google && google.accounts && google.accounts.id) {
+                    google.accounts.id.prompt();
+                  } else {
+                    alert('GSI client chưa sẵn sàng. Vui lòng thử lại.');
+                  }
+                } catch (e) {
+                  console.error('Error prompting GSI', e);
+                  alert('Lỗi khi mở cửa sổ đăng nhập Google');
+                }
+              });
             }
           } catch (err){
             console.error('Error initializing Google Identity', err);
@@ -155,7 +206,7 @@
             disableGoogle('GSI client không load được');
             return;
           }
-          setTimeout(function(){ initWhenReady(attemptsLeft-1); }, 100);
+          setTimeout(function(){ initWhenReady(attemptsLeft-1); }, 150);
         }
       }
 
