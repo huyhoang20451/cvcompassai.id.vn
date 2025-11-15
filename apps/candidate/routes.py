@@ -7,7 +7,7 @@ import uuid
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Cookie, File, UploadFile, Form
 from fastapi.responses import HTMLResponse, JSONResponse
 from sqlmodel import Session
-from .services import (jd_to_str, search_jobs, 
+from .services import (get_jds_by_category, jd_to_str, search_jobs, 
                        get_cvs_by_username as service_get_cvs_by_username, 
                        get_jds, 
                        update_coin,
@@ -64,9 +64,12 @@ async def pricing(request: Request,
 
 @router.get("/ocr-scan-logged-in", response_class=HTMLResponse)
 async def ocr_scan(request: Request,
-                   user_info: user = Depends(authorize_role(["candidate", "candidate_premium"]))):
+                   user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
+                   session: Session = Depends(get_session)):
+    job_categories = get_job_categories(session)
     return templates.TemplateResponse("ocr-scan.html", {"request": request, 
-                                                        "user_info": user_info})
+                                                        "user_info": user_info,
+                                                        "job_categories": job_categories})
 
 @router.get("/finding-jobs", response_class=HTMLResponse)
 async def finding_jobs(request: Request,
@@ -234,10 +237,13 @@ progress_store = {}  # {"progress": int, "total": int, "done": bool}
 result_store = []  # [{"jd": jd, "Ratio": float}, ...]
 
 # === Hàm xử lý CV trong nền ===
-def process_cv(cv_str: str, cv_id: int, user_id: int):
+def process_cv(cv_str: str, cv_id: int, user_id: int, job_category: Optional[str] = None):
     # Tạo session RIÊNG trong thread
     with Session(engine) as session:
-        jds = get_jds(session)
+        if job_category:
+            jds = get_jds_by_category(session, job_category)
+        else:
+            jds = get_jds(session)
 
         # Reset tiến độ & kết quả
         with progress_lock:
@@ -285,6 +291,7 @@ async def top10_best_jd(
     request: Request,
     background_tasks: BackgroundTasks,  # <-- ĐƯA LÊN TRƯỚC
     file: UploadFile = File(...),
+    job_category: Optional[str] = Form(None),
     user_info: user = Depends(authorize_role(["candidate", "candidate_premium"])),
     session: Session = Depends(get_session)
 ):
@@ -300,7 +307,7 @@ async def top10_best_jd(
         raise HTTPException(status_code=400, detail="Chỉ hỗ trợ PDF hoặc ảnh (JPG, PNG).")
 
     # Chạy xử lý nền (an toàn với FastAPI)
-    background_tasks.add_task(process_cv, cv_str, cv.id, user_info.id)
+    background_tasks.add_task(process_cv, cv_str, cv.id, user_info.id, job_category)
 
     # Trả về trang loading
     html_content = f"""

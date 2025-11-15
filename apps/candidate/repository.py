@@ -96,6 +96,25 @@ def get_jds(session: Session) -> List[jd]:
 
     return jds
 
+def get_jds_by_category(session: Session, category: str) -> List[jd]:
+    statement = (
+        select(jd_db, 
+               User_db.avatar_path,
+               User_db.company_name)
+        .join(User_db, jd_db.business_id == User_db.id)
+        .where(jd_db.job_category == category)
+    )
+    results = session.exec(statement).all()
+
+    jds = []
+    for jd_in_db, avatar_path, company_name in results:
+        jd_obj = jd.model_validate(jd_in_db, from_attributes=True)
+        jd_obj.avatar_path = avatar_path
+        jd_obj.company_name = company_name
+        jds.append(jd_obj)
+
+    return jds
+
 def get_jd_by_id(session: Session, id: int) -> jd:
     statement = (
         select(jd_db, 

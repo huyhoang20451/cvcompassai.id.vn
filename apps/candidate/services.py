@@ -14,7 +14,8 @@ from .repository import (search_jobs as repo_search_jobs,
                          get_saved_jobs_by_user as repo_get_saved_jobs_by_user,
                          update_candidate_cv as repo_update_candidate_cv,
                          get_cv_with_top10_jds as repo_get_cv_with_top10_jds,
-                         get_applied_cvs as repo_get_applied_cvs)
+                         get_applied_cvs as repo_get_applied_cvs,
+                         get_jds_by_category as repo_get_jds_by_category)
 from fastapi import Depends, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 from typing import Annotated, List, Optional
@@ -44,6 +45,9 @@ def get_cvs_by_username(username: str, session: Session) -> List[candidate_CV]:
 
 def get_jds(session: Session) -> List[jd]:
     return repo_get_jds(session)
+
+def get_jds_by_category(session: Session, job_category: str) -> List[jd]:
+    return repo_get_jds_by_category(session, job_category)
 
 def update_coin (session: Session,
                  id: int,
