@@ -100,7 +100,9 @@
       const roleSelect = document.getElementById('google-role');
       // Use server-provided GOOGLE_CLIENT_ID when available. If it's not passed to the template
       // this will render as null and we will disable the Google flow gracefully.
-      const clientId = {{ google_client_id | default(None) | tojson }};
+  const clientId = {{ google_client_id | default(None) | tojson }};
+  // Detect native mobile bridge (Android WebView or iOS WKWebView message handler).
+  const isNativeBridge = !!(window.Android || (window.webkit && window.webkit.messageHandlers));
 
       function disableGoogle(reason){
         console.warn('Google Sign-In disabled:', reason);
@@ -117,13 +119,12 @@
         if (gdiv) gdiv.style.display = 'none';
       }
 
-      async function handleCredentialResponse(response) {
-        console.log('GSI credential response', response);
-        const id_token = response && response.credential;
+      // Generic processor for any id_token source (web GSI or native mobile SDK).
+      async function processIdToken(id_token, client_type='web'){
+        console.log('Processing id_token from', client_type);
         const role = (roleSelect && roleSelect.value) ? roleSelect.value : 'candidate';
-
         if (!id_token) {
-          console.error('No credential returned by GSI', response);
+          console.error('No credential provided to processor');
           alert('Đăng nhập Google thất bại: không nhận được token.');
           return;
         }
@@ -133,30 +134,40 @@
             method: 'POST',
             credentials: 'same-origin',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id_token: id_token, role: role })
+            body: JSON.stringify({ id_token: id_token, role: role, client_type: client_type })
           });
 
-          // helpful logging for debugging server responses
           const text = await res.text();
           if (res.redirected) {
-            // server asked for redirect (e.g., to dashboard)
             window.location.href = res.url;
             return;
           }
           if (res.ok) {
-            // Some servers return HTML or JSON; simply reload to pick up session
             window.location.reload();
             return;
           }
 
           console.error('Google login failed', { status: res.status, body: text });
-          // show server-provided message when possible
           alert('Đăng nhập Google thất bại: ' + (text || res.statusText || res.status));
         } catch (err) {
           console.error('Network or parsing error during Google login', err);
           alert('Lỗi mạng khi đăng nhập bằng Google');
         }
       }
+
+      // Called by the GSI client when using web sign-in
+      async function handleCredentialResponse(response) {
+        console.log('GSI credential response', response);
+        const id_token = response && response.credential;
+        await processIdToken(id_token, 'web');
+      }
+
+      // Exposed for native mobile apps (Android/iOS) to call after they obtain an id_token
+      // Example: window.receiveNativeCredential('<token from mobile SDK>')
+      window.receiveNativeCredential = async function(nativeToken){
+        console.log('Received native token from app');
+        await processIdToken(nativeToken, 'mobile');
+      };
 
       // If server didn't provide clientId, disable the Google button with a message
       if (!clientId) {
@@ -182,19 +193,37 @@
 
             // Keep a fallback click handler on the visible fallback (if still shown)
             if (googleBtn) {
-              googleBtn.addEventListener('click', function(){
-                try {
-                  // Prompt One Tap / sign-in dialog if available
-                  if (google && google.accounts && google.accounts.id) {
-                    google.accounts.id.prompt();
-                  } else {
-                    alert('GSI client chưa sẵn sàng. Vui lòng thử lại.');
+              if (isNativeBridge) {
+                // If running inside a native app WebView, call the native bridge to start sign-in.
+                googleBtn.addEventListener('click', function(){
+                  try {
+                    if (window.Android && typeof window.Android.signInWithGoogle === 'function') {
+                      window.Android.signInWithGoogle();
+                    } else if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.nativeHandler) {
+                      // iOS: postMessage to native handler; native must call window.receiveNativeCredential(token)
+                      window.webkit.messageHandlers.nativeHandler.postMessage({ action: 'signInWithGoogle' });
+                    } else {
+                      alert('Ứng dụng chưa hỗ trợ tính năng đăng nhập Google trong WebView.');
+                    }
+                  } catch (e) {
+                    console.error('Error calling native bridge', e);
+                    alert('Lỗi khi mở cửa sổ đăng nhập Google');
                   }
-                } catch (e) {
-                  console.error('Error prompting GSI', e);
-                  alert('Lỗi khi mở cửa sổ đăng nhập Google');
-                }
-              });
+                });
+              } else {
+                googleBtn.addEventListener('click', function(){
+                  try {
+                    if (google && google.accounts && google.accounts.id) {
+                      google.accounts.id.prompt();
+                    } else {
+                      alert('GSI client chưa sẵn sàng. Vui lòng thử lại.');
+                    }
+                  } catch (e) {
+                    console.error('Error prompting GSI', e);
+                    alert('Lỗi khi mở cửa sổ đăng nhập Google');
+                  }
+                });
+              }
             }
           } catch (err){
             console.error('Error initializing Google Identity', err);
