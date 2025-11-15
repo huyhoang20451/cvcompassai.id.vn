@@ -148,16 +148,9 @@
                 <label for="job_category">Ngành nghề:</label>
                 <select id="job_category" name="job_category" required>
                     <option value="" disabled selected>Chọn ngành nghề</option>
-                    <option value="Công nghệ thông tin">Công nghệ thông tin</option>
-                    <option value="Kinh doanh">Kinh doanh</option>
-                    <option value="Tiếp thị">Tiếp thị</option>
-                    <option value="Tài chính">Tài chính</option>
-                    <option value="Nhân sự">Nhân sự</option>
-                    <option value="Sản xuất">Sản xuất</option>
-                    <option value="Y tế">Y tế</option>
-                    <option value="Giáo dục">Giáo dục</option>
-                    <option value="Dịch vụ khách hàng">Dịch vụ khách hàng</option>
-                    <option value="Khác">Khác</option>
+                    {% for job in job_categories %}
+                        <option value="{{ job.job_category }}">{{ job.job_category }}</option>
+                    {% endfor %}
                 </select>
             </div>
 
