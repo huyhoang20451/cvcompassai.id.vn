@@ -60,6 +60,7 @@
             <p class="cau_hoi">Bạn là nhà tuyển dụng?</p>
             <p><a href="/business-home" target="_blank">Đăng tin ngay</a></p>
         </div>
+        <button id="theme-toggle">🌙</button>
     </div>
 
     <div class="sidenav" id="mobile-sidenav">
@@ -98,37 +99,71 @@
                 <p class="cau_hoi-sidenav">Bạn là nhà tuyển dụng?</p>
                 <p><a href="/business-home" target="_blank">Đăng tin ngay</a></p>
             </div>
+            <button id="theme-toggle">🌙</button>
         </div>
     </div>
 
     <script>
-        function boxAppear() {
-            const box = document.createElement('div');
-            box.style.position = 'absolute';
-            box.style.top = '70px';
-            box.style.right = '20px';
-            box.style.backgroundColor = '#fff';
-            box.style.border = '1px solid #ccc';
-            box.style.borderRadius = '5px';
-            box.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
-            box.style.padding = '10px';
-            box.style.zIndex = '1000';
-            box.innerHTML = `
-                <p><a href="/edit-profile" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
-                <p><a href="/mycv-settings" style="text-decoration:none;color:#222;">CV của tôi</a></p>
-                <p><a href="/system-settings" style="text-decoration:none;color:#222;">Cài đặt tài khoản</a></p>
-                <p><a href="/logout" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
-            `;
-            document.body.appendChild(box);
-
-            document.addEventListener('click', function handleClickOutside(event) {
-                if (!box.contains(event.target) && event.target !== document.querySelector('.user-avatar img')) {
-                    box.remove();
-                    document.removeEventListener('click', handleClickOutside);
-                }
-            });
+    function boxAppear() {
+        // Kiểm tra xem menu đã tồn tại chưa
+        if (document.getElementById('user-menu-dropdown')) {
+            return;
         }
-    </script>
+
+        const box = document.createElement('div');
+        box.id = 'user-menu-dropdown'; // Thêm ID để dễ quản lý
+        
+        // Gán class CSS (quan trọng nhất)
+        box.className = 'user-menu-box'; 
+        
+        // Xóa các style inline (vì đã có trong file CSS)
+        // box.style.position = 'absolute';
+        // box.style.top = '70px';
+        // box.style.right = '20px';
+        // box.style.backgroundColor = '#fff';
+        // box.style.border = '1px solid #ccc';
+        // box.style.borderRadius = '5px';
+        // box.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+        // box.style.padding = '10px';
+        // box.style.zIndex = '1000';
+        
+        box.innerHTML = `
+            <p style="margin-top:0; margin-bottom:10px;"><a href="/edit-profile">Hồ sơ của tôi</a></p>
+            <p style="margin:10px 0;"><a href="/mycv-settings">CV của tôi</a></p>
+            <p style="margin:10px 0;"><a href="/system-settings">Cài đặt tài khoản</a></p>
+            <p style="margin-bottom:0; margin-top:10px;"><a href="/logout">Đăng xuất</a></p>
+        `;
+        document.body.appendChild(box);
+
+        // Thay đổi p một chút để căn chỉnh đẹp hơn
+        box.querySelectorAll('p a').forEach(a => {
+             a.style.textDecoration = 'none';
+             // (Màu sắc sẽ được lấy từ CSS)
+        });
+
+        // Thêm event listener để đóng khi click ra ngoài
+        setTimeout(() => { // Thêm setTimeout để tránh việc click mở và đóng cùng lúc
+            document.addEventListener('click', handleClickOutside, { once: true, capture: true });
+        }, 0);
+
+        function handleClickOutside(event) {
+            const avatarImg = document.querySelector('.user-avatar img');
+            // Nếu click vào avatar, không làm gì (để avatar tự đóng)
+            if (event.target === avatarImg) {
+                // Nếu click lại vào avatar, hãy đóng nó đi
+                if (box) box.remove();
+                return;
+            }
+            // Nếu click ra ngoài box
+            if (box && !box.contains(event.target)) {
+                box.remove();
+            } else if (box) {
+                // Nếu click trong box, gắn lại listener
+                document.addEventListener('click', handleClickOutside, { once: true, capture: true });
+            }
+        }
+    }
+</script>
 </div>
     </div> <!-- kết thúc phần header -->
     <div class="introduction"> <!-- Bắt đầu phần tựa đề -->

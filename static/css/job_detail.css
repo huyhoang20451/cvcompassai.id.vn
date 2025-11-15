@@ -620,3 +620,226 @@ Breakpoint 768px: Xếp chồng các cột nội dung
         padding: 0 15px;
     }
 }
+/* =========================================== */
+/* === BẮT ĐẦU CSS GIAO DIỆN TỐI (job_detail) === */
+/* =========================================== */
+
+/* 1. Nền chung & Văn bản */
+/* Ghi đè style inline "background-color: #F6FCFF" trên <body> */
+html.dark-mode body {
+  background-color: #121212 !important; /* Bắt buộc dùng !important */
+  color: #E0E0E0;
+}
+
+#theme-toggle {
+  font-size: 20px;
+  background: transparent;
+  border: 1px solid #ccc;
+  color: #333;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#theme-toggle:hover {
+  background-color: #f0f0f0;
+}
+
+/* Nút bấm ở Sidenav (mobile) */
+.sidenav #theme-toggle {
+    position: relative;
+    left: 28px; /* Căn chỉnh lại cho đẹp */
+    margin-top: 15px;
+}
+
+/* 2. Header & Sidenav */
+html.dark-mode .header,
+html.dark-mode .sidenav {
+  background-color: #1E1E1E;
+  border-bottom-color: #333;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  color: #E0E0E0; /* Áp dụng màu chữ cho Sidenav */
+}
+
+html.dark-mode .header-logo .logo-text h1,
+html.dark-mode .sidenav a,
+html.dark-mode .header-menu a {
+  color: #E0E0E0;
+}
+
+html.dark-mode .header-logo .logo-text p,
+html.dark-mode .header-nhatuyendung .cau_hoi,
+html.dark-mode .sidenav .cau_hoi-sidenav,
+html.dark-mode .sidenav p { /* Thêm cho chữ "Người dùng" */
+  color: #B0B0B0;
+}
+
+html.dark-mode .header-menu a:hover,
+html.dark-mode .sidenav a:hover {
+  color: #0D6EFD; /* Giữ màu xanh */
+  background-color: #2A2A2A;
+}
+
+/* Nút Hamburger */
+html.dark-mode .hamburger-btn {
+  color: #E0E0E0;
+}
+
+/* 3. Thông tin User (Header & Sidenav) */
+html.dark-mode #welcome-user {
+  color: #E0E0E0;
+}
+
+/* Ghi đè style inline cho ô hiển thị Coin */
+html.dark-mode p[style*="background-color: #D1E9F6"] {
+  background-color: #333 !important; /* Ghi đè inline style */
+  color: #E0E0E0;
+}
+
+/* Ghi đè style inline cho ô Coin trong Sidenav */
+html.dark-mode .welcome-coin-sidenav p {
+  background-color: #333 !important; /* Ghi đè inline style */
+  color: #E0E0E0;
+}
+/* Reset cho p 'Chào mừng' trong sidenav */
+html.dark-mode .welcome-coin-sidenav #welcome-user-sidenav {
+  background-color: transparent !important;
+}
+
+/* 4. Khối Nội dung Chi tiết Công việc */
+html.dark-mode .job-header {
+  background-color: #1E1E1E;
+  border-color: #333;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+html.dark-mode .job-main h1,
+html.dark-mode .job-company h2 {
+  color: #E0E0E0;
+}
+
+html.dark-mode .job-main p,
+html.dark-mode .job-company p {
+  color: #B0B0B0;
+}
+
+html.dark-mode .job-content {
+  background-color: #1E1E1E;
+  border-color: #333;
+  border-radius: 8px; /* Thêm bo góc cho đẹp */
+  padding: 20px;
+}
+
+html.dark-mode .job-content h3 {
+  color: #E0E0E0;
+  border-bottom-color: #444;
+}
+
+html.dark-mode .job-content ul li,
+html.dark-mode .job-content p {
+  color: #B0B0B0;
+}
+
+html.dark-mode .back-link a {
+  color: #0D6EFD; /* Giữ màu xanh */
+}
+html.dark-mode .back-link a:hover {
+  color: #3a96fd;
+}
+
+
+/* 5. Modal Ứng tuyển (Phần quan trọng) */
+
+/* Ghi đè style inline "background:#fff" trên modal */
+html.dark-mode #update-form-modal {
+  background-color: #2a2a2a !important; /* Bắt buộc dùng !important */
+  color: #E0E0E0;
+  box-shadow: 0 4px 24px #000a;
+}
+
+html.dark-mode #update-form-modal label,
+html.dark-mode #update-form-modal strong {
+  color: #E0E0E0;
+}
+
+/* Nút X (đóng modal) */
+html.dark-mode button[onclick*="document.getElementById('update-modal-overlay')"] {
+  color: #E0E0E0;
+}
+
+/* Tab buttons (Tải lên / Chọn CV) */
+html.dark-mode .tab-btn {
+  background-color: #333;
+  border-color: #555;
+  color: #E0E0E0;
+}
+/* Ghi đè style inline "background:#eef" khi tab được chọn */
+html.dark-mode .tab-btn[style*="background: rgb(238, 238, 255)"],
+html.dark-mode .tab-btn[style*="background: #eef"] {
+  background-color: #0D6EFD !important;
+  color: #FFF !important;
+}
+
+/* Form elements */
+html.dark-mode #existing-cv {
+  background-color: #333;
+  border-color: #555;
+  color: #E0E0E0;
+}
+html.dark-mode input[type="file"] {
+  color: #E0E0E0;
+}
+html.dark-mode #cv-filename {
+    color: #ccc !important;
+}
+
+/* Style nút "Choose File" cho đẹp hơn trong dark mode */
+html.dark-mode input[type="file"]::file-selector-button {
+  background-color: #333;
+  color: #E0E0E0;
+  border: 1px solid #555;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 8px;
+}
+html.dark-mode input[type="file"]::file-selector-button:hover {
+    background-color: #444;
+}
+
+/* CSS cho menu thả xuống từ avatar */
+.user-menu-box {
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    z-index: 1000;
+}
+.user-menu-box a {
+    text-decoration: none;
+    color: #222;
+}
+
+/* Định nghĩa màu tối cho menu */
+html.dark-mode .user-menu-box {
+    background-color: #2a2a2a;
+    border-color: #444;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+html.dark-mode .user-menu-box a {
+    color: #E0E0E0;
+}
+html.dark-mode .user-menu-box a:hover {
+    color: #0D6EFD;
+}
+/* ========================================= */
+/* === KẾT THÚC CSS GIAO DIỆN TỐI (job_detail) === */
+/* ========================================= */
