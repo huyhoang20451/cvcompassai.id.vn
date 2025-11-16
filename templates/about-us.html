@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/x-icon" href="../static/favicon.ico">
     <link rel="stylesheet" href="/static/css/about-us.css">
+    <script src="/static/js/theme.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=upload" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=menu" />
@@ -58,6 +59,7 @@
             <p class="cau_hoi">Bạn là nhà tuyển dụng?</p>
             <p><a href="/business-home" target="_blank">Đăng tin ngay</a></p>
         </div>
+        <button id="theme-toggle">🌙</button>
     </div>
 
     <div class="header-actions mobile-sidenav" id="mobile-sidenav">
@@ -76,37 +78,9 @@
                 <p class="cau_hoi-sidenav">Bạn là nhà tuyển dụng?</p>
                 <p><a href="/business-home" target="_blank">Đăng tin ngay</a></p>
             </div>
+            <button id="theme-toggle">🌙</button>
         </div>
     </div>
-
-    <script>
-        function boxAppear() {
-            const box = document.createElement('div');
-            box.style.position = 'absolute';
-            box.style.top = '70px';
-            box.style.right = '20px';
-            box.style.backgroundColor = '#fff';
-            box.style.border = '1px solid #ccc';
-            box.style.borderRadius = '5px';
-            box.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
-            box.style.padding = '10px';
-            box.style.zIndex = '1000';
-            box.innerHTML = `
-                <p><a href="/edit-profile" style="text-decoration:none;color:#222;">Hồ sơ của tôi</a></p>
-                <p><a href="/mycv-settings" style="text-decoration:none;color:#222;">CV của tôi</a></p>
-                <p><a href="/system-settings" style="text-decoration:none;color:#222;">Cài đặt tài khoản</a></p>
-                <p><a href="/logout" style="text-decoration:none;color:#222;">Đăng xuất</a></p>
-            `;
-            document.body.appendChild(box);
-
-            document.addEventListener('click', function handleClickOutside(event) {
-                if (!box.contains(event.target) && event.target !== document.querySelector('.user-avatar img')) {
-                    box.remove();
-                    document.removeEventListener('click', handleClickOutside);
-                }
-            });
-        }
-    </script>
 </div>
 
     </div> <!-- kết thúc phần header -->

@@ -540,3 +540,251 @@ ul.pricing-features li i {
         display: block; /* Hiện nút hamburger */
     }
 }
+
+/* =========================================== */
+/* === CSS CƠ BẢN (Nút Theme & Menu Avatar) === */
+/* =========================================== */
+
+/* 1. Nút bấm Đổi Giao diện */
+#theme-toggle {
+  font-size: 20px;
+  background: transparent;
+  border: 1px solid #ccc;
+  color: #333;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#theme-toggle:hover {
+  background-color: #f0f0f0;
+}
+/* Nút bấm ở Sidenav (mobile) */
+.sidenav #theme-toggle {
+    position: relative;
+    left: 28px; /* Căn chỉnh lại cho đẹp */
+    margin-top: 15px;
+}
+
+/* 2. Menu Avatar (Tạo bằng JS) */
+.user-menu-box {
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    z-index: 1000;
+}
+.user-menu-box a {
+    text-decoration: none;
+    color: #222;
+}
+.user-menu-box p {
+    margin: 10px 0;
+}
+
+
+/* =========================================== */
+/* === CSS GIAO DIỆN TỐI (DARK MODE)         === */
+/* =========================================== */
+
+/* 1. Nền chung & Văn bản */
+/* Ghi đè style inline "background-color: #F6FCFF" trên <body> */
+html.dark-mode body {
+  background-color: #121212 !important; /* Bắt buộc dùng !important */
+  color: #E0E0E0;
+}
+
+/* 2. Header & Sidenav */
+html.dark-mode .header,
+html.dark-mode .sidenav {
+  background-color: #1E1E1E;
+  border-bottom-color: #333;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  color: #E0E0E0; /* Áp dụng màu chữ cho Sidenav */
+}
+
+html.dark-mode .header-logo .logo-text h1,
+html.dark-mode .sidenav a,
+html.dark-mode .header-menu a {
+  color: #E0E0E0;
+}
+
+html.dark-mode .header-logo .logo-text p,
+html.dark-mode .header-nhatuyendung .cau_hoi,
+html.dark-mode .sidenav .cau_hoi-sidenav,
+html.dark-mode .sidenav p { /* Thêm cho chữ "Người dùng" */
+  color: #B0B0B0;
+}
+
+html.dark-mode .header-menu a:hover,
+html.dark-mode .sidenav a:hover {
+  color: #0D6EFD; /* Giữ màu xanh */
+  background-color: #2A2A2A;
+}
+
+/* Nút Hamburger */
+html.dark-mode .hamburger-btn {
+  color: #E0E0E0;
+}
+
+/* 3. Thông tin User (Header, Sidenav, Menu Avatar) */
+html.dark-mode #welcome-user {
+  color: #E0E0E0;
+}
+
+/* Ghi đè style inline cho ô hiển thị Coin */
+html.dark-mode p[style*="background-color: #D1E9F6"] {
+  background-color: #333 !important; /* Ghi đè inline style */
+  color: #E0E0E0;
+}
+
+/* Ghi đè style inline cho ô Coin trong Sidenav */
+html.dark-mode .welcome-coin-sidenav p {
+  background-color: #333 !important; /* Ghi đè inline style */
+  color: #E0E0E0;
+}
+/* Reset cho p 'Chào mừng' trong sidenav */
+html.dark-mode .welcome-coin-sidenav #welcome-user-sidenav {
+  background-color: transparent !important;
+}
+
+/* Menu Avatar (Tạo bằng JS) */
+html.dark-mode .user-menu-box {
+    background-color: #2a2a2a;
+    border-color: #444;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+html.dark-mode .user-menu-box a {
+    color: #E0E0E0;
+}
+html.dark-mode .user-menu-box a:hover {
+    color: #0D6EFD;
+}
+
+/* Nút Bấm Đổi Giao diện */
+html.dark-mode #theme-toggle {
+    color: #E0E0E0;
+    border-color: #555;
+}
+html.dark-mode #theme-toggle:hover {
+    background-color: #333;
+}
+
+/* 4. Introduction */
+html.dark-mode .introduction {
+    position: relative;
+}
+/* Thêm lớp phủ tối lên ảnh nền */
+html.dark-mode .background_intro::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 0;
+}
+/* Ghi đè style inline cho tiêu đề & mô tả */
+html.dark-mode .introduction .title_content h1 {
+    color: #FFF !important; 
+}
+html.dark-mode .introduction .title_content p {
+    color: #E0E0E0 !important; 
+}
+
+/* 5. Gói Dịch Vụ (Pricing Cards) */
+html.dark-mode .card-pricing {
+    background-color: #1E1E1E;
+    border: 1px solid #333;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+html.dark-mode .card-pricing .card-header {
+    color: #E0E0E0;
+    border-bottom-color: #333;
+}
+
+html.dark-mode .card-pricing .price {
+    color: #FFF; /* Cho giá nổi bật */
+}
+
+html.dark-mode .card-body .pricing-features li,
+html.dark-mode .card-body .pricing-features span {
+    color: #B0B0B0;
+}
+
+/* Nút Mua ngay */
+html.dark-mode .card-body .buy-btn {
+    background-color: #0D6EFD; /* Giữ màu nút chính */
+    color: #FFF;
+    border: none;
+}
+html.dark-mode .card-body .buy-btn:hover {
+    background-color: #0056b3;
+}
+
+
+/* 6. Hộp Thanh toán (Checkout Box) */
+html.dark-mode .checkout-box {
+    background-color: #2A2A2A;
+    color: #E0E0E0;
+    border: 1px solid #444;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+}
+
+html.dark-mode .checkout-box #checkout-title,
+html.dark-mode .checkout-box label {
+    color: #E0E0E0;
+}
+
+html.dark-mode .checkout-box input[type="number"] {
+    background-color: #333;
+    color: #E0E0E0;
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 8px;
+}
+
+html.dark-mode .checkout-box .btn-primary {
+    background-color: #0D6EFD; /* Giữ màu nút chính */
+    color: #FFF;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+}
+html.dark-mode .checkout-box .btn-primary:hover {
+    background-color: #0056b3;
+}
+
+
+/* 7. Footer */
+html.dark-mode .footer {
+  background-color: #1E1E1E;
+  color: #ecf0f1;
+  border-top: 1px solid #333;
+}
+
+html.dark-mode .footer-contact-item span,
+html.dark-mode .footer-links-group a {
+  color: #B0B0B0;
+}
+
+html.dark-mode .footer-links-group a:hover {
+  color: #0D6EFD;
+}
+
+html.dark-mode .footer-logo-text,
+html.dark-mode .footer-links-group .footer-links-title {
+  color: #E0E0E0;
+}
+
+/* ========================================= */
+/* === KẾT THÚC CSS GIAO DIỆN TỐI          === */
+/* ========================================= */
