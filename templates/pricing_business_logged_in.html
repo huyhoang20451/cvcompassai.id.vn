@@ -129,7 +129,7 @@
         {% for package in packages %}
         <div class="card-pricing premium"> <!--Bắt đầu các gói dịch vụ-->
             <div class="card-header">{{ 'Gói Premium Doanh Nghiệp' if package.name == 'business_premium' }}</div>
-            <div class="price">{{ package.price }} VNĐ/tháng</div>
+            <div class="price">{% if package.price is not none %}{{ "{:,.0f}".format(package.price) }} VNĐ/tháng{% endif %}</div>
             <div class="card-body">
                 {{ render_features_list(package.description) }}
                 <button class="buy-btn" data-package-name="{{ package.name }}" data-package-price="{{ package.price }}">Mua ngay</button>
